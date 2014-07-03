@@ -14,8 +14,8 @@ router.get('/subscribe', function(req,res) {
     connection.query('INSERT INTO mailingList (email,type) VALUES (?,?)', [req.query['email'],req.query['type']],function(err, rows, fields) {
       if (err) res.send('err')
       else res.send('ok')
-    });
       connection.end();
+    });
 })
 
 router.get('/healthy', function(req,res) {
