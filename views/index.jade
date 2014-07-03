@@ -53,13 +53,21 @@ html
           var btn = $(this)
           btn.button('loading')
           $.ajax({
-                  url: '/subscribe',
-                  data: { 
-                          email: $('#email').val(),
-                          type: emailType 
-                        }
-                  })
+              url: '/subscribe',
+              data: { 
+                email: $('#email').val(),
+                type: emailType 
+                    }
+            })
+            .done(function(){
+              btn.val('Success')
+              setTimeout(function(){
+                btn.val('Subscribe to emails')
+                $('#email').reset()
+              },2000)
+            })
             .always(function(){btn.button('reset')})
+            .fail(function(){alert("An error occured. Please try again")})
         }
       }
       subscribePush = function()
