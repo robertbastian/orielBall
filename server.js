@@ -13,17 +13,17 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 /*** ROUTES ***/
 app.get('/', function(req, res) {
-  res.render('index');
-});
+  res.render('index')
+})
 
 app.get('/subscribe', function(req,res) {
     var connection = mysql.createConnection(constants.credentials)
-    connection.connect();
+    connection.connect()
     connection.query('INSERT INTO mailingList (email,type) VALUES (?,?)', [req.query['email'],req.query['type']],function(err, rows, fields) {
       if (err) res.send(500)
       else res.send(200)
-    });
-    connection.end();
+    })
+    connection.end()
 })
 
 app.get('/healthy', function(req,res) {
