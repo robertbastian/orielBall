@@ -16,7 +16,7 @@ http.get('/', function(req, res) {
   res.redirect('https://orielball.uk')
 })
 
-https.get('/', function(req, res)) {
+https.get('/', function(req, res) {
     res.render('index')
 }
 
