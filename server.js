@@ -11,8 +11,8 @@ var options = {
     key: fs.readFileSync('cert/key.pem').toString(),
     cert: fs.readFileSync('cert/certificate.pem').toString()
 }
-var http = express.createServer(app).listen(80)
-var https = express.createServer(options,app).listen(443)
+var http = express.createServer().listen(80)
+var https = express.createServer(options).listen(443)
 
 express.set('view engine', 'jade')
 express.use(express.static(path.join(__dirname, 'public')))
