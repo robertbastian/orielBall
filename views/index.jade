@@ -1,6 +1,117 @@
-extends layout
+doctype html
+html
+  head
+    title Oriel College Commemoration Ball 2015
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap-theme.min.css')
+    link(rel='stylesheet', href='/stylesheets/jquery.fullPage.css')
+    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js')
+    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js') 
+    script(type='text/javascript', src='/javascripts/jquery.fullPage.min.js')
+    script(type='text/javascript', src='/javascripts/bootstrap.min.js')
+    script(type='text/javascript').
+      $(document).ready(function() {
+        $('#fullpage').fullpage({navigation: true})
+        $('#scrollBtn').click($.fn.fullpage.moveSectionDown)
 
-block content
-  h1= title
-  p Welcome to #{title}
-  p How are you today?
+        $('#email').keyup(validateEmail)
+        $('#email').change(validateEmail)
+
+        $('#emailBtn').click(subscribeEmail)
+        $('#pushBtn').click(subscribePush)
+      })
+
+      var emailType = "invalid"
+      validateEmail = function()
+      {
+        var email = $(this).val()
+        if (/^[a-zA-Z0-9_.+-]+@oriel\.ox\.ac\.uk$/.test(email))
+          emailType = "oriel"
+        else if (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(email))
+          emailType = "oxford"
+        else if (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email))
+          emailType = "alumni"
+        else
+          emailType = "invalid" 
+
+        $('#emailGroup').removeClass('has-success')
+        $('#emailGroup').removeClass('has-error') 
+
+        if(emailType != 'invalid')
+          $('#emailGroup').addClass('has-success')
+        else
+          $('#emailGroup').addClass('has-error')
+      }
+      subscribeEmail = function()
+      {
+        if(emailType == "invalid")
+          $('#email').focus()
+        else if ($('input:radio:checked').attr('id') == "student" && emailType == "alumni")
+          $('#alert').removeClass('hidden')
+        else
+        {
+          var btn = $(this)
+          btn.button('loading')
+          $.ajax({
+                  url: '/subscribe',
+                  data: { 
+                          email: $('#email').val(),
+                          type: emailType 
+                        }
+                  })
+            .always(function(){btn.button('reset')})
+        }
+      }
+      subscribePush = function()
+      {
+
+      }
+    style.
+      #main{
+        background-image: url(images/quad.jpg);
+        background-size: 100%;
+        color: #fff;
+        text-shadow: 0px 0px 5px #000;
+      }
+      #subscribe{
+        background-image: url(images/tent.jpg);
+        background-size: 100%;
+      }
+      #emailBtn{
+        margin-left: 30px;
+      }
+  body
+    #fullpage
+      #main.section
+        .container
+          .row.text-center
+            img(src='http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Oriel_College_Oxford_Coat_Of_Arms.svg/524px-Oriel_College_Oxford_Coat_Of_Arms.svg.png', height='200')
+            h2 Oriel College Commemoration Ball
+            h4 26 June 2015
+            br
+            #scrollBtn.btn.btn-primary.btn-lg Subscribe to updates
+      #subscribe.section
+        .container
+          .row
+            .col-md-5
+              .jumbotron
+                .form(role='form')
+                  .form-group.has-feedback#emailGroup
+                    .input-group
+                      .input-group-addon @
+                      input.form-control#email(type=email,placeholer='Enter email')
+                  #alert.hidden.alert.alert-info(role='alert') Please use your university address
+                  .btn-group(data-toggle="buttons")
+                    label.btn.btn-default.active
+                      input#student(type='radio', name='options',checked) 
+                      x Student
+                    label.btn.btn-default
+                      input#alumnus(type='radio', name='options') 
+                      x Alumnus
+                  #emailBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to emails
+          .row
+            .col-md-8
+            .col-md-4
+              .jumbotron
+                #pushBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to push notifications
+
