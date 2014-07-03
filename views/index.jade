@@ -63,11 +63,11 @@ html
               btn.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
               setTimeout(function(){
                 btn.html('Subscribe to emails')
+                btn.button('reset')
                 $('#email').val('')
               },2000)
             })
-            .always(function(){btn.button('reset')})
-            .fail(function(){alert("An error occured. Please try again")})
+            .fail(function(){alert("An error occured. Please try again");btn.button('reset')})
         }
       }
       subscribePush = function()
