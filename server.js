@@ -12,15 +12,15 @@ app.set('view engine', 'jade')
 app.use(express.static(path.join(__dirname, 'public')))
 
 /*** ROUTES ***/
-app.get('/', function(req, res) {
+http.get('/', function(req, res) {
   res.redirect('https://orielball.uk')
 })
 
-app.get('/', function(req, res) {
+https.get('/', function(req, res) {
     res.render('index')
-}
+})
 
-app.get('/subscribe', function(req,res) {
+https.get('/subscribe', function(req,res) {
     var connection = mysql.createConnection(constants.credentials)
     connection.connect()
     connection.query('INSERT INTO mailingList (email,type) VALUES (?,?)', [req.query['email'],req.query['type']],function(err, rows, fields) {
@@ -30,7 +30,7 @@ app.get('/subscribe', function(req,res) {
     connection.end()
 })
 
-app.get('/healthy', function(req,res) {
+https.get('/healthy', function(req,res) {
     res.send('ok')
 })
 
