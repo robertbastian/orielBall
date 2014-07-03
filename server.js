@@ -4,16 +4,23 @@ var https = require('https')
 var fs = require('fs')
 var path = require('path')
 var mysql = require('mysql')
+
 var constants = require('./constants')
 
-var app = express()
+var options = {
+    key: fs.readFileSync('cert/key.pem').toString(),
+    cert: fs.readFileSync('cert/certificate.pem').toString()
+}
+var http = express.createServer(app).listen(80)
+var https = express.createServer(options,app).listen(443)
 
-app.set('view engine', 'jade')
-app.use(express.static(path.join(__dirname, 'public')))
+express.set('view engine', 'jade')
+express.use(express.static(path.join(__dirname, 'public')))
 
 /*** ROUTES ***/
-http.get('/', function(req, res) {
-  res.redirect('https://orielball.uk')
+
+http.get('*',function(req,res){  
+    res.redirect('https://orielball.uk'+req.url)
 })
 
 https.get('/', function(req, res) {
@@ -34,10 +41,3 @@ https.get('/healthy', function(req,res) {
     res.send('ok')
 })
 
-var options = {
-    key: fs.readFileSync('cert/key.pem').toString(),
-    cert: fs.readFileSync('cert/certificate.pem').toString()
-}
-
-http.createServer(app).listen(80)
-https.createServer(options,app).listen(443)
