@@ -32,7 +32,7 @@ app.get('/healthy', function(req,res) {
 
 var options = {
     key: fs.readFileSync('cert/key.pem').toString(),
-    certificate: fs.readFileSync('cert/certificate.pem').toString()
+    cert: fs.readFileSync('cert/certificate.pem').toString()
 }
 http.createServer(app).listen(80)
 https.createServer(options,app).listen(443)

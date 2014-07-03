@@ -60,10 +60,10 @@ html
                     }
             })
             .done(function(){
-              btn.val('Success')
+              btn.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
               setTimeout(function(){
-                btn.val('Subscribe to emails')
-                $('#email').reset()
+                btn.html('Subscribe to emails')
+                $('#email').val('')
               },2000)
             })
             .always(function(){btn.button('reset')})
