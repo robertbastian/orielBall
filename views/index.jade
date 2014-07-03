@@ -65,6 +65,7 @@ html
                 btn.html('Subscribe to emails')
                 btn.button('reset')
                 $('#email').val('')
+                $('#alert').addClass('hidden')
               },2000)
             })
             .fail(function(){alert("An error occured. Please try again");btn.button('reset')})
@@ -117,8 +118,7 @@ html
                       input#alumnus(type='radio', name='options') 
                       x Alumnus
                   #emailBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to emails
-          .row
-            .col-md-8
+            .col-md-3
             .col-md-4
               .jumbotron
                 #pushBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to push notifications
