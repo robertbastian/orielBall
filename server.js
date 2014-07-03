@@ -12,9 +12,13 @@ app.set('view engine', 'jade')
 app.use(express.static(path.join(__dirname, 'public')))
 
 /*** ROUTES ***/
-app.get('/', function(req, res) {
-  res.render('index')
+http.get('/', function(req, res) {
+  res.redirect('https://orielball.uk')
 })
+
+https.get('/', function(req, res)) {
+    res.render('index')
+}
 
 app.get('/subscribe', function(req,res) {
     var connection = mysql.createConnection(constants.credentials)
@@ -34,5 +38,6 @@ var options = {
     key: fs.readFileSync('cert/key.pem').toString(),
     cert: fs.readFileSync('cert/certificate.pem').toString()
 }
+
 http.createServer(app).listen(80)
 https.createServer(options,app).listen(443)
