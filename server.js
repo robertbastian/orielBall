@@ -14,7 +14,7 @@ app.set('env','production')
 app.set('port',port)
 https.createServer(constants.certs,app).listen(443,function(){
   console.log("HTTPS server listening on port "+port)
-}
+})
 
 // HTTP Server
 var httpApp = express()
