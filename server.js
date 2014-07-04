@@ -6,9 +6,10 @@ var mysql = require('mysql')
 var constants = require('./constants')
 var db = mysql.createConnection(constants.mysql)
 var server = express()
-
+var bodyParser = require('body-parser')
 /* Routes */
 
+server.use(bodyParser.json())
 server.get('/', function(req, res) {
   res.render('index')
 })
@@ -29,17 +30,8 @@ server.get('/check', function(req,res) {
 
 /* Push routes */
 
-server.post('/v1/pushPackages/web.uk.orielball/',function(req,res){
+server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
   res.sendfile('public/pushPackage.zip')
-  /* i will now create the push package myself */
-  var website = {
-		    "websiteName":"Oriel College Ball 2015",
-  		    "websitePushID":"web.uk.orielball",
-   		    "allowedDomains":["https://orielball.uk","http://orielball.uk"],
-                    "urlFormatString":"https://orielball.uk/updates/%@/",
-                    "authenticationToken":"",
-                    "webServiceURL":"https://orielball.uk"
-                }
 })
 
 server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
@@ -51,13 +43,12 @@ server.delete('/v1/devices/:token/registration/web.uk.orielball',function(req,re
 })
 
 server.post('/v1/log', function(req,res){
-  console.log(req)
+  console.log(req.body.logs)
 })
 
 /* Configuring server */
 server.set('view engine', 'jade')
 server.use(express.static(path.join(__dirname, 'public')))
-
 /* HTTPS main server */
 https.createServer(constants.certs,server).listen(443,function(){
   console.log('Listening on port 443')
