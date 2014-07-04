@@ -23,12 +23,13 @@ html
         if ('safari' in window && 'pushNotification' in window.safari)
         {
           $('#pushBtn').removeClass('disabled')
-          var permissionData = window.safari.pushNotification.permission('web.uk.orielball')
+          permissionData = window.safari.pushNotification.permission('web.uk.orielball')
           adjustButton()
         }
       })
 
       var emailType = "invalid"
+      var permissionData
       validateEmail = function()
       {
         var email = $(this).val()
@@ -150,7 +151,7 @@ html
                       input#alumnus(type='radio', name='emailOptions') 
                       x Alumnus
                   #emailBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to emails
-          .row.hidden
+          .row
             .col-md-8
             .col-md-4
               .jumbotron
