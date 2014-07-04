@@ -29,7 +29,7 @@ html
         $('#emailBtn').click(subscribeEmail)
         $('#pushBtn').click(subscribePush)
 
-        $('#about').on('click',$('#modal').modal('show'))
+        $('#about').click(function(){$('#modal').modal('show')})
 
         if ('safari' in window && 'pushNotification' in window.safari)
         {
