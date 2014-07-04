@@ -28,13 +28,11 @@ server.get('/check', function(req,res) {
 
 /* Email subscription */
 server.get('/subscribe', function(req,res) {
-  db.connect()
   db.query(
     'INSERT INTO mailingList (email,type) VALUES (?,?)',
     [req.query['email'],req.query['type']],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
-  db.end()
 })
 
 /* Push subscription */
@@ -44,24 +42,19 @@ server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
 })
 
 server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
-  console.log(req.body)
-  db.connect()
   db.query(
     'INSERT INTO pushList (device,type) VALUES (?,?)',
-    [reg.param('token'),'oxford'],
+    [req.param('token'),'oxford'],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
-  db.end()
 })
 
 server.delete('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
-  db.connect()
   db.query(
     'DELETE FROM pushList WHERE device = ?',
-    [reg.param('token')],
+    [req.param('token')],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
-  db.end()
 })
 
 server.post('/v1/log', function(req,res){
