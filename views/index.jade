@@ -25,6 +25,8 @@ html
           $('#pushBtn').removeClass('disabled')
           adjustButton()
         }
+        else
+          $('#tooltipWrapper').tooltip({title: "Push notifications require OS X 10.9 or higher"})
       })
 
       var emailType = "invalid"
@@ -54,9 +56,13 @@ html
         if(emailType == "invalid")
           $('#email').focus()
         else if ($('input:radio:checked').attr('id') == "student" && emailType == "alumni")
-          $('#alert').removeClass('hidden')
+        {
+          $('#emailGroup').tooltip({title: "Please use your university email address",trigger:"manual"})
+          $('#emailGroup').tooltip('show')
+        }
         else
         {
+          $('#emailGroup').tooltip('destroy')
           var btn = $(this)
           btn.button('loading')
           $.ajax({
@@ -142,7 +148,6 @@ html
                     .input-group
                       .input-group-addon @
                       input.form-control#email(type=email,placeholder='University email address')
-                  #alert.hidden.alert.alert-info(role='alert') Please use your university address
                   .btn-group(data-toggle="buttons")
                     label.btn.btn-default.active
                       input#student(type='radio', name='emailOptions',checked) 
@@ -150,10 +155,10 @@ html
                     label.btn.btn-default
                       input#alumnus(type='radio', name='emailOptions') 
                       x Alumnus
-                  #emailBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to emails
+                  #emailBtn.btn.btn-primary(data-loading-text="Loading...",style="width: 43%; margin-left:36px;") Subscribe to emails
           .row
             .col-md-8
             .col-md-4
               .jumbotron
-                div(data-toggle="tooltip", data-placement="top",title="Push notifications require OS X 10.9 or higher")
+                #tooltipWrapper
                   #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...", style="width:100%") Subscribe to push notifications

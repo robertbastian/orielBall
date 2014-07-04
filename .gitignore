@@ -1,2 +1,3 @@
 constants.js
-cert/
+certificates/
+public/pushPackage.zip
