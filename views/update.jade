@@ -16,8 +16,19 @@ html
         text-align: center;
         box-shadow: 0px 0px 25px #888;
       }
+      hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 1em 0;
+        padding: 0;
+      }
   body
     #pageWrapper
+      img(src='/images/shield.png',height='100px')
       h1= subject
+      small= date
+      hr
       br
-      div!= body
+      div(style='text-align:left')!= body

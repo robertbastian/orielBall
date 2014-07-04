@@ -43,11 +43,27 @@ server.get('/subscribe', function(req,res) {
     )
 })
 
+server.get('/unsubscribe/:email',function(req,res){
+  var email = req.param('email')
+  console.log(email)
+  db.query(
+    'DELETE FROM mailingList WHERE email = ?',
+    [email],
+    function(err,rows,fields){
+      if (err) 
+        res.send("error")
+      else
+        res.send(email+" unsubscribed")
+    })
+})
+
 /* Sending updates */
 server.get('/processUpdate/:subject',function(req,res){
+  var date = new Date()
   var message = {
     subject: req.param('subject'),
-    number: fs.readdirSync('updates/').length
+    number: fs.readdirSync('updates/').length,
+    date: date.getDay()+"."+date.getMonth()+"."+date.getFullYear()
   }  
 
   var markdown = fs.readFileSync('updates/'+message.subject)
@@ -60,12 +76,13 @@ server.get('/processUpdate/:subject',function(req,res){
       url:     'https://api.github.com/markdown/raw',
       body:    markdown
     },
-    function(err, res, body) {
+    function(err, res2, body) {
       message['body'] = body
-      console.log(body)
       fs.writeFileSync('updates/'+message.number,JSON.stringify(message))
       fs.unlinkSync('updates/'+message.subject)
       sendUpdate(message.number)
+      res.writeHead(301,{"Location":"https://orielball.uk/updates/"+message.number})
+      res.end()
     }
   )
 })
@@ -85,12 +102,15 @@ function sendUpdate(number)
         var mailOptions = {
           from: "Oriel College Ball <marketing@orielball.uk>",
           subject: message.subject,
-          html: "If the message doesn't display properly, click here: <a href='https://orielball.uk/updates/"+message.number+"'>https://orielball.uk/updates/"+message.number+"</a><br>"+message.body
         }
         var recipients = []
         for (var i = 0, len = rows.length; i < len; i++)
         {
           mailOptions['to'] = rows[i]['email']
+          mailOptions['html'] = message.body+
+            "<center><br>If the message doesn't display properly, click here: <a href='https://orielball.uk/updates/"+
+            message.number+"'>https://orielball.uk/updates/"+message.number+"</a><br>"+
+            "To unscubscribe, click <a href='http://orielball.uk/unsubscribe/"+encodeURIComponent(rows[i]['email'])+"'>here</a></center>"
           transport.sendMail(mailOptions,function(err,res){ if (err) console.log(err) })
         }
         transport.close()
