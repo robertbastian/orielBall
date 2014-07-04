@@ -137,6 +137,35 @@ html
       #emailBtn{
         margin-left: 30px;
       }
+      #bottomBar {
+        height: 36px;
+        color: #f2f2f2;
+        position:fixed;
+        z-index:70;
+        bottom:0;
+        width:100%;
+        text-align:right;
+        font-size:0.9em;
+        padding:8px 0 8px 0;
+      }
+      #bottomBar ul {
+       padding: 0 40px;
+      }
+      #bottomBar li {
+        display: inline-block;
+        position: relative;
+      }
+      #bottomBar a {
+        display: block;
+        margin: 0 22px 0 0; 
+        color: #fff;
+      }
+      .modal-header {
+        text-align: center;
+      }
+      .center {
+        text-align: center;
+      }
   body
     #fullpage
       #main.section
@@ -171,3 +200,28 @@ html
               .jumbotron
                 #tooltipWrapper
                   #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...", style="width:100%") Subscribe to push notifications
+    #bottomBar
+      a(href="javascript:$('#modal').modal('show')") About
+
+    .modal.fade#modal(tabindex="-1",role="dialog")
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(type='button',data-dismiss='modal')
+              span &times;
+              span.sr-only Close
+            h3.modal-title Commitee
+          .modal-body
+            br
+            table.table.table-hover
+              each person in committee
+                tr
+                  td!=person[0]
+                  td!=person[1]
+                  td
+                    a(href='mailto:'+person[2])=person[2]
+                tr
+            br
+            br
+            h3.center Imprint
+            p.center &copy; 2014 Oriel Ball Commitee. Photos by Oliver Ford

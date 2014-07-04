@@ -21,7 +21,8 @@ server.use(bodyParser.json())
 
 /* Index */
 server.get('/', function(req, res) {
-  res.render('index')
+  var csv = fs.readFileSync('committee.csv').toString().replace(/\\n/g,'<br>').split('\n').map(function(line){return line.split(',')})
+  res.render('index',{committee:csv})
 })
 
 server.get('/updates/:number',function(req,res){
