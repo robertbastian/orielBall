@@ -23,7 +23,6 @@ html
         if ('safari' in window && 'pushNotification' in window.safari)
         {
           $('#pushBtn').removeClass('disabled')
-          permissionData = window.safari.pushNotification.permission('web.uk.orielball')
           adjustButton()
         }
       })
@@ -92,12 +91,13 @@ html
       }
       adjustButton = function()
       {
-        if (permissionData.permissionData === 'granted')
+        permissionData = window.safari.pushNotification.permission('web.uk.orielball')
+        if (permissionData.permission === 'granted')
         {
           $('#pushBtn').addClass('disabled')
           $('#pushBtn').html('Subscribed to push notifications')
         }
-        else if (permissionData.permissionData === 'denied')
+        else if (permissionData.permission === 'denied')
         {
           $('#pushBtn').addClass('disabled')
           $('#pushBtn').html('Disabled push notifications')
