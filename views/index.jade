@@ -19,6 +19,13 @@ html
 
         $('#emailBtn').click(subscribeEmail)
         $('#pushBtn').click(subscribePush)
+
+        if ('safari' in window && 'pushNotification' in window.safari)
+        {
+          $('#pushBtn').removeClass('disabled')
+          var permissionData = window.safari.pushNotification.permission('web.uk.orielball')
+          adjustButton()
+        }
       })
 
       var emailType = "invalid"
@@ -73,7 +80,32 @@ html
       }
       subscribePush = function()
       {
-
+        if (permissionData.permission === 'default')
+        {
+          window.safari.pushNotification.requestPermission(
+            'https://orielball.uk',
+            'web.uk.orielball',
+            {},
+            adjustButton)
+        }
+      }
+      adjustButton = function()
+      {
+        if (permissionData.permissionData === 'granted')
+        {
+          $('#pushBtn').addClass('disabled')
+          $('#pushBtn').html('Subscribed to push notifications')
+        }
+        else if (permissionData.permissionData === 'denied')
+        {
+          $('#pushBtn').addClass('disabled')
+          $('#pushBtn').html('Disabled push notifications')
+        }
+        else
+        {
+          $('#pushBtn').removeClass('disabled')
+          $('#pushBtn').html('Subscribe to push notifications')
+        }
       }
     style.
       #main{
@@ -112,15 +144,14 @@ html
                   #alert.hidden.alert.alert-info(role='alert') Please use your university address
                   .btn-group(data-toggle="buttons")
                     label.btn.btn-default.active
-                      input#student(type='radio', name='options',checked) 
+                      input#student(type='radio', name='emailOptions',checked) 
                       x Student
                     label.btn.btn-default
-                      input#alumnus(type='radio', name='options') 
+                      input#alumnus(type='radio', name='emailOptions') 
                       x Alumnus
                   #emailBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to emails
-          //-.row
-          //-  .col-md-8
-          //-  .col-md-4
-          //-    .jumbotron
-          //-      #pushBtn.btn.btn-primary(data-loading-text="Loading...") Subscribe to push notifications
-
+          .row.hidden
+            .col-md-8
+            .col-md-4
+              .jumbotron
+                #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...") Subscribe to push notifications
