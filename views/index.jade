@@ -155,4 +155,5 @@ html
             .col-md-8
             .col-md-4
               .jumbotron
-                #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...") Subscribe to push notifications
+                div(data-toggle="tooltip", data-placement="top",title="Push notifications require OS X 10.9 or higher")
+                  #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...", style="width:100%") Subscribe to push notifications
