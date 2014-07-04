@@ -30,6 +30,14 @@ html
         $('#pushBtn').click(subscribePush)
 
         $('#about').click(function(){$('#modal').modal('show')})
+        $('#modal').on('shown.bs.modal', function(){
+            setAllowScrolling(false)
+            setKeyboardScrolling(false)
+        })
+        $('#modal').on('hidden.bs.modal', function(){
+            setAllowScrolling(true)
+            setKeyboardScrolling(true)
+        })
 
         if ('safari' in window && 'pushNotification' in window.safari)
         {
