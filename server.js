@@ -3,7 +3,6 @@ var http = require('http')
 var https = require('https')
 var path = require('path')
 var mysql = require('mysql')
-var push = require('safari-push-notifications')
 var constants = require('./constants')
 var db = mysql.createConnection(constants.mysql)
 var server = express()
@@ -30,9 +29,17 @@ server.get('/check', function(req,res) {
 
 /* Push routes */
 
-server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
-  res.writeHead(200,{"Content-type:application/zip"})
-  res.sendFile('public/pushPackage.zip')
+server.post('/v1/pushPackages/web.uk.orielball/',function(req,res){
+  res.sendfile('public/pushPackage.zip')
+  /* i will now create the push package myself */
+  var website = {
+		    "websiteName":"Oriel College Ball 2015",
+  		    "websitePushID":"web.uk.orielball",
+   		    "allowedDomains":["https://orielball.uk","http://orielball.uk"],
+                    "urlFormatString":"https://orielball.uk/updates/%@/",
+                    "authenticationToken":"",
+                    "webServiceURL":"https://orielball.uk"
+                }
 })
 
 server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res){

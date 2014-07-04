@@ -1,8 +1,0 @@
-{
-    "websiteName":"Oriel College Ball 2015",
-    "websitePushID":"web.uk.orielball",
-    "allowedDomains":["https://orielball.uk","http://orielball.uk"],
-    "urlFormatString":"https://orielball.uk/updates/%@/",
-    "authenticationToken":"{AUTHENTICATIONTOKEN}",
-    "webServiceURL":"https://orielball.uk"
-}
