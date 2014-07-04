@@ -31,12 +31,12 @@ html
 
         $('#about').click(function(){$('#modal').modal('show')})
         $('#modal').on('shown.bs.modal', function(){
-            setAllowScrolling(false)
-            setKeyboardScrolling(false)
+            $.fn.fullpage.setAllowScrolling(false)
+            $.fn.fullpage.setKeyboardScrolling(false)
         })
         $('#modal').on('hidden.bs.modal', function(){
-            setAllowScrolling(true)
-            setKeyboardScrolling(true)
+            $.fn.fullpage.setAllowScrolling(true)
+            $.fn.fullpage.setKeyboardScrolling(true)
         })
 
         if ('safari' in window && 'pushNotification' in window.safari)
