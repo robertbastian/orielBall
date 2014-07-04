@@ -1,5 +1,23 @@
 html
   head
     title= 'Oriel Ball Update #'+number+' – '+subject
+    link(rel='stylesheet',href='https://gist.githubusercontent.com/tuzz/3331384/raw/94f2380c2b798fab2139fd0a8f478c4f2d642e3b/github.css')
+    style.
+      body {
+        background-image: url('/images/tent.jpg');
+        background-attachment: fixed;
+        background-size: 100%;
+      }
+      #pageWrapper {
+        width: 50%;
+        background: #fff;
+        margin: 0 auto;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0px 0px 25px #888;
+      }
   body
-    div!= body
+    #pageWrapper
+      h1= subject
+      br
+      div!= body

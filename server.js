@@ -4,6 +4,7 @@ var https = require('https')
 var path = require('path')
 var mysql = require('mysql')
 var fs = require('fs')
+var request = require('request')
 var apn = require('apn')
 var bodyParser = require('body-parser')
 var nodemailer = require('nodemailer')
@@ -42,17 +43,36 @@ server.get('/subscribe', function(req,res) {
     )
 })
 
-
-function sendUpdate(subject, body)
-{
+/* Sending updates */
+server.get('/processUpdate/:subject',function(req,res){
   var message = {
-    subject: subject,
-    body: body,
-    number: fs.readdirSync('updates/').length + 1
-  }
+    subject: req.param('subject'),
+    number: fs.readdirSync('updates/').length
+  }  
 
-  fs.writeFile('updates/'+message.number,JSON.stringify(message))
+  var markdown = fs.readFileSync('updates/'+message.subject)
+  request.post(
+    {
+      headers: {
+        'content-type' : 'text/plain',
+        'user-agent' : 'orielball'
+      },
+      url:     'https://api.github.com/markdown/raw',
+      body:    markdown
+    },
+    function(err, res, body) {
+      message['body'] = body
+      console.log(body)
+      fs.writeFileSync('updates/'+message.number,JSON.stringify(message))
+      fs.unlinkSync('updates/'+message.subject)
+      sendUpdate(message.number)
+    }
+  )
+})
 
+function sendUpdate(number)
+{
+  var message = JSON.parse(fs.readFileSync('updates/'+number))
   /* Sending emails */
   db.query('SELECT email FROM mailingList',
     function(err,rows,fields)
