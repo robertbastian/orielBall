@@ -62,10 +62,10 @@ server.post('/v1/log', function(req,res){
 })
 
 
-/* HTTPS main server
+/* HTTPS main server */
 https.createServer(constants.certs,server).listen(443,function(){
   console.log('Listening on port 443')
-}) */
+})
 
 /* HTTP main server because firefox rejects certificates, will be replaced */
 http.createServer(server).listen(80,function(){
