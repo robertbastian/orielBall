@@ -48,7 +48,7 @@ server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res)
   db.connect()
   db.query(
     'INSERT INTO pushList (device,type) VALUES (?,?)',
-    [token,'oxford'],
+    [reg.param('token'),'oxford'],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
   db.end()
@@ -58,7 +58,7 @@ server.delete('/v1/devices/:token/registration/web.uk.orielball',function(req,re
   db.connect()
   db.query(
     'DELETE FROM pushList WHERE device = ?',
-    [token],
+    [reg.param('token')],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
   db.end()
