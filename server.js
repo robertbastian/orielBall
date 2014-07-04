@@ -41,7 +41,7 @@ server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
   res.sendfile('public/pushPackage.zip')
 })
 
-server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
+server.post('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
     'INSERT INTO pushList (device,type) VALUES (?,?)',
     [req.param('token'),'oxford'],
@@ -49,7 +49,7 @@ server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res)
     )
 })
 
-server.delete('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
+server.delete('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
     'DELETE FROM pushList WHERE device = ?',
     [req.param('token')],
