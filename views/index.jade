@@ -29,6 +29,8 @@ html
         $('#emailBtn').click(subscribeEmail)
         $('#pushBtn').click(subscribePush)
 
+        $('#about').click($('#modal').modal('show'))
+
         if ('safari' in window && 'pushNotification' in window.safari)
         {
           $('#pushBtn').removeClass('disabled')
@@ -201,7 +203,7 @@ html
                 #tooltipWrapper
                   #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...", style="width:100%") Subscribe to push notifications
     #bottomBar
-      a(href="javascript:$('#modal').modal('show')") About
+      a#about(href="#") About
 
     .modal.fade#modal(tabindex="-1",role="dialog")
       .modal-dialog
