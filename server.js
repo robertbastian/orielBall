@@ -3,52 +3,72 @@ var http = require('http')
 var https = require('https')
 var path = require('path')
 var mysql = require('mysql')
+var bodyParser = require('body-parser')
 var constants = require('./constants')
 var db = mysql.createConnection(constants.mysql)
-var server = express()
-var bodyParser = require('body-parser')
-/* Routes */
 
+
+/* Configuring server */
+var server = express()
+server.set('view engine', 'jade')
+server.use(express.static(path.join(__dirname, 'public')))
 server.use(bodyParser.json())
+
+
+
+/* Index */
 server.get('/', function(req, res) {
   res.render('index')
 })
 
-server.get('/subscribe', function(req,res) {
-    db.connect()
-    db.query(
-      'INSERT INTO mailingList (email,type) VALUES (?,?)',
-      [req.query['email'],req.query['type']],
-      function(err, rows, fields) { res.send((err) ? 500 : 200) }
-    )
-    db.end()
-})
-
+/* Health check */
 server.get('/check', function(req,res) {
     res.send(200)
 })
 
-/* Push routes */
+/* Email subscription */
+server.get('/subscribe', function(req,res) {
+  db.connect()
+  db.query(
+    'INSERT INTO mailingList (email,type) VALUES (?,?)',
+    [req.query['email'],req.query['type']],
+    function(err, rows, fields) { res.send((err) ? 500 : 200) }
+    )
+  db.end()
+})
+
+/* Push subscription */
 
 server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
   res.sendfile('public/pushPackage.zip')
 })
 
 server.post('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
-
+  console.log(req.body)
+  db.connect()
+  db.query(
+    'INSERT INTO pushList (device,type) VALUES (?,?)',
+    [token,'oxford'],
+    function(err, rows, fields) { res.send((err) ? 500 : 200) }
+    )
+  db.end()
 })
 
 server.delete('/v1/devices/:token/registration/web.uk.orielball',function(req,res){
-
+  db.connect()
+  db.query(
+    'DELETE FROM pushList WHERE device = ?',
+    [token],
+    function(err, rows, fields) { res.send((err) ? 500 : 200) }
+    )
+  db.end()
 })
 
 server.post('/v1/log', function(req,res){
   console.log(req.body.logs)
 })
 
-/* Configuring server */
-server.set('view engine', 'jade')
-server.use(express.static(path.join(__dirname, 'public')))
+
 /* HTTPS main server */
 https.createServer(constants.certs,server).listen(443,function(){
   console.log('Listening on port 443')
