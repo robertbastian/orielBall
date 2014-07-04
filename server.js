@@ -32,7 +32,9 @@ server.get('/healthy', function(req,res) {
 })
 
 
-https.createServer(constants.certs,server).listen(443)
+https.createServer(constants.certs,server).listen(443,function(){
+  console.log('Server listening on port 443')
+})
 http.createServer(function(req,res){
   res.writeHead(301,{"Location":"https://orielball.uk/"+req.url})
   res.end()
