@@ -25,7 +25,7 @@ server.get('/', function(req, res) {
 })
 
 server.get('/updates/:number',function(req,res){
-  var message = JSON.parse(fs.readFileSync('updates/'+req.param('number')))
+  var message = JSON.parse(fs.readFileSync('public/updates'+req.param('number')))
   res.render('update',message)
 })
 
@@ -62,11 +62,11 @@ server.get('/processUpdate/:subject',function(req,res){
   var date = new Date()
   var message = {
     subject: req.param('subject'),
-    number: fs.readdirSync('updates/').length,
+    number: fs.readdirSync('public/updates').length,
     date: date.getDay()+"."+date.getMonth()+"."+date.getFullYear()
   }  
 
-  var markdown = fs.readFileSync('updates/'+message.subject)
+  var markdown = fs.readFileSync('public/updates'+message.subject)
   request.post(
     {
       headers: {
@@ -78,8 +78,8 @@ server.get('/processUpdate/:subject',function(req,res){
     },
     function(err, res2, body) {
       message['body'] = body
-      fs.writeFileSync('updates/'+message.number,JSON.stringify(message))
-      fs.unlinkSync('updates/'+message.subject)
+      fs.writeFileSync('public/updates'+message.number,JSON.stringify(message))
+      fs.unlinkSync('public/updates'+message.subject)
       sendUpdate(message.number)
       res.writeHead(301,{"Location":"https://orielball.uk/updates/"+message.number})
       res.end()
@@ -89,7 +89,7 @@ server.get('/processUpdate/:subject',function(req,res){
 
 function sendUpdate(number)
 {
-  var message = JSON.parse(fs.readFileSync('updates/'+number))
+  var message = JSON.parse(fs.readFileSync('public/updates'+number))
   /* Sending emails */
   db.query('SELECT email FROM mailingList',
     function(err,rows,fields)
@@ -142,8 +142,8 @@ function sendUpdate(number)
 
         var connection = new apn.Connection({
           "production": true,
-          "key": fs.readFileSync('certificates/push-key.pem'),
-          "cert": fs.readFileSync('certificates/push-cert.pem')  
+          "key": fs.readFileSync('/private/certificates/push-key.pem'),
+          "cert": fs.readFileSync('/private/certificates/push-cert.pem')  
         })
         connection.pushNotification(notification,devices)
         connection.shutdown()
