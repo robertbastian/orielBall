@@ -1,6 +1,5 @@
 var express = require('express')
 var http = require('http')
-var https = require('https')
 var path = require('path')
 var mysql = require('mysql')
 var fs = require('fs')
@@ -143,7 +142,7 @@ function sendUpdate(number)
 
         var connection = new apn.Connection({
           "production": true,
-          "key": fs.readFileSync('certificates/ssl-key.pem'),
+          "key": fs.readFileSync('certificates/push-key.pem'),
           "cert": fs.readFileSync('certificates/push-cert.pem')  
         })
         connection.pushNotification(notification,devices)
@@ -178,7 +177,7 @@ server.post('/v1/log', function(req,res){
   console.log(req.body.logs)
 })
 
-/* HTTP main server because firefox rejects certificates, will be replaced */
+/* HTTP server */
 http.createServer(server).listen(80,function(){
   console.log('Listening for HTTP requests on port 80')
 })
