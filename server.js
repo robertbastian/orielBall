@@ -20,7 +20,7 @@ server.use(bodyParser.json())
 
 /* Index */
 server.get('/', function(req, res) {
-  var csv = fs.readFileSync('committee.csv').toString().replace(/\\n/g,'<br>').split('\n').map(function(line){return line.split(',')})
+  var csv = fs.readFileSync('private/committee.csv').toString().replace(/\\n/g,'<br>').split('\n').map(function(line){return line.split(',')})
   res.render('index',{committee:csv})
 })
 

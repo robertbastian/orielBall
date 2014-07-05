@@ -10,7 +10,7 @@
         "mysql":"2.3.2",
         "request":"2.36.0",
         "apn":"1.5.2",
-        "bodyParse":"1.4.3",
+        "body-parser":"1.4.3",
         "nodemailer":"0.7.0"
     }
 }
