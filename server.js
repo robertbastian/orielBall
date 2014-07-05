@@ -178,19 +178,7 @@ server.post('/v1/log', function(req,res){
   console.log(req.body.logs)
 })
 
-
-/* HTTPS main server */
-https.createServer(constants.certs,server).listen(443,function(){
-  console.log('Listening on port 443')
-})
-
 /* HTTP main server because firefox rejects certificates, will be replaced */
 http.createServer(server).listen(80,function(){
-  console.log('Listening on port 80')
+  console.log('Listening for HTTP requests on port 80')
 })
-
-/* HTTP redirect server */
-/*http.createServer(function(req,res){
-  res.writeHead(301,{"Location":"https://orielball.uk"+req.url})
-  res.end()
-}).listen(80)*/
