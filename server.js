@@ -20,13 +20,55 @@ server.use(bodyParser.json())
 
 /* Index */
 server.get('/', function(req, res) {
-  var csv = fs.readFileSync('private/committee.csv').toString().replace(/\\n/g,'<br>').split('\n').map(function(line){return line.split(',')})
+  var csv = fs.readFileSync('private/committee.csv')
+    .toString()
+    .replace(/\\n/g,'<br>')
+    .split('\n')
+    .map(function(line){return line.split(',')})
   res.render('index',{committee:csv})
 })
 
+server.get('/topsecret',function(req,res){
+  var csv = fs.readFileSync('private/committee.csv').toString().replace(/\\n/g,'<br>').split('\n').map(function(line){return line.split(',')})
+  res.render('topsecret',{committee:csv})
+})
+
+/* Updates */
 server.get('/updates/:number',function(req,res){
   var message = JSON.parse(fs.readFileSync('public/updates'+req.param('number')))
   res.render('update',message)
+})
+
+/* Tickets */
+server.get('/tickets',function(req,res){
+  db.query(
+    'SELECT COUNT(*) FROM bookings',
+    function(err,rows,fields){
+      if (constants.tickets.date > Date.now())
+        res.render('ticketsCountdown',{ date: constants.tickets.date })
+      else if (err)
+        res.send(500,"Internal server error")
+      else if (constants.tickets.total - rows[0][0] <= 0)
+        res.render('ticketsSoldOut')
+      else
+        res.render('tickets',{ left: constants.tickets.total - rows[0][0] })
+    }
+  )
+})
+
+server.post('/tickets',function(req,res){
+
+})
+
+server.get('/remainingTickets',function(req,res){
+  db.query(
+    'SELECT COUNT(*) FROM bookings',
+    function(err,rows,fields){
+      if (err)
+          res.send(500)
+      else
+        res.send(200, ""+(constants.tickets.total - rows[0][0]))
+    })
 })
 
 /* Health check */
@@ -38,22 +80,21 @@ server.get('/check', function(req,res) {
 server.get('/subscribe', function(req,res) {
   db.query(
     'INSERT INTO mailingList (email,type) VALUES (?,?)',
-    [req.query['email'],req.query['type']],
+    [req.query['email'],/^.+@oriel\.ox\.ac\.uk$/.test(req.query['email'])],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
 })
 
 server.get('/unsubscribe/:email',function(req,res){
   var email = req.param('email')
-  console.log(email)
   db.query(
     'DELETE FROM mailingList WHERE email = ?',
     [email],
     function(err,rows,fields){
       if (err) 
-        res.send("error")
+        res.send(500, "error")
       else
-        res.send(email+" unsubscribed")
+        res.send(200, email+" unsubscribed")
     })
 })
 
