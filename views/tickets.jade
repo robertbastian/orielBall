@@ -1,0 +1,50 @@
+doctype html
+html
+  head
+    title Oriel College Commemoration Ball 2015 - Tickets
+    require 'imports'
+    link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
+    script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
+    script(type='text/javascript').
+      var tickets = !{left}
+      $(document).ready(function(){
+        $('#ticketsCounter').flipcountdown({
+          tick: function(){ return parseInt(tickets) },
+          size: 'sm'
+        })
+        updateTickets()
+      })
+      updateTickets = function()
+      {
+        //- tickets =  $.ajax({
+        //-   type: "GET",
+        //-   url: '/remainingTickets',
+        //-   async: false
+        //- }).responseText
+        tickets--
+        setTimeout(updateTickets,10000)
+      }
+  body.text-center
+    h6 Tickets left
+    #ticketsCounter
+    .row
+    .col-md-3
+    .col-md-6
+      .form(role='form')
+        .form-group
+          label(for='name') Name
+          input#name.form-control(type='text',placeholder='Enter name')
+        .form-group
+          label(for='email') Email address
+          input#email.form-control(type='text',placeholder='Enter .ox.ac.uk email')
+        .form-group
+          label(for='bodcard') University card number
+          input#bodcard.form-control(type='text',placeholder='Enter card number')
+          p.help-block Your card number is the number above the barcode
+        .form-group
+          label(for='creditcard') Credit card Number
+          input#creditcard.form-control(type='text',placeholder='Enter card number')
+        .form-group
+          label(for='cvv') CCV
+          input#cvv.form-control(type='password',placeholder='Enter CCV')
+    .col-md-3

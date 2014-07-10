@@ -1,0 +1,20 @@
+doctype html
+html
+  head
+    title Oriel College Commemoration Ball 2015 - Tickets
+    include imports
+    link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
+    script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
+    script(type='text/javascript').
+      $(document).ready(function(){
+          $('#timecountdown').flipcountdown({
+            size: 'lg',
+            beforeDateTime: !{'\''+(date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()+'\''}
+          })  
+        })
+  body.text-center
+    h1 Tickets open in 
+    #timecountdown
+    h5 You will need your Bod card and a credit or debit card
+      br
+      small This page will automatically update
