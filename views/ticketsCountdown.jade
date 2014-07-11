@@ -10,11 +10,15 @@ html
           $('#timecountdown').flipcountdown({
             size: 'lg',
             beforeDateTime: !{'\''+(date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()+'\''}
-          })  
+          }) 
+          $('.xdsoft_space').addClass('xdsoft_separator')
+          $('.xdsoft_space').removeClass('xdsoft_space')
         })
-  body.text-center
-    h1 Tickets open in 
-    #timecountdown
-    h5 You will need your Bod card and a credit or debit card
-      br
-      small This page will automatically update
+  body
+    .content
+      .row.text-center(style='padding-top:20%')
+        h1 Tickets open in 
+        #timecountdown
+        h5 You will need your Bod card and a credit or debit card
+          br
+          small This page will automatically update
