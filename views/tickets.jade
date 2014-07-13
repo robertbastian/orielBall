@@ -2,49 +2,77 @@ doctype html
 html
   head
     title Oriel College Commemoration Ball 2015 - Tickets
-    require 'imports'
+    include imports
     link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
     script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
+    script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
     script(type='text/javascript').
       var tickets = !{left}
+      var prices = !{JSON.stringify(prices)}
+      var handler = StripeCheckout.configure({
+        key: 'pk_test_4OXTvuFT64DPWCJhHYuJyTMX',
+        currency: 'gbp',
+        allowRememberMe: false,
+        token: function(token){
+          $('#payment-form').append($('<input type="hidden" name="stripeToken" />').val(token.id))
+          $('#payment-form').get(0).submit()
+        }
+      })
+
       $(document).ready(function(){
         $('#ticketsCounter').flipcountdown({
           tick: function(){ return parseInt(tickets) },
           size: 'sm'
         })
         updateTickets()
+
+        $('#addcc').click(function(){
+          var type = $('input[name=type]:checked').val()
+          handler.open({
+            email: $('#email').val(),
+            name: (type === 'standard') ? 'Non-dining ticket' : 'Dining ticket',
+            amount: prices[type] * 100
+            })
+          return false
+        })
+
       })
+
       updateTickets = function()
       {
-        //- tickets =  $.ajax({
-        //-   type: "GET",
-        //-   url: '/remainingTickets',
-        //-   async: false
-        //- }).responseText
-        tickets--
+        tickets =  $.ajax({
+          type: "GET",
+          url: '/remainingTickets',
+          async: false
+        }).responseText
         setTimeout(updateTickets,10000)
       }
-  body.text-center
-    h6 Tickets left
-    #ticketsCounter
-    .row
-    .col-md-3
-    .col-md-6
-      .form(role='form')
-        .form-group
-          label(for='name') Name
-          input#name.form-control(type='text',placeholder='Enter name')
-        .form-group
-          label(for='email') Email address
-          input#email.form-control(type='text',placeholder='Enter .ox.ac.uk email')
-        .form-group
-          label(for='bodcard') University card number
-          input#bodcard.form-control(type='text',placeholder='Enter card number')
-          p.help-block Your card number is the number above the barcode
-        .form-group
-          label(for='creditcard') Credit card Number
-          input#creditcard.form-control(type='text',placeholder='Enter card number')
-        .form-group
-          label(for='cvv') CCV
-          input#cvv.form-control(type='password',placeholder='Enter CCV')
-    .col-md-3
+  body
+    .content
+      .row
+        .col-xs-4.col-xs-offset-4
+          .text-center  
+            h6 Tickets left
+            #ticketsCounter
+
+          form#payment-form.form(role='form',method='POST',autocomplete='on')
+            .form-group
+              label(for='name') Name
+              input#name.form-control(name='name',type='text',placeholder='Enter name')
+            .form-group
+              label(for='email') Email address
+              input#email.form-control(name='email',type='email',placeholder='Enter .ox.ac.uk email')
+            .form-group
+              label(for='bodcard') University card number
+              input#bodcard.form-control(name='bodcard',type='text',placeholder='Enter card number')
+              p.help-block Your card number is the number above the barcode
+            .form-group
+              .btn-group(data-toggle="buttons")
+                label.btn.active.btn-default
+                  input(type="radio", name="type", value='standard', checked)
+                  x Standard
+                label.btn.btn-default
+                  input(type="radio", name="type", value="dining")
+                  x Dining
+            .text-center
+              button#addcc.btn.btn-primary(style='margin-top:30px') Pay with card
