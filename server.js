@@ -160,8 +160,9 @@ http.createServer(server).listen(443,function(){
 
 /* HTTP redirect server */
 http.createServer(function(req,res){
-  res.writeHead(301,{'Location':'https://www.orielball.uk'+req.originalUrl})
+  res.writeHead(301,{'Location':'https://www.orielball.uk'+req.url})
   res.end()
-}).listen(80,function(){
-  console.log('Redirect requests at port 80 to https')
+})
+.listen(80,function(){
+  console.log('Redirecting requests at port 80 to https')
 })
