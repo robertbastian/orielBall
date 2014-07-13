@@ -154,6 +154,14 @@ server.post('/v1/log', function(req,res){
 })
 
 /* HTTP server */
-http.createServer(server).listen(80,function(){
-  console.log('Listening for HTTP requests on port 80')
+http.createServer(server).listen(443,function(){
+  console.log('Listening for HTTP requests on port 443')
+})
+
+/* HTTP redirect server */
+http.createServer(function(req,res){
+  res.writeHead(301,{'Location':'https://www.orielball.uk'+req.originalUrl})
+  res.end()
+}).listen(80,function(){
+  console.log('Redirect requests at port 80 to https')
 })
