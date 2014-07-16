@@ -3,15 +3,19 @@ html
   head
     title Oriel College Commemoration Ball 2015 - Tickets
     include imports
+    meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
     link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
     script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
     script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
     script(type='text/javascript').
       var tickets = !{left}
+      /* Changing the price here will just make your payment fail ;) */
       var prices = !{JSON.stringify(prices)}
       var handler = StripeCheckout.configure({
         key: 'pk_test_4OXTvuFT64DPWCJhHYuJyTMX',
         currency: 'gbp',
+        name: 'Oriel College Ball',
+        image: '/images/icon.png',
         allowRememberMe: false,
         token: function(token){
           $('#payment-form').append($('<input type="hidden" name="stripeToken" />').val(token.id))
@@ -27,12 +31,32 @@ html
         updateTickets()
 
         $('#addcc').click(function(){
-          var type = $('input[name=type]:checked').val()
-          handler.open({
-            email: $('#email').val(),
-            name: (type === 'standard') ? 'Non-dining ticket' : 'Dining ticket',
-            amount: prices[type] * 100
-            })
+          var valid = true
+          $('#emailWarning, #bodcardWarning, #nameWarning').addClass('hidden')
+          if (!/^.+ .+$/.test($('#name').val()))
+          {
+            $('#nameWarning').removeClass('hidden')
+            valid = false
+          }
+          if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test($('#email').val()))
+          {
+            $('#emailWarning').removeClass('hidden')
+            valid = false
+          }
+          if (!/^[0-9]{7}$/.test($('#bodcard').val()))
+          {
+            $('#bodcardWarning').removeClass('hidden')
+            valid = false
+          }
+          if (valid)
+          {
+            var type = $('input[name=type]:checked').val()
+            handler.open({
+              email: $('#email').val(),
+              description: (type === 'standard') ? '1 Standard Ticket' : '1 Dining Ticket',
+              amount: prices[type] * 100
+              })
+          }
           return false
         })
 
@@ -50,21 +74,24 @@ html
   body
     .content
       .row
-        .col-xs-4.col-xs-offset-4
+        .col-xs-12.col-sm-4.col-sm-offset-4
           .text-center  
             h6 Tickets left
             #ticketsCounter
 
-          form#payment-form.form(role='form',method='POST',autocomplete='on')
+          form#payment-form.form(role='form',method='POST',autocomplete='on',action='/tickets')
             .form-group
               label(for='name') Name
               input#name.form-control(name='name',type='text',placeholder='Enter name')
+              #nameWarning.alert.alert-danger.hidden(role="alert") Please enter your name
             .form-group
               label(for='email') Email address
               input#email.form-control(name='email',type='email',placeholder='Enter .ox.ac.uk email')
+              #emailWarning.alert.alert-danger.hidden(role="alert") Incorrect email. Please use your college email address
             .form-group
-              label(for='bodcard') University card number
-              input#bodcard.form-control(name='bodcard',type='text',placeholder='Enter card number')
+              label(for='bodcard') Bodleian card number
+              input#bodcard.form-control(name='bodcard',type='text',placeholder='Enter card number', pattern='[0-9]*')
+              #bodcardWarning.alert.alert-danger.hidden(role="alert") This should be a seven-digit number
               p.help-block Your card number is the number above the barcode
             .form-group
               .btn-group(data-toggle="buttons")
@@ -75,4 +102,7 @@ html
                   input(type="radio", name="type", value="dining")
                   x Dining
             .text-center
-              button#addcc.btn.btn-primary(style='margin-top:30px') Pay with card
+              button#addcc.btn.btn-primary.btn-lg(style='margin-top:30px;width=200px') Proceed to payment
+              br
+              a(href='https://stripe.com',target='_blank')
+                img(src='/images/stripe.png',width='119',height='26',style='margin-top:10px')

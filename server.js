@@ -63,6 +63,23 @@ server.get('/tickets',function(req,res){
   }
 })
 
+server.get('/ticketsformarkianandcharliebutdontgivethislinktoanyone',function(req,res){
+  db.query(
+    'SELECT COUNT(*) FROM bookings',
+    function(err,rows,fields){
+      if (err)
+        res.send(500,err)
+      else if (rows[0]['COUNT(*)'] >= constants.tickets.total)
+        res.render('ticketsSoldOut')
+      else
+        res.render('tickets',{ 
+          left: constants.tickets.total - rows[0]['COUNT(*)'],
+          prices: constants.tickets.prices
+        })
+    }
+  )
+})
+
 server.post('/tickets',function(req,res){
   var charge = stripe.charges.create(
     {
@@ -74,16 +91,21 @@ server.post('/tickets',function(req,res){
     },
     function(err, charge) {
       if (err && err.type === 'StripeCardError')
-        res.send(500,err)     // The card has been declined
+        res.send(200,'Payment error\n'+err)     // The card has been declined
       if (!err && charge.paid)
       {
-        console.log(charge)
         db.query(
           'INSERT INTO bookings (name,email,bodcard,charge,type) VALUES (?,?,?,?,?)',
           [req.body.name,req.body.email,req.body.bodcard,charge.id,req.body.type],
           function(error,rows,fields)
           {
-            res.send(error)
+            if (error)
+              res.send('Your payment succeeded but there was a database error. Please contact us at it@orielball.uk with a copy of this page!\n\n\n'+charge+'\n'+error)
+            else
+            {
+              res.send('Success! You should receive a confirmation email shortly')
+              //TODO Send that email!
+            }
           }
         )
       }
