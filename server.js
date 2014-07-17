@@ -25,11 +25,20 @@ server.get('/', function(req, res) {
     'SELECT position, name, email FROM committee ORDER BY id ASC',
     function(err,rows,fields)
     {
-      res.render('index2',{committee:(!err)?rows:false,bookingDate:constants.tickets.date})
+      res.render('index',{committee:(!err)?rows:false,bookingDate:constants.tickets.date})
     }
   )
 })
 
+server.get('/2', function(req, res) {
+  db.query(
+    'SELECT position, name, email FROM committee ORDER BY id ASC',
+    function(err,rows,fields)
+    {
+      res.render('index2',{committee:(!err)?rows:false,bookingDate:constants.tickets.date})
+    }
+  )
+})
 server.get('/topsecret',function(req,res){
   db.query(
     'SELECT position, name, email FROM committee ORDER BY id ASC',
