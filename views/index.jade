@@ -7,132 +7,112 @@ html
     script(type='text/javascript', src='/javascripts/jquery.fullPage.min.js')
     script(type='text/javascript').
       $(document).ready(function() {
-        $('#fullpage').fullpage({navigation: true})
-        $('#scrollBtn').click($.fn.fullpage.moveSectionDown)
+        $('#fullpage').fullpage({
+          navigation: true,
+          css3: true,
+          fixedElements: '#bottomBar, #aboutModal, #emailModal',
+          animateAnchor: false
+        })
+        $('#learnMore').click($.fn.fullpage.moveSectionDown)
 
-        $('#email').keyup(validateEmail)
-        $('#email').change(validateEmail)
-
+        $('#emailOpenModal').click(function(){ 
+          $('#emailModal').modal('show') 
+          $('#emailInput').focus()
+        })
         $('#emailBtn').click(subscribeEmail)
+
         $('#pushBtn').click(subscribePush)
 
-        $('#about').click(function(){$('#modal').modal('show')})
-        $('#modal').on('shown.bs.modal', function(){
+        $('#aboutBtn').click(function(){
+          $('#aboutModal').modal('show')
+        })
+        $('#aboutModal').on('shown.bs.modal', function(){
             $.fn.fullpage.setAllowScrolling(false)
             $.fn.fullpage.setKeyboardScrolling(false)
         })
-        $('#modal').on('hidden.bs.modal', function(){
+        $('#aboutModal').on('hidden.bs.modal', function(){
             $.fn.fullpage.setAllowScrolling(true)
             $.fn.fullpage.setKeyboardScrolling(true)
         })
 
         if ('safari' in window && 'pushNotification' in window.safari)
-        {
-          $('#pushBtn').removeClass('disabled')
           adjustButton()
-        }
         else
-          $('#tooltipWrapper').tooltip({title: "Push notifications require OS X 10.9 or higher"})
+        {
+          $('#pushBtn').addClass('disabled')
+          $('#pushBtn').parent().tooltip({title: "Push notifications require OS X 10.9 or higher",placement:'bottom'})
+        }
       })
 
-      var emailType = "invalid"
-      var permissionData
       validateEmail = function()
       {
-        var email = $(this).val()
-        if (/^[a-zA-Z0-9_.+-]+@oriel\.ox\.ac\.uk$/.test(email))
-          emailType = "oriel"
-        else if (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(email))
-          emailType = "oxford"
-        else if (/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email))
-          emailType = "alumni"
-        else
-          emailType = "invalid" 
+        var inp = $('#emailInput')
 
-        $('#emailGroup').removeClass('has-success')
-        $('#emailGroup').removeClass('has-error') 
-
-        if(emailType != 'invalid')
-          $('#emailGroup').addClass('has-success')
-        else
-          $('#emailGroup').addClass('has-error')
+        $('#emailFeedback').removeClass('has-error') 
+        $('.form-control-feedback').addClass('hidden')
+        if(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(inp.val()))
+          return true
+        $('#emailFeedback').addClass('has-error')
+        $('.glyphicon-remove').removeClass('hidden')
+        inp.focus()
+        return false
       }
       subscribeEmail = function()
       {
-        if(emailType == "invalid")
-          $('#email').focus()
-        else if ($('input:radio:checked').attr('id') == "student" && emailType == "alumni")
+        if (validateEmail())
         {
-          $('#emailGroup').tooltip({title: "Please use your university email address",trigger:"manual"})
-          $('#emailGroup').tooltip('show')
-        }
-        else
-        {
-          $('#emailGroup').tooltip('destroy')
           var btn = $(this)
           btn.button('loading')
           $.ajax({
-              url: '/subscribe',
-              data: { 
-                email: $('#email').val(),
-                type: emailType 
-                    }
-            })
-            .done(function(){
-              btn.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
-              setTimeout(function(){
-                btn.html('Subscribe to emails')
-                btn.button('reset')
-                $('#email').val('')
-                $('#alert').addClass('hidden')
-              },2000)
-            })
-            .fail(function(){alert("An error occured. Please try again");btn.button('reset')})
+            url: '/subscribe',
+            data: { 
+              email: $('#emailInput').val()
+            }
+          })
+          .done(function(){
+            btn.html('Success!')
+            setTimeout(function(){
+              $('#emailModal').modal('hide')
+              $('#emailInput').val('')
+              btn.button('reset')
+            },1000)
+          })
+          .fail(function(){
+            alert("An error occured. Please try again")
+          })
         }
       }
       subscribePush = function()
       {
-        if (permissionData.permission === 'default')
-        {
-          window.safari.pushNotification.requestPermission(
-            'https://www.orielball.uk',
-            'web.uk.orielball',
-            {},
-            adjustButton)
-        }
+        window.safari.pushNotification.requestPermission(
+          'https://www.orielball.uk',
+          'web.uk.orielball',
+          {},
+          adjustButton
+        )
       }
       adjustButton = function()
       {
-        permissionData = window.safari.pushNotification.permission('web.uk.orielball')
-        if (permissionData.permission === 'granted')
+        var permission = window.safari.pushNotification.permission('web.uk.orielball').permission
+        if (permission !== 'default') 
         {
           $('#pushBtn').addClass('disabled')
-          $('#pushBtn').html('Subscribed to push notifications')
-        }
-        else if (permissionData.permission === 'denied')
-        {
-          $('#pushBtn').addClass('disabled')
-          $('#pushBtn').html('Disabled push notifications')
-        }
-        else
-        {
-          $('#pushBtn').removeClass('disabled')
-          $('#pushBtn').html('Subscribe to push notifications')
+          $('#pushBtn').parent().tooltip({title: (permission === 'granted') ? "Already subscribed" : "Adjust your subscription in Safari settings",placement:'bottom'})
         }
       }
     style.
-      #main{
-        background-image: url(images/quad.jpg);
-        background-size: cover;
+      #fullpage {
         color: #fff;
         text-shadow: 0px 0px 5px #000;
       }
-      #subscribe{
-        background-image: url(images/tent.jpg);
-        background-size: cover;
+      #mainSec {
+        background-image: url(images/quad.jpg);
       }
-      #emailBtn{
-        margin-left: 30px;
+      #updatesSec {
+        background-image: url(images/tent.jpg);
+      }
+      .section {
+        background-size: cover;
       }
       #bottomBar {
         height: 36px;
@@ -157,26 +137,51 @@ html
         margin: 0 22px 0 0; 
         color: #fff;
       }
-      .modal-header {
-        text-align: center;
-      }
-      .center {
-        text-align: center;
-      }
-      span:hover {
+      #aboutBtn:hover {
         cursor: pointer;
       }
+      .link:hover {
+        cursor: pointer;
+      }
+      .exitblur {
+        -webkit-transition: all 1.5s;
+        -webkit-filter: blur(10px);
+        opacity: 0;
+      }
+      #emailModal {
+        position: fixed;
+        top: 40% !important;
+      }
   body
-    .modal.fade#modal(tabindex="-1",role="dialog")
+    #fullpage
+      #mainSec.section
+        .container
+          .row.text-center
+            img(src='../images/shield.png', height='200')
+            h2 Oriel College Commemoration Ball
+            h4 26 June 2015
+            br
+            #learnMore.btn.btn-primary.btn-lg Subscribe to updates
+      #updatesSec.section
+        .container
+          .row
+            .col-sm-6.col-sm-offset-3.text-center
+              h3 Keep up to date
+              br
+          .row
+            .col-sm-3
+            .col-sm-3
+              #emailOpenModal.btn.btn-default.btn-block Email
+            .col-sm-3
+              #pushBtn.btn.btn-default.btn-block Push notifications
+    #bottomBar
+      span#aboutBtn About
+    
+    .modal.fade#aboutModal(tabindex="-1",role="dialog")
       .modal-dialog
         .modal-content
-          .modal-header
-            button.close(type='button',data-dismiss='modal')
-              span &times;
-              span.sr-only Close
-            h3.modal-title Commitee
           .modal-body
-            br
+            h3.text-center Committee
             if committee
               table.table.table-hover
                 each person in committee
@@ -189,41 +194,16 @@ html
             else
               h4 An error occured while loading the committee.
             br
-            br
-            h3.center Imprint
-            p.center &copy; 2014 Oriel Ball Commitee. Photos by Oliver Ford and JDR Photography
-    #fullpage
-      #main.section
-        .container
-          .row.text-center
-            img(src='../images/shield.png', height='200')
-            h2 Oriel College Commemoration Ball
-            h4 26 June 2015
-            br
-            #scrollBtn.btn.btn-primary.btn-lg Subscribe to updates
-      #subscribe.section
-        .container
-          .row
-            .col-md-5
-              .jumbotron
-                .form(role='form')
-                  .form-group.has-feedback#emailGroup
-                    .input-group
-                      .input-group-addon @
-                      input.form-control#email(type=email,placeholder='University email address')
-                  .btn-group(data-toggle="buttons")
-                    label.btn.btn-default.active
-                      input#student(type='radio', name='emailOptions',checked) 
-                      x Student
-                    label.btn.btn-default
-                      input#alumnus(type='radio', name='emailOptions') 
-                      x Alumnus
-                  #emailBtn.btn.btn-primary(data-loading-text="Loading...",style="width: 43%; margin-left:36px;") Subscribe to emails
-          .row.hidden
-            .col-md-8
-            .col-md-4
-              .jumbotron
-                #tooltipWrapper
-                  #pushBtn.btn.btn-primary.disabled(data-loading-text="Loading...", style="width:100%") Subscribe to push notifications
-    #bottomBar
-      span#about About
+            h3.text-center Imprint
+            p.text-center &copy; 2014 Oriel Ball Commitee. Photos by Oliver Ford and JDR Photography
+
+    .modal.fade#emailModal(tabindex="-1",role="dialog")
+      .modal-dialog.modal-sm
+        .modal-content
+          .modal-body
+            .form
+              .form-group.has-feedback#emailFeedback
+                label.sr-only Email
+                input.form-control#emailInput(type=email,placeholder='University email address')
+                span.glyphicon.glyphicon-remove.form-control-feedback.hidden
+              #emailBtn.btn.btn-primary(data-loading-text="Loading...",style="width: 100%") Subscribe to emails
