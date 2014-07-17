@@ -21,23 +21,38 @@ server.use(express.static(path.join(__dirname, 'public')))
 
 /* Index */
 server.get('/', function(req, res) {
-  var csv = fs.readFileSync('private/committee.csv')
-    .toString()
-    .replace(/\\n/g,'<br>')
-    .split('\n')
-    .map(function(line){return line.split(',')})
-  res.render('index',{committee:csv})
+  db.query(
+    'SELECT position, name, email FROM committee ORDER BY id ASC',
+    function(err,rows,fields)
+    {
+      res.render('index2',{committee:(!err)?rows:false,bookingDate:constants.tickets.date})
+    }
+  )
 })
 
 server.get('/topsecret',function(req,res){
-  var csv = fs.readFileSync('private/committee.csv').toString().replace(/\\n/g,'<br>').split('\n').map(function(line){return line.split(',')})
-  res.render('topsecret',{committee:csv})
+  db.query(
+    'SELECT position, name, email FROM committee ORDER BY id ASC',
+    function(err,rows,fields)
+    {
+      res.render('draft',{committee:(!err)?rows:false,bookingDate:constants.tickets.date})
+    }
+  )
 })
 
 /* Updates */
 server.get('/updates/:number',function(req,res){
-  var message = JSON.parse(fs.readFileSync('public/updates'+req.param('number')))
-  res.render('update',message)
+  db.query(
+    'SELECT text FROM updates WHERE id = ?',
+    [req.param('number')],
+    function(err,rows,fields)
+    {
+      if (!err)
+        res.render('update',rows[0]['text'])
+      else 
+        res.send('Database error')
+    }
+  )
 })
 
 /* Tickets */
@@ -64,20 +79,25 @@ server.get('/tickets',function(req,res){
 })
 
 server.get('/ticketsformarkianandcharliebutdontgivethislinktoanyone',function(req,res){
-  db.query(
-    'SELECT COUNT(*) FROM bookings',
-    function(err,rows,fields){
-      if (err)
-        res.send(500,err)
-      else if (rows[0]['COUNT(*)'] >= constants.tickets.total)
-        res.render('ticketsSoldOut')
-      else
-        res.render('tickets',{ 
-          left: constants.tickets.total - rows[0]['COUNT(*)'],
-          prices: constants.tickets.prices
-        })
-    }
-  )
+  if (false)
+    res.render('ticketsCountdown',{ date: constants.tickets.date })
+  else 
+  {
+    db.query(
+      'SELECT COUNT(*) FROM bookings',
+      function(err,rows,fields){
+        if (err)
+          res.send(500,err)
+        else if (rows[0]['COUNT(*)'] >= constants.tickets.total)
+          res.render('ticketsSoldOut')
+        else
+          res.render('tickets',{ 
+            left: constants.tickets.total - rows[0]['COUNT(*)'],
+            prices: constants.tickets.prices
+          })
+      }
+    )
+  }
 })
 
 server.post('/tickets',function(req,res){

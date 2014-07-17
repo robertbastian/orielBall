@@ -22,11 +22,12 @@ html
         })
         $('#learnMore').click($.fn.fullpage.moveSectionDown)
 
-        $('#emailOpenModal').click(function(){
-          $('#emailModal').modal('show')
+        $('#emailOpenModal').click(function(){ 
+          $('#emailModal').modal('show') 
+          $('#emailInput').focus()
         })
-
         $('#emailBtn').click(subscribeEmail)
+
         $('#pushBtn').click(subscribePush)
 
         $('#aboutBtn').click(function(){
@@ -51,20 +52,16 @@ html
         $('.link').click(function(){
           var link = this;
           $('body').addClass('exitblur')
-          setTimeout(function(){
-              location.href = link.getAttribute('href')
-              },1000)
+          setTimeout(function(){ location.href = link.getAttribute('href') },1000)
           return false
         })
       })
 
-      var permissionData
       validateEmail = function()
       {
         var inp = $('#emailInput')
 
         $('#emailFeedback').removeClass('has-error') 
-        $('#emailFeedback').removeClass('has-success') 
         $('.form-control-feedback').addClass('hidden')
         if(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(inp.val()))
           return true
@@ -90,44 +87,30 @@ html
             setTimeout(function(){
               $('#emailModal').modal('hide')
               $('#emailInput').val('')
+              btn.button('reset')
             },1000)
           })
           .fail(function(){
             alert("An error occured. Please try again")
           })
-          .always(function(){            
-            btn.button('reset')
-          })
         }
       }
       subscribePush = function()
       {
-        if (permissionData.permission === 'default')
-        {
-          window.safari.pushNotification.requestPermission(
-            'https://www.orielball.uk',
-            'web.uk.orielball',
-            {},
-            adjustButton)
-        }
+        window.safari.pushNotification.requestPermission(
+          'https://www.orielball.uk',
+          'web.uk.orielball',
+          {},
+          adjustButton
+        )
       }
       adjustButton = function()
       {
-        permissionData = window.safari.pushNotification.permission('web.uk.orielball')
-        if (permissionData.permission === 'granted')
+        var permission = window.safari.pushNotification.permission('web.uk.orielball').permission
+        if (permission !== 'default') 
         {
           $('#pushBtn').addClass('disabled')
-          $('#pushBtn').html('Subscribed')
-        }
-        else if (permissionData.permission === 'denied')
-        {
-          $('#pushBtn').addClass('disabled')
-          $('#pushBtn').html('Disabled')
-        }
-        else
-        {
-          $('#pushBtn').removeClass('disabled')
-          $('#pushBtn').html('Push notifications')
+          $('#pushBtn').tooltip({title: (permission === 'granted') ? "Already subscribed" : "Adjust your subscription in Safari settings"})
         }
       }
       function onYouTubeIframeAPIReady() {}
@@ -180,6 +163,9 @@ html
         display: block;
         margin: 0 22px 0 0; 
         color: #fff;
+      }
+      #aboutBtn:hover {
+        cursor: pointer;
       }
       .link:hover {
         cursor: pointer;
@@ -238,7 +224,7 @@ html
             .col-md-6.text-center
               p Standard: £165, Dining: £180
               .link.btn.btn-primary.btn-block.btn-lg(href='/tickets') Access Booking
-              p Booking opens Feb 12, 5pm
+              p Booking opens !{(new Date(bookingDate)).toLocaleDateString()}
           .row
             .col-md-3
             .col-md-6.text-center
@@ -251,24 +237,27 @@ html
             .col-md-2
               #pushBtn.btn.btn-default.btn-block(data-loading-text="Loading...") Push notifications
             .col-md-2
-              .link(href='https://facebook.com/orielball',target='_blank') Facebook
+              a.btn.btn-default.btn-block(href='https://facebook.com/orielball',target='_blank') Facebook
             .col-md-3
     #bottomBar
-      button.btn-link#aboutBtn About
+      span#aboutBtn About
     
     .modal.fade#aboutModal(tabindex="-1",role="dialog")
       .modal-dialog
         .modal-content
           .modal-body
             h3.text-center Committee
-            table.table.table-hover.table-condensed
-              each person in committee
-                tr
-                  td!=person[0]
-                  td!=person[1]
-                  td
-                    a(href='mailto:'+person[2])=person[2]
-                tr
+            if committee
+              table.table.table-hover
+                each person in committee
+                  tr
+                    td!=person['position']
+                    td!=person['name']
+                    td
+                      a(href='mailto:'+person['email'])=person['email']
+                  tr
+            else
+              h4 An error occured while loading the committee.
             br
             h3.text-center Imprint
             p.text-center &copy; 2014 Oriel Ball Commitee. Photos by Oliver Ford and JDR Photography
