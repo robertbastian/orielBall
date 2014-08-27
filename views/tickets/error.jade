@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title Oriel College Commemoration Ball 2015 - Tickets
+    include imports
+  body
+    .content
+      .row.text-center(style='padding-top:20%')
+        if type == 'payment'
+          .alert.alert-danger(role='alert')= message
+          button.btn.btn-default(type='button',onclick='window.history.back()') Back
+        else
+          .alert.alert-warning(role='alert') Your payment succeded, but there was an error entering your ticket into the database. Please email tickets@orielball.uk with a screenshot of this page
+          .well=charge
+          .well=error
