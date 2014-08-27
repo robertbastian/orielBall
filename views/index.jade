@@ -8,8 +8,8 @@ html
     script(type='text/javascript').
       $(document).ready(function() {
         $('#fullpage').fullpage({
-          navigation: true,
-          css3: true,
+          //navigation: true,
+          //css3: true,
           fixedElements: '#bottomBar, #aboutModal, #emailModal',
           animateAnchor: false
         })
@@ -170,10 +170,12 @@ html
               br
           .row
             .col-sm-3
-            .col-sm-3
+            .col-sm-2
               #emailOpenModal.btn.btn-default.btn-block Email
-            .col-sm-3
+            .col-sm-2
               #pushBtn.btn.btn-default.btn-block Push notifications
+            .col-sm-2
+              a.btn.btn-default.btn-block(href='https://facebook.com/orielball',target='_blank') Facebook
     #bottomBar
       span#aboutBtn About
     
