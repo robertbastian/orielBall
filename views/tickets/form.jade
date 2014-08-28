@@ -8,11 +8,12 @@ html
     script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
     script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
     script(type='text/javascript').
-      var tickets = !{left}
+      var left = !{JSON.stringify(left)}
       /* Changing the price here will just make your payment fail ;) */
       var prices = !{JSON.stringify(prices)}
+      var stripe = !{JSON.stringify(stripe)}
       var handler = StripeCheckout.configure({
-        key: 'pk_test_4OXTvuFT64DPWCJhHYuJyTMX',
+        key: stripe,
         currency: 'gbp',
         name: 'Oriel College Ball',
         image: '/images/icon.png',
@@ -24,8 +25,12 @@ html
       })
 
       $(document).ready(function(){
-        $('#ticketsCounter').flipcountdown({
-          tick: function(){ return parseInt(tickets) },
+        $('#totalCounter').flipcountdown({
+          tick: function(){ return parseInt(left[0]) },
+          size: 'sm'
+        })
+        $('#diningCounter').flipcountdown({
+          tick: function(){ return parseInt(left[1]) },
           size: 'sm'
         })
         updateTickets()
@@ -64,21 +69,19 @@ html
 
       updateTickets = function()
       {
-        tickets =  $.ajax({
-          type: "GET",
-          url: '/remainingTickets',
-          async: false
-        }).responseText
-        setTimeout(updateTickets,10000)
+        $.ajax('/ticketsLeft').done(function(json){
+          left = json
+          if (left[0] == 0)
+            location.reload()
+          if (left[1] == 0)
+            $('#diningToggle').addClass('disabled')
+          setTimeout(updateTickets,10000)
+        })
       }
   body
     .content
-      .row
+      .row(style='padding-top:100px')
         .col-xs-12.col-sm-4.col-sm-offset-4
-          .text-center  
-            h6 Tickets left
-            #ticketsCounter
-
           form#payment-form.form(role='form',method='POST',autocomplete='on',action='/tickets')
             .form-group
               label(for='name') Name
@@ -98,7 +101,7 @@ html
                 label.btn.active.btn-default
                   input(type="radio", name="type", value='standard', checked)
                   x Standard
-                label.btn.btn-default
+                label.btn.btn-default#diningToggle
                   input(type="radio", name="type", value="dining")
                   x Dining
             .text-center
@@ -106,3 +109,15 @@ html
               br
               a(href='https://stripe.com',target='_blank')
                 img(src='/images/stripe.png',width='119',height='26',style='margin-top:10px')
+          .text-center  
+            br 
+            br
+            br
+            h4 Tickets left
+              .row
+                .col-xs-6
+                  h7 Total
+                  #totalCounter
+                .col-xs-6
+                  h7 Dining
+                  #diningCounter

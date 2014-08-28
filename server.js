@@ -1,28 +1,39 @@
-var express = require('express')
-var jade = require('jade')
-var http = require('http')
-var https = require ('https')
-var path = require('path')
-var mysql = require('mysql')
-var fs = require('fs')
-var request = require('request')
-var apn = require('apn')
-var bodyParser = require('body-parser')
-var nodemailer = require('nodemailer')
-var mailer = nodemailer.createTransport('direct')
 var constants = require('./constants')
-var stripe = require('stripe')(constants.stripesecret)
-var db = mysql.createConnection(constants.mysql)
 
+// Email template service
+var jade = require('jade')
+// Mail service
+var mailer = require('nodemailer').createTransport('direct')
+// Payment service
+var stripe = require('stripe')(constants.stripe.secret)
+// Database service
+var db = require('mysql').createConnection(constants.mysql)
 
 // Creating server
+var express = require('express')
 var server = express()
-// Bodyparser to parse json requests
-server.use(bodyParser())
+
+// Bodyparser to parse post requests
+var bodyParser = require('body-parser')
+server.use(bodyParser.json())
+server.use(bodyParser.urlencoded())
+
 // Setting jade as view engine
 server.set('view engine', 'jade')
+
 // Directory for static files
-server.use(express.static(path.join(__dirname, 'public')))
+server.use(express.static(require('path').join(__dirname, 'public')))
+
+// Redirecting everything to https://www.orielball.uk (missing www., .co.uk, http://)
+server.all('*',function(req,res,next){
+  var host = (constants.local) ? 'localhost' : 'www.orielball.uk'
+  if (req.headers.host != host || !req.secure)
+    res.redirect('https://' + host + req.url)
+  else
+    next()
+})
+
+/* ROUTES */
 
 // Index
 server.get('/', function(req, res){
@@ -30,65 +41,57 @@ server.get('/', function(req, res){
     'SELECT position, name, email FROM committee ORDER BY id ASC',
     function(err,rows,fields)
     {
-      res.render('index',{
-        committee:(!err)?rows:false,
-        bookingDate:constants.tickets.date
+      res.render((constants.local) ? 'draft' : 'index',{
+        committee: (!err) ? rows : false,
+        bookingDate: constants.tickets.date
       })
-    }
-  )
-})
-
-// Draft
-server.get('/topsecret',function(req,res){
-  db.query(
-    'SELECT position, name, email FROM committee ORDER BY id ASC',
-    function(err,rows,fields)
-    {
-      res.render('draft',{committee:(!err)?rows:false,bookingDate:constants.tickets.date})
-    }
-  )
-})
-
-// Display subscription email
-server.get('/updates/:number',function(req,res){
-  db.query(
-    'SELECT text FROM updates WHERE id = ?',
-    [req.param('number')],
-    function(err,rows,fields)
-    {
-      if (!err)
-        res.render('update',rows[0]['text'])
-      else 
-        res.send('Database error')
     }
   )
 })
 
 // Tickets
 server.get('/tickets',function(req,res){
-  // If before release date
-  if (constants.tickets.date < Date.now())
-    res.render('tickets/countdown',{ date: constants.tickets.date })
-  // Booking live 
-  else 
+  // After release date
+  if (Date.now() > constants.tickets.date || constants.local)
   {
-    db.query(
-      'SELECT COUNT(*) FROM bookings',
-      function(err,rows,fields){
-        if (err)
-          res.send(500,err)
-        else if (rows[0]['COUNT(*)'] >= constants.tickets.total)
-          res.render('tickets/soldOut')
-        else
-          res.render('tickets/form',{ 
-            left: constants.tickets.total - rows[0]['COUNT(*)'],
-            prices: constants.tickets.prices
-          })
-      }
-    )
-  }
+    ticketsLeft(res, function(total,dining){
+      // Tickets sold out
+      if (total <= 0)
+        res.render('tickets/soldOut')
+      // Tickets available
+      else
+        res.render('tickets/form',{ 
+          left: [total,dining],
+          prices: constants.tickets.prices,
+          stripe: constants.stripe.publ
+        })
+    })
+  } 
+  // Before release date 
+  else
+    res.render('tickets/countdown',{ date: constants.tickets.date }) 
+  
 })
 
+// Send the numbers of remaining tickets
+server.get('/ticketsLeft',function(req,res){
+  ticketsLeft(res,function(total,dining){
+    res.json(200,[total,dining])
+  })
+})
+
+var ticketsLeft = function(res,callback)
+{
+  db.query(
+    'SELECT (SELECT COUNT(*) FROM bookings) AS total, (SELECT COUNT(*) FROM bookings WHERE type = "dining") AS dining',
+    function(err,rows,fields){
+      if (err)
+        res.send(500,err)
+      else
+        callback(constants.tickets.total - rows[0]['total'],constants.tickets.dining - rows[0]['dining'])
+    }
+  )
+}
 
 // Reply from ticket form & payment processing
 server.post('/tickets',function(req,res){
@@ -136,17 +139,7 @@ server.post('/tickets',function(req,res){
 })
 
 
-// Send a string containing the number of remaining tickets (for the counter)
-server.get('/remainingTickets',function(req,res){
-  db.query(
-    'SELECT COUNT(*) FROM bookings',
-    function(err,rows,fields){
-      if (err)
-          res.send(500)
-      else
-        res.send(200, ""+(constants.tickets.total - rows[0]['COUNT(*)']))
-    })
-})
+
 
 // Email subscription processing
 server.get('/subscribe', function(req,res) {
@@ -169,6 +162,21 @@ server.get('/unsubscribe/:email',function(req,res){
       else
         res.send(200, email+" unsubscribed")
     })
+})
+
+// Display subscription email
+server.get('/updates/:number',function(req,res){
+  db.query(
+    'SELECT text FROM updates WHERE id = ?',
+    [req.param('number')],
+    function(err,rows,fields)
+    {
+      if (!err)
+        res.render('update',rows[0]['text'])
+      else 
+        res.send('Database error')
+    }
+  )
 })
 
 // Serving push package
@@ -200,23 +208,11 @@ server.post('/v1/log', function(req,res){
 })
 
 // HTTPS server
-https.createServer(constants.ssl,server).listen(443,function(){
+require ('https').createServer(constants.ssl,server).listen(443,function(){
   console.log('Listening for HTTPS requests on port 443')
 })
 
-// HTTP redirect server
-http.createServer(function(req,res){
-  res.writeHeader(301,{'Location':'https://www.orielball.uk'+req.url})
-  res.end()
-}).listen(80,function(){
-  console.log('Redirecting requests at port 80 to https')
+// HTTP SERVER
+require('http').createServer(server).listen(80,function(){
+  console.log('Listening for HTTP requests on port 80')
 })
-
-// Redirecting orielball.uk, orielball.co.uk, www.orielball.co.uk to www.orielball.uk
-server.all('/*',function(req,res,next){
-  if (req.headers.host != 'www.orielball.uk')
-    res.redirect('https://www.orielball.uk'+req.url)
-  else
-    next()
-})
-
