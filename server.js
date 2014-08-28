@@ -51,7 +51,7 @@ server.get('/', function(req, res){
     'SELECT position, name, email FROM committee ORDER BY id ASC',
     function(err,rows,fields)
     {
-      res.render((constants.local) ? 'draft' : 'index',{
+      res.render((constants.indexoverride) ? 'draft' : 'index',{
         committee: (!err) ? rows : false,
         bookingDate: constants.tickets.date
       })
