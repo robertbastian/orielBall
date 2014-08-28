@@ -4,15 +4,6 @@ var constants = require('./constants')
 var jade = require('jade')
 // Mail service
 var mailer = require('nodemailer').createTransport('direct')
-var emailTemplates = require('email-templates')
-var rendermail = function(name,locals,callback){
-  emailTemplates(path.join(__dirname, 'views/emails'), function(err, template){
-    if (err)
-      console.log(err);
-    else
-      template(name, locals,callback) 
-  })
-}
 
 // Payment service
 var stripe = require('stripe')(constants.stripe.secret)
@@ -132,29 +123,14 @@ server.post('/tickets',function(req,res){
               res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
             else
             {
-              rendermail(
-                'confirmation',
-                {
-                  email: req.body.email,
-                  name: req.body.name,
-                  dining: (req.body.type !== 'standard')
-                },
-                function(err,html,text){
-                  if (err)
-                    console.log(err);
-                  else 
-                  {
-                    mailer.sendMail(
-                    {
-                      from: 'Oriel College Ball <no-reply@orielball.uk>',
-                      to: (req.body.name + '<' + req.body.email + '>'),
-                      subject: 'Ticket confirmation',
-                      html: html,
-                      text: text
-                    })
-                  }
-                }
-              )
+              mailer.sendMail(
+              {
+                from: 'Oriel College Ball <no-reply@orielball.uk>',
+                to: (req.body.name + '<' + req.body.email + '>'),
+                subject: 'Ticket confirmation',
+                html: 'html',
+                text: 'text'
+              })
               res.render('tickets/success',{type:req.body.type})
             }
           }
