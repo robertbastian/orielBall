@@ -37,9 +37,8 @@ server.use(express.static(path.join(__dirname, 'public')))
 
 // Redirecting everything to https://www.orielball.uk (missing www., .co.uk, http://)
 server.all('*',function(req,res,next){
-  var host = (constants.local) ? 'localhost' : 'www.orielball.uk'
-  if (req.headers.host != host || !req.secure)
-    res.redirect('https://' + host + req.url)
+  if (req.headers.host != constants.host || !req.secure)
+    res.redirect('https://' + constants.host + req.url)
   else
     next()
 })
