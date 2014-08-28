@@ -21,4 +21,7 @@ html
         #timecountdown
         h5 You will need your Bod card and a credit or debit card
           br
-          small This page will automatically update
+          if (date-Date.now() < 3600000)
+            small This page will automatically update
+            script.
+              setTimeout(function(){location.reload()},!{date-Date.now()})

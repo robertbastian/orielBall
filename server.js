@@ -4,6 +4,16 @@ var constants = require('./constants')
 var jade = require('jade')
 // Mail service
 var mailer = require('nodemailer').createTransport('direct')
+var emailTemplates = require('email-templates')
+var rendermail = function(name,locals,callback){
+  emailTemplates(path.join(__dirname, 'views/emails'), function(err, template){
+    if (err)
+      console.log(err);
+    else
+      template(name, locals,callback) 
+  })
+}
+
 // Payment service
 var stripe = require('stripe')(constants.stripe.secret)
 // Database service
@@ -22,7 +32,8 @@ server.use(bodyParser.urlencoded())
 server.set('view engine', 'jade')
 
 // Directory for static files
-server.use(express.static(require('path').join(__dirname, 'public')))
+var path = require('path')
+server.use(express.static(path.join(__dirname, 'public')))
 
 // Redirecting everything to https://www.orielball.uk (missing www., .co.uk, http://)
 server.all('*',function(req,res,next){
@@ -52,7 +63,7 @@ server.get('/', function(req, res){
 // Tickets
 server.get('/tickets',function(req,res){
   // After release date
-  if (Date.now() > constants.tickets.date || constants.local)
+  if (Date.now() > constants.tickets.date || constants.ticketoverride)
   {
     ticketsLeft(res, function(total,dining){
       // Tickets sold out
@@ -122,12 +133,27 @@ server.post('/tickets',function(req,res){
               res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
             else
             {
-              mailer.sendMail(
+              rendermail(
+                'confirmation',
                 {
-                  from: 'Oriel College Ball <no-reply@orielball.uk>',
-                  to: (req.body.name + '<' + req.body.email + '>'),
-                  subject: 'Ticket confirmation',
-                  html: jade.renderFile('views/tickets/success.jade',{type:req.body.type})
+                  email: req.body.email,
+                  name: req.body.name,
+                  dining: (req.body.type !== 'standard')
+                },
+                function(err,html,text){
+                  if (err)
+                    console.log(err);
+                  else 
+                  {
+                    mailer.sendMail(
+                    {
+                      from: 'Oriel College Ball <no-reply@orielball.uk>',
+                      to: (req.body.name + '<' + req.body.email + '>'),
+                      subject: 'Ticket confirmation',
+                      html: html,
+                      text: text
+                    })
+                  }
                 }
               )
               res.render('tickets/success',{type:req.body.type})
@@ -208,7 +234,7 @@ server.post('/v1/log', function(req,res){
 })
 
 // HTTPS server
-require ('https').createServer(constants.ssl,server).listen(443,function(){
+require('https').createServer(constants.ssl,server).listen(443,function(){
   console.log('Listening for HTTPS requests on port 443')
 })
 
