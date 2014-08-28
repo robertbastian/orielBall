@@ -17,7 +17,7 @@ var server = express()
 // Bodyparser to parse post requests
 var bodyParser = require('body-parser')
 server.use(bodyParser.json())
-server.use(bodyParser.urlencoded())
+server.use(bodyParser.urlencoded({extended:false}))
 
 // Setting jade as view engine
 server.set('view engine', 'jade')
@@ -145,8 +145,8 @@ server.post('/tickets',function(req,res){
 // Email subscription processing
 server.get('/subscribe', function(req,res) {
   db.query(
-    'INSERT INTO mailingList (email,type) VALUES (?,?)',
-    [req.query['email'],/^.+@oriel\.ox\.ac\.uk$/.test(req.query['email'])],
+    'INSERT IGNORE INTO mailingList (email,type) VALUES (?,?)',
+    [req.query['email'],(/^.+@oriel\.ox\.ac\.uk$/.test(req.query['email']))?'oriel':'oxford'],
     function(err, rows, fields) { res.send((err) ? 500 : 200) }
     )
 })
