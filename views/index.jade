@@ -1,185 +1,180 @@
 doctype html
-//hi
 html
   head
     title Oriel College Commemoration Ball 2015
     include imports
-    link(rel='stylesheet', href='/stylesheets/jquery.fullPage.css')
-    script(type='text/javascript', src='/javascripts/jquery.fullPage.min.js')
-    script(type='text/javascript').
-      $(document).ready(function() {
-        $('#fullpage').fullpage({
-          //navigation: true,
-          //css3: true,
-          fixedElements: '#bottomBar, #aboutModal, #emailModal',
-          animateAnchor: false
-        })
-        $('#learnMore').click($.fn.fullpage.moveSectionDown)
-
-        $('#emailOpenModal').click(function(){ 
-          $('#emailModal').modal('show') 
-          $('#emailInput').focus()
-        })
-        $('#emailBtn').click(subscribeEmail)
-
-        $('#pushBtn').click(subscribePush)
-
-        $('#aboutBtn').click(function(){
-          $('#aboutModal').modal('show')
-        })
-        $('#aboutModal').on('shown.bs.modal', function(){
-            $.fn.fullpage.setAllowScrolling(false)
-            $.fn.fullpage.setKeyboardScrolling(false)
-        })
-        $('#aboutModal').on('hidden.bs.modal', function(){
-            $.fn.fullpage.setAllowScrolling(true)
-            $.fn.fullpage.setKeyboardScrolling(true)
-        })
-
-        if ('safari' in window && 'pushNotification' in window.safari)
-          adjustButton()
-        else
-        {
-          $('#pushBtn').addClass('disabled')
-          $('#pushBtn').parent().tooltip({title: "Push notifications require OS X 10.9 or higher",placement:'bottom'})
-        }
-      })
-
-      validateEmail = function()
-      {
-        var inp = $('#emailInput')
-
-        $('#emailFeedback').removeClass('has-error') 
-        $('.form-control-feedback').addClass('hidden')
-        if(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(inp.val()))
-          return true
-        $('#emailFeedback').addClass('has-error')
-        $('.glyphicon-remove').removeClass('hidden')
-        inp.focus()
-        return false
-      }
-      subscribeEmail = function()
-      {
-        if (validateEmail())
-        {
-          var btn = $(this)
-          btn.button('loading')
-          $.ajax({
-            url: '/subscribe',
-            data: { 
-              email: $('#emailInput').val()
-            }
-          })
-          .done(function(){
-            btn.html('Success!')
-            setTimeout(function(){
-              $('#emailModal').modal('hide')
-              $('#emailInput').val('')
-              btn.button('reset')
-            },1000)
-          })
-          .fail(function(){
-            alert("An error occured. Please try again")
-          })
-        }
-      }
-      subscribePush = function()
-      {
-        window.safari.pushNotification.requestPermission(
-          'https://www.orielball.uk',
-          'web.uk.orielball',
-          {},
-          adjustButton
-        )
-      }
-      adjustButton = function()
-      {
-        var permission = window.safari.pushNotification.permission('web.uk.orielball').permission
-        if (permission !== 'default') 
-        {
-          $('#pushBtn').addClass('disabled')
-          $('#pushBtn').parent().tooltip({title: (permission === 'granted') ? "Already subscribed" : "Adjust your subscription in Safari settings",placement:'bottom'})
-        }
-      }
-    style.
-      #fullpage {
-        color: #fff;
-        text-shadow: 0px 0px 5px #000;
-      }
-      #mainSec {
-        background-image: url(images/quad.jpg);
-      }
-      #updatesSec {
-        background-image: url(images/tent.jpg);
-      }
-      .section {
-        background-size: cover;
-      }
-      #bottomBar {
-        height: 36px;
-        color: #f2f2f2;
-        position:fixed;
-        z-index:70;
-        bottom:0;
-        width:100%;
-        text-align:right;
-        font-size:0.9em;
-        padding:8px 0 8px 0;
-      }
-      #bottomBar ul {
-       padding: 0 40px;
-      }
-      #bottomBar li {
-        display: inline-block;
-        position: relative;
-      }
-      #bottomBar span {
-        display: block;
-        margin: 0 22px 0 0; 
-        color: #fff;
-      }
-      #aboutBtn:hover {
-        cursor: pointer;
-      }
-      .link:hover {
-        cursor: pointer;
-      }
-      .exitblur {
-        -webkit-transition: all 1.5s;
-        -webkit-filter: blur(10px);
-        opacity: 0;
-      }
-      #emailModal {
-        position: fixed;
-        top: 40% !important;
-      }
+    link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Montserrat:400,700')
+    link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Kaushan+Script')
+    link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic')
+    link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700')
+    link(rel='stylesheet', href='/stylesheets/main.css')
+    script(src='/javascripts/jq-sticky-anything.min.js')
+    script(src='/javascripts/animatescroll.min.js')
+    script(src='/javascripts/main.js')
+    |<!--[if lt IE 9]>
+    |    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    |    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    |<![endif]-->
   body
-    #fullpage
-      #mainSec.section
-        .container
-          .row.text-center
-            img(src='../images/shield.png', height='200')
-            h2 Oriel College Commemoration Ball
-            h4 26 June 2015
-            br
-            #learnMore.btn.btn-primary.btn-lg Subscribe to updates
-      #updatesSec.section
-        .container
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+        .navbar-header
+          button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar-collapse-1")
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+        .collapse.navbar-collapse#navbar-collapse-1
+          ul.nav.navbar-nav
+            li
+              a(href="#entertainment") Entertainment
+            li
+              a(href="#fooddrink") Food &amp; Drink
+            li.hidden-xs#navbarGap
+              | &nbsp;
+            li
+              a(href="#sponsoring") Sponsoring
+            li
+              a(href="#tickets") Tickets
+            li 
+              a(href="#news") News
+    .container-fluid
+      img(src='/images/logo.png')#logo
+      #top.row
+        .col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center
+          h1(style="font-variant:small-caps;font-size:3.5em;") Gardens of Babylon
+          h4 The  Oriel College Commemoration Ball 2015
+          p.hidden-xs.
+            Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which lingers longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
+          #enter.btn.btn-primary.btn-lg Enter
+      if trailer
+        #trailer.row
+          .col-xs-12.text-center
+            iframe(src="//player.vimeo.com/video/77726239?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff&amp;api=1", width="100%", height="100%", frameborder="0", webkitallowfullscreen, mozallowfullscreen, allowfullscreen)
+
+      #entertainment.row
+        .col-xs-12.col-sm-10.col-sm-offset-1
           .row
-            .col-sm-6.col-sm-offset-3.text-center
+            .col-sm-7
+              h1 Entertainment
+              p.
+                On our main stage we welcome live performances from THE HOOSIERS and ELIZA AND THE BEAR as well as a DJ set by PENDULUM ft Verse MC.Beside musical entertainment, we have the renowned magician Alan Hudson, who will be performing close up magic at our ball! Alan is an associate of the inner magic circle, London, has appeared on ITV’s hit Saturday night show Penn &amp; Teller: Fool Us with Jonathan Ross, BBC2’s Culture Show, ITV1’s Sooty Show, and BBC1’s The Holiday Show. Check out this video of Alan in action, prepare to be amazed! We will also be welcoming a trio of comedians including Joel Dommet, who many of you will know as DC Sweeney from Skins. He will be appearing as our headline comedy act along with Naz Osmanoglu and Ben Van Der Velde. There will be a fairground, a ceilidh, and many photo opportunities! If you need to refresh yourself or powder your nose, you will be able to make your way to our Powder Room where beauticians and masseuses will be on hand to help.
+            .col-sm-4.col-sm-offset-1
+              img.img-thumbnail(src='/images/main/entertainment1.jpg')
+      #fooddrink.row
+        .col-xs-12.col-sm-10.col-sm-offset-1
+          .row
+            .col-sm-4
+              img.img-thumbnail(src='/images/main/entertainment1.jpg')
+            .col-sm-7.col-sm-offset-1
+              h1 Food &amp; Drink
+              p.
+                On our main stage we welcome live performances from THE HOOSIERS and ELIZA AND THE BEAR as well as a DJ set by PENDULUM ft Verse MC.Beside musical entertainment, we have the renowned magician Alan Hudson, who will be performing close up magic at our ball! Alan is an associate of the inner magic circle, London, has appeared on ITV’s hit Saturday night show Penn &amp; Teller: Fool Us with Jonathan Ross, BBC2’s Culture Show, ITV1’s Sooty Show, and BBC1’s The Holiday Show. Check out this video of Alan in action, prepare to be amazed! We will also be welcoming a trio of comedians including Joel Dommet, who many of you will know as DC Sweeney from Skins. He will be appearing as our headline comedy act along with Naz Osmanoglu and Ben Van Der Velde. There will be a fairground, a ceilidh, and many photo opportunities! If you need to refresh yourself or powder your nose, you will be able to make your way to our Powder Room where beauticians and masseuses will be on hand to help.
+      #sponsoring.row
+        .col-xs-12.col-sm-10.col-sm-offset-1
+          .row
+            .col-xs-12.text-center
+              h1 Our sponsors
+          .row.text-center
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/elastichosts.jpg')
+              p.
+                Elastichosts are generously hosting our website on their new Elastic Servers
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/emtpy.jpg')
+              p.
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/emtpy.jpg')
+              p.
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/emtpy.jpg')
+              p.
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/emtpy.jpg')
+              p.
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/emtpy.jpg')
+              p.
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+
+
+          .row
+            .col-xs-12.text-center
+              h6 Want to become a sponsor? Email us at <a href='mailto:sponsoring@orielball.uk'>sponsoring@orielball.uk</a>
+      #tickets.row
+        .col-xs-10.col-xs-offset-1.text-center
+          h1 Tickets
+          .row
+            .col-sm-4.col-sm-offset-2
+              i.fa.fa-cutlery.fa-2x
+              h3
+                | Dining Ticket <br>
+                small &pound;!{(pricesPublic)?prices['dining']:'TBD'}
+              p.
+                Bla bla enjoy 5 course meal bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              br
+              br
+            .col-sm-4
+              i.fa.fa-glass.fa-2x
+              h3 
+                | Standard Ticket <br>
+                small &pound;!{(pricesPublic)?prices['standard']:'TBD'}
+              p.
+                Bla bla no 5 course meal for you bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              br
+              br
+          if showTicketLinks 
+            a.btn.btn-lg.btn-primary(href='/tickets',style='margin:-10px 0px 10px 0px') Buy Tickets
+          else
+            a.btn.btn-lg.btn-primary.disabled(href='/tickets',style='margin-bottom:-20px') Buy Tickets
+            h3 
+              small Tickets go on sale on !{bookingDateString}
+      #news.row
+        .col-xs-10.col-xs-offset-1
+          .row
+            .col-md-4.hidden-sm.hidden-xs.
+              <iframe overflow=hidden src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Forielball&amp;height=395&amp;colorscheme=light&amp;show_faces=false&amp;header=false&amp;stream=true&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:395px; background: #fff" allowTransparency="true"></iframe>
+            .col-md-4.col-sm-6.col-xs-12.text-center
               h3 Keep up to date
               br
+              a(href='https://twitter.com/orielball',target='_blank')
+                span.fa-stack.fa-4x
+                  i.fa.fa-square.fa-stack-2x
+                  i.fa.fa-twitter.fa-stack-1x.fa-inverse
+              a(href='https://facebook.com/orielball',target='_blank',data-toggle="tooltip" data-placement="right" title="Facebook")
+                span.fa-stack.fa-4x
+                  i.fa.fa-square.fa-stack-2x
+                  i.fa.fa-facebook.fa-stack-1x.fa-inverse
+              br
+              a(href="javascript:$('#emailModal').modal('show')")
+                span.fa-stack.fa-4x
+                  i.fa.fa-square.fa-stack-2x
+                  i.fa.fa-envelope.fa-stack-1x.fa-inverse
+              a 
+                span.fa-stack.fa-4x
+                  i.fa.fa-square.fa-stack-2x
+                  i.fa.fa-certificate.fa-stack-1x.fa-inverse
+            .col-md-4.col-sm-6.hidden-xs.
+              <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+            
+      #footer.row
+        .col-xs-10.col-xs-offset-1.text-center
           .row
-            .col-sm-3
-            .col-sm-2
-              #emailOpenModal.btn.btn-default.btn-block Email
-            .col-sm-2
-              #pushBtn.btn.btn-default.btn-block Push notifications
-            .col-sm-2
-              a.btn.btn-default.btn-block(href='https://facebook.com/orielball',target='_blank') Facebook
-    #bottomBar
-      span#aboutBtn About
-    
+            h5 
+              small <a href="javascript:$('#aboutModal').modal('show')">Committee</a> • <a>Jobs</a><br>&copy; 2014 Oriel College Commemoration Ball
+
+
     .modal.fade#aboutModal(tabindex="-1",role="dialog")
       .modal-dialog
         .modal-content
@@ -196,9 +191,6 @@ html
                   tr
             else
               h4 An error occured while loading the committee.
-            br
-            h3.text-center Imprint
-            p.text-center &copy; 2014 Oriel Ball Commitee. Photos by Oliver Ford and JDR Photography
 
     .modal.fade#emailModal(tabindex="-1",role="dialog")
       .modal-dialog.modal-sm

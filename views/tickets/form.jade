@@ -16,7 +16,7 @@ html
         key: stripe,
         currency: 'gbp',
         name: 'Oriel College Ball',
-        image: '/images/icon.png',
+        image: '/images/logo.png',
         allowRememberMe: false,
         token: function(token){
           $('#payment-form').append($('<input type="hidden" name="stripeToken" />').val(token.id))

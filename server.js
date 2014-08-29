@@ -44,15 +44,16 @@ server.get('/', function(req, res){
     'SELECT position, name, email FROM committee ORDER BY id ASC',
     function(err,rows,fields)
     {
-      res.render((constants.indexoverride) ? 'draft' : 'index',{
+      res.render('index',{
         committee: (!err) ? rows : false,
         bookingDateString: moment(constants.tickets.date).format('dddd, DD MMMM [at] h a'),
+        // is the trailer public
         trailer: constants.trailer,
         // are the prices public
         pricesPublic: constants.tickets.public,
         // ticket prices
         prices: constants.tickets.prices,
-        // start showing the ticket links on the day of booking
+        // activate the ticket button on the day of booking
         showTicketLinks: new Date(constants.tickets.date.setHours(0,0,0,0)) <= Date.now()
       })
     }
@@ -62,7 +63,7 @@ server.get('/', function(req, res){
 // Tickets
 server.get('/tickets',function(req,res){
   // After release date
-  if (Date.now() > constants.tickets.date || constants.ticketoverride)
+  if (Date.now() > constants.tickets.date || constants.ticketdebug)
   {
     ticketsLeft(res, function(total,dining){
       // Tickets sold out
@@ -73,7 +74,7 @@ server.get('/tickets',function(req,res){
         res.render('tickets/form',{ 
           left: [total,dining],
           prices: constants.tickets.prices,
-          stripe: constants.stripe.publ
+          stripe: constants.stripe.public
         })
     })
   } 
@@ -147,9 +148,6 @@ server.post('/tickets',function(req,res){
       }
   })
 })
-
-
-
 
 // Email subscription processing
 server.get('/subscribe', function(req,res) {
