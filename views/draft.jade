@@ -43,15 +43,16 @@ html
     .container-fluid
       img(src='/images/logo.png')#logo
       #top.row
-        .col-xs-6.col-xs-offset-3.text-center
-          h1 Oriel College Commemoration Ball
-          h2 The Gardens of Babylon
+        .col-md-6.col-md-offset-3.col-xs-12.col-sm-10.col-sm-offset-1.text-center
+          h1 The Gardens of Babylon
+          h4 The  Oriel College Commemoration Ball 2015
           p.
-            On 26 June 2015 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+            Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which lingers longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
           #enter.btn.btn-primary.btn-lg Enter
-      #trailer.row
-        .col-xs-12.text-center
-          iframe(src="//player.vimeo.com/video/77726239?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff&amp;api=1", width="100%", height="100%", frameborder="0", webkitallowfullscreen, mozallowfullscreen, allowfullscreen)
+      if trailer
+        #trailer.row
+          .col-xs-12.text-center
+            iframe(src="//player.vimeo.com/video/77726239?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff&amp;api=1", width="100%", height="100%", frameborder="0", webkitallowfullscreen, mozallowfullscreen, allowfullscreen)
 
       #entertainment.row
         .col-xs-10.col-xs-offset-1
@@ -112,35 +113,30 @@ html
           .row
             .col-md-4.
               <iframe overflow=hidden src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Forielball&amp;height=395&amp;colorscheme=light&amp;show_faces=false&amp;header=false&amp;stream=true&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:395px; background: #fff" allowTransparency="true"></iframe>
-            .col-md-4#fbwrapper.
-              <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>
-              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-            .col-md-4
-              h2 Connect with us!
+            .col-md-4.text-center
+              h3 Keep up to date
               br
               a(href='https://twitter.com/orielball',target='_blank')
-                span.fa-stack.fa-2x
+                span.fa-stack.fa-4x
                   i.fa.fa-square.fa-stack-2x
                   i.fa.fa-twitter.fa-stack-1x.fa-inverse
-                x Twitter
-              br
-              a(href='https://facebook.com/orielball',target='_blank')
-                span.fa-stack.fa-2x
+              a(href='https://facebook.com/orielball',target='_blank',data-toggle="tooltip" data-placement="right" title="Facebook")
+                span.fa-stack.fa-4x
                   i.fa.fa-square.fa-stack-2x
                   i.fa.fa-facebook.fa-stack-1x.fa-inverse
-                x Facebook
               br
               a(href="javascript:$('#emailModal').modal('show')")
-                span.fa-stack.fa-2x
+                span.fa-stack.fa-4x
                   i.fa.fa-square.fa-stack-2x
                   i.fa.fa-envelope.fa-stack-1x.fa-inverse
-                x Email subscription
-              br
               a 
-                span.fa-stack.fa-2x
+                span.fa-stack.fa-4x
                   i.fa.fa-square.fa-stack-2x
                   i.fa.fa-certificate.fa-stack-1x.fa-inverse
-                x Push notification
+            .col-md-4.
+              <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+            
       #tickets.row
         .col-xs-10.col-xs-offset-1.text-center
           h1 Tickets

@@ -30,7 +30,7 @@ nav {
   position: relative;
 }
 
-#top .col-xs-6 {
+#top .col-md-6 {
   position: absolute;
   bottom: 5%;
 }
@@ -40,6 +40,8 @@ nav {
   position: fixed;
   left: 50%;
   top: 100px;
+  cursor: pointer; 
+  cursor: hand;
 }
 
 #trailer {
@@ -52,7 +54,7 @@ nav {
   height:100%;
   padding:0px
 }
-#entertainment, #fooddrink, #sponsoring {
+#entertainment, #fooddrink, #sponsoring, #news {
 background: #eeeeee;
 background: -moz-linear-gradient(top,  #eeeeee 0%, #cccccc 100%);
 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#cccccc));
@@ -67,9 +69,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', end
   width:100%;
   margin: 0px 0px 20px 0px;
 }
-#news {
-  background: #bbb;
-}
 
 #tickets {
   background: #832;
@@ -79,13 +78,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', end
 .row img {
  margin: 20px;
 }
+
 p {
   font-size: 12px;
 }
-x {
-  color: white;
-  padding-left: 10px;
-}
-#fbwrapper * {
-   width: 100% !important;
-}
+

@@ -47,6 +47,7 @@ server.get('/', function(req, res){
       res.render((constants.indexoverride) ? 'draft' : 'index',{
         committee: (!err) ? rows : false,
         bookingDateString: moment(constants.tickets.date).format('dddd, DD MMMM [at] h a'),
+        trailer: constants.trailer,
         // are the prices public
         pricesPublic: constants.tickets.public,
         // ticket prices

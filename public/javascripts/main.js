@@ -13,7 +13,7 @@ $(document).ready(function(){
     $('#trailer').css('height', Math.min(9/16*window.innerWidth, window.innerHeight-navbar))
 
     // Give the logo 80% of the space between the navbar and the opening text
-    var spaceForLogo = Math.min(window.innerHeight-navbar-$('#top .col-xs-6').height(),window.innerWidth)
+    var spaceForLogo = Math.min(window.innerHeight-navbar-$('#top .col-md-6').height(),window.innerWidth)
     var logoSize = spaceForLogo*0.8
     var logoY = spaceForLogo*0.5+50-logoSize/2
 
