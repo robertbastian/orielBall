@@ -16,7 +16,8 @@ html body {
   font-family: Droid Serif;
 }
 .container-fluid .row {
-  padding: 20px;
+  padding-bottom: 20px;
+  padding-top: 20px;
 }
 nav {
   position: relative;
@@ -54,25 +55,20 @@ nav {
   height:100%;
   padding:0px
 }
-#entertainment, #fooddrink, #sponsoring, #news {
-background: #eeeeee;
-background: -moz-linear-gradient(top,  #eeeeee 0%, #cccccc 100%);
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#cccccc));
-background: -webkit-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
-background: -o-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
-background: -ms-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
-background: linear-gradient(to bottom,  #eeeeee 0%,#cccccc 100%);
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
-
+#entertainment, #fooddrink, #sponsoring, #news, #tickets {
+  background: #eeeeee;
+  background: -moz-linear-gradient(top,  #eeeeee 0%, #cccccc 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#cccccc));
+  background: -webkit-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+  background: -o-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+  background: -ms-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+  background: linear-gradient(to bottom,  #eeeeee 0%,#cccccc 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
 }
+
 #sponsoring img {
   width:100%;
   margin: 0px 0px 20px 0px;
-}
-
-#tickets {
-  background: #832;
-  color: white;
 }
 
 .row img {

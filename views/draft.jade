@@ -34,19 +34,17 @@ html
               | &nbsp;
             li
               a(href="#sponsoring") Sponsoring
-            li 
-              a(href="#news") News
             li
               a(href="#tickets") Tickets
-            li.hidden
-              a(href='#top') 
+            li 
+              a(href="#news") News
     .container-fluid
       img(src='/images/logo.png')#logo
       #top.row
-        .col-md-6.col-md-offset-3.col-xs-12.col-sm-10.col-sm-offset-1.text-center
-          h1 The Gardens of Babylon
+        .col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center
+          h1(style="font-variant:small-caps;font-size:3.5em;") Gardens of Babylon
           h4 The  Oriel College Commemoration Ball 2015
-          p.
+          p.hidden-xs.
             Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which lingers longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
           #enter.btn.btn-primary.btn-lg Enter
       if trailer
@@ -55,65 +53,98 @@ html
             iframe(src="//player.vimeo.com/video/77726239?title=0&amp;byline=0&amp;portrait=0&amp;color=ffffff&amp;api=1", width="100%", height="100%", frameborder="0", webkitallowfullscreen, mozallowfullscreen, allowfullscreen)
 
       #entertainment.row
-        .col-xs-10.col-xs-offset-1
+        .col-xs-12.col-sm-10.col-sm-offset-1
           .row
-            .col-md-7
+            .col-sm-7
               h1 Entertainment
               p.
                 On our main stage we welcome live performances from THE HOOSIERS and ELIZA AND THE BEAR as well as a DJ set by PENDULUM ft Verse MC.Beside musical entertainment, we have the renowned magician Alan Hudson, who will be performing close up magic at our ball! Alan is an associate of the inner magic circle, London, has appeared on ITV’s hit Saturday night show Penn &amp; Teller: Fool Us with Jonathan Ross, BBC2’s Culture Show, ITV1’s Sooty Show, and BBC1’s The Holiday Show. Check out this video of Alan in action, prepare to be amazed! We will also be welcoming a trio of comedians including Joel Dommet, who many of you will know as DC Sweeney from Skins. He will be appearing as our headline comedy act along with Naz Osmanoglu and Ben Van Der Velde. There will be a fairground, a ceilidh, and many photo opportunities! If you need to refresh yourself or powder your nose, you will be able to make your way to our Powder Room where beauticians and masseuses will be on hand to help.
-            .col-md-4.col-md-offset-1
+            .col-sm-4.col-sm-offset-1
               img.img-thumbnail(src='/images/main/entertainment1.jpg')
       #fooddrink.row
-        .col-xs-10.col-xs-offset-1
+        .col-xs-12.col-sm-10.col-sm-offset-1
           .row
-            .col-md-4
+            .col-sm-4
               img.img-thumbnail(src='/images/main/entertainment1.jpg')
-            .col-md-7.col-md-offset-1
+            .col-sm-7.col-sm-offset-1
               h1 Food &amp; Drink
               p.
                 On our main stage we welcome live performances from THE HOOSIERS and ELIZA AND THE BEAR as well as a DJ set by PENDULUM ft Verse MC.Beside musical entertainment, we have the renowned magician Alan Hudson, who will be performing close up magic at our ball! Alan is an associate of the inner magic circle, London, has appeared on ITV’s hit Saturday night show Penn &amp; Teller: Fool Us with Jonathan Ross, BBC2’s Culture Show, ITV1’s Sooty Show, and BBC1’s The Holiday Show. Check out this video of Alan in action, prepare to be amazed! We will also be welcoming a trio of comedians including Joel Dommet, who many of you will know as DC Sweeney from Skins. He will be appearing as our headline comedy act along with Naz Osmanoglu and Ben Van Der Velde. There will be a fairground, a ceilidh, and many photo opportunities! If you need to refresh yourself or powder your nose, you will be able to make your way to our Powder Room where beauticians and masseuses will be on hand to help.
       #sponsoring.row
-        .col-xs-10.col-xs-offset-1
+        .col-xs-12.col-sm-10.col-sm-offset-1
           .row
             .col-xs-12.text-center
               h1 Our sponsors
           .row.text-center
-            .col-sm-2.col-sm-offset-1   
+            .col-md-2.col-sm-4.col-xs-6
               a(href='http://elastichosts.co.uk')            
                 img.img-thumbnail(src='/images/main/elastichosts.jpg')
               p.
                 Elastichosts are generously hosting our website on their new Elastic Servers
-            .col-sm-2 
+            .col-md-2.col-sm-4.col-xs-6
               a(href='http://elastichosts.co.uk')            
                 img.img-thumbnail(src='/images/main/emtpy.jpg')
               p.
-                Another sponsor
-            .col-sm-2 
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
               a(href='http://elastichosts.co.uk')            
                 img.img-thumbnail(src='/images/main/emtpy.jpg')
               p.
-                Another sponsor
-            .col-sm-2 
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
               a(href='http://elastichosts.co.uk')            
                 img.img-thumbnail(src='/images/main/emtpy.jpg')
               p.
-                Another sponsor
-            .col-sm-2 
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
               a(href='http://elastichosts.co.uk')            
                 img.img-thumbnail(src='/images/main/emtpy.jpg')
               p.
-                Another sponsor
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
+            .col-md-2.col-sm-4.col-xs-6
+              a(href='http://elastichosts.co.uk')            
+                img.img-thumbnail(src='/images/main/emtpy.jpg')
+              p.
+                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
 
 
           .row
             .col-xs-12.text-center
               h6 Want to become a sponsor? Email us at <a href='mailto:sponsoring@orielball.uk'>sponsoring@orielball.uk</a>
+      #tickets.row
+        .col-xs-10.col-xs-offset-1.text-center
+          h1 Tickets
+          .row
+            .col-sm-4.col-sm-offset-2
+              i.fa.fa-cutlery.fa-2x
+              h3
+                | Dining Ticket <br>
+                small &pound;!{(pricesPublic)?prices['dining']:'TBD'}
+              p.
+                Bla bla enjoy 5 course meal bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              br
+              br
+            .col-sm-4
+              i.fa.fa-glass.fa-2x
+              h3 
+                | Standard Ticket <br>
+                small &pound;!{(pricesPublic)?prices['standard']:'TBD'}
+              p.
+                Bla bla no 5 course meal for you bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              br
+              br
+          if showTicketLinks 
+            a.btn.btn-lg.btn-primary(href='/tickets',style='margin:-10px 0px 10px 0px') Buy Tickets
+          else
+            a.btn.btn-lg.btn-primary.disabled(href='/tickets',style='margin-bottom:-20px') Buy Tickets
+            h3 
+              small Tickets go on sale on !{bookingDateString}
       #news.row
         .col-xs-10.col-xs-offset-1
           .row
-            .col-md-4.
+            .col-md-4.hidden-sm.hidden-xs.
               <iframe overflow=hidden src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Forielball&amp;height=395&amp;colorscheme=light&amp;show_faces=false&amp;header=false&amp;stream=true&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:395px; background: #fff" allowTransparency="true"></iframe>
-            .col-md-4.text-center
+            .col-md-4.col-sm-6.col-xs-12.text-center
               h3 Keep up to date
               br
               a(href='https://twitter.com/orielball',target='_blank')
@@ -133,30 +164,10 @@ html
                 span.fa-stack.fa-4x
                   i.fa.fa-square.fa-stack-2x
                   i.fa.fa-certificate.fa-stack-1x.fa-inverse
-            .col-md-4.
+            .col-md-4.col-sm-6.hidden-xs.
               <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>
               <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
             
-      #tickets.row
-        .col-xs-10.col-xs-offset-1.text-center
-          h1 Tickets
-          .row
-            .col-md-3.col-md-offset-3
-              i.fa.fa-cutlery.fa-2x
-              h3 Dining Ticket
-              p.
-                Bla bla enjoy 5 course meal bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-              h3 &pound;!{(pricesPublic)?prices['dining']:'TBD'}
-            .col-md-3
-              i.fa.fa-glass.fa-2x
-              h3 Standard Ticket
-              p.
-                Bla bla no 5 course meal for you bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-              h3 &pound;!{(pricesPublic)?prices['standard']:'TBD'}
-          if showTicketLinks 
-            a.btn.btn-lg.btn-primary(href='/tickets',style='margin:20px') Buy Tickets
-          else 
-            h3 Tickets go on sale on !{bookingDateString}
       #footer.row
         .col-xs-10.col-xs-offset-1.text-center
           .row
