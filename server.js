@@ -9,6 +9,8 @@ var mailer = require('nodemailer').createTransport('direct')
 var stripe = require('stripe')(constants.stripe.secret)
 // Database service
 var db = require('mysql').createConnection(constants.mysql)
+// Date formatting
+var moment = require('moment')
 
 // Creating server
 var express = require('express')
@@ -44,7 +46,13 @@ server.get('/', function(req, res){
     {
       res.render((constants.indexoverride) ? 'draft' : 'index',{
         committee: (!err) ? rows : false,
-        bookingDate: constants.tickets.date
+        bookingDateString: moment(constants.tickets.date).format('dddd, DD MMMM [at] h a'),
+        // are the prices public
+        pricesPublic: constants.tickets.public,
+        // ticket prices
+        prices: constants.tickets.prices,
+        // start showing the ticket links on the day of booking
+        showTicketLinks: new Date(constants.tickets.date.setHours(0,0,0,0)) <= Date.now()
       })
     }
   )

@@ -1,0 +1,274 @@
+doctype html
+html
+  head
+    title Oriel College Commemoration Ball 2015
+    include imports
+    link(rel='stylesheet', href='/stylesheets/jquery.fullPage.css')
+    script(type='text/javascript', src='/javascripts/jquery.fullPage.min.js')
+    script(type='text/javascript').
+      $(document).ready(function() {
+        $('#fullpage').fullpage({
+          //- navigation: true,
+          anchors:['#home','#trailer','#entertainment','#foodanddrink','#updates'],
+          css3: true,
+          fixedElements: '#bottomBar',
+          animateAnchor: false,
+          //- navigationTooltips: ['Home','Trailer','Entertainment',"Food&nbsp;and&nbsp;Drink","Updates"],
+          onLeave: function(index,nextIndex)
+          {
+            //if(nextIndex == 2)
+                //player.play()
+          }
+        })
+        $('#learnMore').click($.fn.fullpage.moveSectionDown)
+
+        $('#emailOpenModal').click(function(){ 
+          $('#emailModal').modal('show') 
+          $('#emailInput').focus()
+        })
+        $('#emailBtn').click(subscribeEmail)
+
+        $('#pushBtn').click(subscribePush)
+
+        $('#aboutBtn').click(function(){
+          $('#aboutModal').modal('show')
+        })
+        $('#aboutModal').on('shown.bs.modal', function(){
+            $.fn.fullpage.setAllowScrolling(false)
+            $.fn.fullpage.setKeyboardScrolling(false)
+        })
+        $('#aboutModal').on('hidden.bs.modal', function(){
+            $.fn.fullpage.setAllowScrolling(true)
+            $.fn.fullpage.setKeyboardScrolling(true)
+        })
+
+        if ('safari' in window && 'pushNotification' in window.safari)
+          adjustButton()
+        else
+        {
+          $('#pushBtn').addClass('disabled')
+          $('#pushBtn').tooltip({title: "Push notifications require OS X 10.9 or higher"})
+        }
+        $('.link').click(function(){
+          var link = this;
+          $('body').addClass('exitblur')
+          setTimeout(function(){ location.href = link.getAttribute('href') },1000)
+          return false
+        })
+      })
+
+      validateEmail = function()
+      {
+        var inp = $('#emailInput')
+
+        $('#emailFeedback').removeClass('has-error') 
+        $('.form-control-feedback').addClass('hidden')
+        if(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(inp.val()))
+          return true
+        $('#emailFeedback').addClass('has-error')
+        $('.glyphicon-remove').removeClass('hidden')
+        inp.focus()
+        return false
+      }
+      subscribeEmail = function()
+      {
+        if (validateEmail())
+        {
+          var btn = $(this)
+          btn.button('loading')
+          $.ajax({
+            url: '/subscribe',
+            data: { 
+              email: $('#emailInput').val()
+            }
+          })
+          .done(function(){
+            btn.html('Success!')
+            setTimeout(function(){
+              $('#emailModal').modal('hide')
+              $('#emailInput').val('')
+              btn.button('reset')
+            },1000)
+          })
+          .fail(function(){
+            alert("An error occured. Please try again")
+          })
+        }
+      }
+      subscribePush = function()
+      {
+        window.safari.pushNotification.requestPermission(
+          'https://www.orielball.uk',
+          'web.uk.orielball',
+          {},
+          adjustButton
+        )
+      }
+      adjustButton = function()
+      {
+        var permission = window.safari.pushNotification.permission('web.uk.orielball').permission
+        if (permission !== 'default') 
+        {
+          $('#pushBtn').addClass('disabled')
+          $('#pushBtn').tooltip({title: (permission === 'granted') ? "Already subscribed" : "Adjust your subscription in Safari settings"})
+        }
+      }
+      function onYouTubeIframeAPIReady() {}
+      var player;
+      function onPlayerReady(event) {
+        player = event.target
+      }
+    style.
+      #fullpage {
+        color: #fff;
+        text-shadow: 0px 0px 5px #000;
+      }
+      #mainSec {
+        background-image: url(images/quad.jpg);
+      }
+      #trailerSec {
+        background-image: url(images/tent.jpg);
+      }
+      #entertainmentSec {
+        background-image: url(images/tent.jpg);
+      }
+      #foodanddrinkSec {
+        background-image: url(images/tent.jpg);
+      }
+      #updatesSec {
+        background-image: url(images/tent.jpg);
+      }
+      .section {
+        background-size: cover;
+      }
+      #bottomBar {
+        height: 36px;
+        color: #f2f2f2;
+        position:fixed;
+        z-index:70;
+        bottom:0;
+        width:100%;
+        text-align:right;
+        font-size:0.9em;
+        padding:8px 0 8px 0;
+      }
+      #bottomBar ul {
+       padding: 0 40px;
+      }
+      #bottomBar li {
+        display: inline-block;
+        position: relative;
+      }
+      #bottomBar span {
+        display: block;
+        margin: 0 22px 0 0; 
+        color: #fff;
+      }
+      #aboutBtn:hover {
+        cursor: pointer;
+      }
+      .link:hover {
+        cursor: pointer;
+      }
+      .exitblur {
+        -webkit-transition: all 1.5s;
+        -webkit-filter: blur(10px);
+        opacity: 0;
+      }
+  body
+    nav.navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+      .container-fluid
+        // Brand and toggle get grouped for better mobile display
+        .navbar-header
+          button.navbar-toggle(type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1")
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href="") Brand
+        // Collect the nav links, forms, and other content for toggling
+        .collapse.navbar-collapse#bs-example-navbar-collapse-1
+          ul.nav.navbar-nav
+            li.active
+              a(href="#trailer") Trailer
+            li
+              a(href="#entertainment") Entertainment
+    #fullpage
+      #mainSec.section
+        .container
+          .row.text-center
+            img(src='../images/shield.png', height='200')
+            h2 Oriel College Commemoration Ball
+            h4 26 June 2015
+            br
+            #learnMore.btn.btn-primary.btn-lg Learn more
+      #trailerSec.section
+        .container
+          .row
+            .embed-responsive.embed-responsive-16by9
+              iframe.embed-responsive-item#youtube(src='https://www.youtube.com/embed/h3sUe_BNYN0?rel=0&autohide=1&modestbranding=1&fs=1&playinline=1&showinfo=0',allowfullscreen)
+          .row(style='padding-top:50px').
+            Lorem ipsum dolor sit amet, dolor quis, sit libero quis, vitae donec, cras eu laoreet lacinia. Vestibulum nulla risus feugiat justo, wisi vel, lacus phasellus conubia suscipit ut, nulla quam iaculis sit litora, urna dignissim. Auctor mauris consectetuer parturient venenatis, at aliquam, non mollitia nunc nisl vestibulum venenatis nulla. Ipsum venenatis molestie massa. Dolor pede tristique donec et maecenas dictum, proin vitae, libero at tellus nunc dis bibendum luctus, adipiscing cum perferendis at morbi et quam, proin vitae cumque tincidunt odio vulputate auctor. Vitae ut aliquam vitae vivamus eleifend ac, sit pede ipsum, vel vitae neque vero massa aliqua erat, nec urna cras voluptas lacinia. Nam orci sed erat, sed in erat tortor id quisque sodales proin vitae cumque tincidunt odio vulputate auctor. Vitae ut aliquam vitae vivamus eleifend ac, sit pede ipsum, vel vitae neque vero massa aliqua erat, nec urna cras voluptas lacinia. Nam orci sed erat, sed in erat tortor id quisque sodales.
+      #entertainmentSec.section
+        .container
+          .row.text-center 
+            h2 Entertainment
+      #foodanddrinkSec.section
+        .container
+          .row.text-center 
+            h2 Food and Drink
+      #updatesSec.section
+        .container
+          .row
+            .col-md-3
+            .col-md-6.text-center
+              p Standard: £165, Dining: £180
+              .link.btn.btn-primary.btn-block.btn-lg(href='/tickets') Access Booking
+              p Booking opens !{(new Date(bookingDate)).toLocaleDateString()}
+          .row
+            .col-md-3
+            .col-md-6.text-center
+              h3 Keep up to date
+            .col-md-3
+          .row
+            .col-md-3
+            .col-md-2
+              #emailOpenModal.btn.btn-default.btn-block Email
+            .col-md-2
+              #pushBtn.btn.btn-default.btn-block(data-loading-text="Loading...") Push notifications
+            .col-md-2
+              a.btn.btn-default.btn-block(href='https://facebook.com/orielball',target='_blank') Facebook
+            .col-md-3
+    #bottomBar
+      span#aboutBtn About
+    
+    .modal.fade#aboutModal(tabindex="-1",role="dialog")
+      .modal-dialog
+        .modal-content
+          .modal-body
+            h3.text-center Committee
+            if committee
+              table.table.table-hover
+                each person in committee
+                  tr
+                    td!=person['position']
+                    td!=person['name']
+                    td
+                      a(href='mailto:'+person['email'])=person['email']
+                  tr
+            else
+              h4 An error occured while loading the committee.
+            br
+            h3.text-center Imprint
+            p.text-center &copy; 2014 Oriel Ball Commitee. Photos by Oliver Ford and JDR Photography
+
+    .modal.fade#emailModal(tabindex="-1",role="dialog")
+      .modal-dialog.modal-sm(style="margin-top:25%")
+        .modal-content
+          .modal-body
+            .form
+              .form-group.has-feedback#emailFeedback
+                label.sr-only Email
+                input.form-control#emailInput(type=email,placeholder='University email address')
+                span.glyphicon.glyphicon-remove.form-control-feedback.hidden
+              #emailBtn.btn.btn-primary(data-loading-text="Loading...",style="width: 100%") Subscribe to emails
