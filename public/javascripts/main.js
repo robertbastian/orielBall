@@ -55,12 +55,21 @@ $(document).ready(function(){
     $('body').animatescroll({padding:navbar})
   })
   
+  function player(method)
+  {
+    var player = $('iframe');
+    player[0].contentWindow.postMessage({method:method}, window.location.protocol + player.attr('src').split('?')[0])
+  }
+
   // Enter button scrolls down to trailer (or entertainment if there is no trailer)
   $('#enter').click(function(){
-    $('#trailer').animatescroll({padding:navbar})
-    var player = $('iframe');
-    player[0].contentWindow.postMessage({method:'play'}, window.location.protocol + player.attr('src').split('?')[0])
-    // $('#entertainment').animatescroll({padding:navbar})
+    if ($('#trailer').length)
+    {
+      $('#trailer').animatescroll({padding:navbar})
+      player('play')
+    }
+    else
+      $('#entertainment').animatescroll({padding:navbar})
   })
 
   // Using animatescroll for the navigation links
@@ -68,6 +77,7 @@ $(document).ready(function(){
   {
     e.preventDefault()
     $(this.hash).animatescroll({padding:navbar-5})
+    player('pause')
   })
 
   $(window).resize(adjustToScreenSize)

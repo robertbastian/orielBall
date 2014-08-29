@@ -19,8 +19,7 @@ html body {
   padding: 20px;
 }
 nav {
-    z-index: 0;
-    position: relative;
+  position: relative;
 }
 .container-fluid .row .row {
   padding: 0px;
@@ -37,7 +36,7 @@ nav {
 }
 
 #logo {
-  z-index:9999999;
+  z-index:1031;
   position: fixed;
   left: 50%;
   top: 100px;
@@ -53,16 +52,20 @@ nav {
   height:100%;
   padding:0px
 }
-#entertainment {
-  background: #ccc;
-}
-#fooddrink {
-  background: #eee;
-}
-#sponsoring{
+#entertainment, #fooddrink, #sponsoring {
+background: #eeeeee;
+background: -moz-linear-gradient(top,  #eeeeee 0%, #cccccc 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#cccccc));
+background: -webkit-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+background: -o-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+background: -ms-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+background: linear-gradient(to bottom,  #eeeeee 0%,#cccccc 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
+
 }
 #sponsoring img {
-  width:180px
+  width:100%;
+  margin: 0px 0px 20px 0px;
 }
 #news {
   background: #bbb;
