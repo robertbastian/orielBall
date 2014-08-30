@@ -53,20 +53,24 @@ $(document).ready(function(){
   // Logo is an anchor to return to the very top
   $('#logo').click(function(){
     $('body').animatescroll({padding:navbar})
+    player('pause')
   })
   
-  function player(method)
-  {
-    var player = $('iframe');
-    player[0].contentWindow.postMessage({method:method}, window.location.protocol + player.attr('src').split('?')[0])
-  }
+  var player = $f($('#vimeo')[0])
+
+  // When the player is ready, add listeners for pause, finish, and playProgress
+  player.addEvent('ready', function() {
+    player.addEvent('finish', function(){
+      $('#entertainment').animatescroll({padding:navbar})       
+    })
+  })
 
   // Enter button scrolls down to trailer (or entertainment if there is no trailer)
   $('#enter').click(function(){
     if ($('#trailer').length)
     {
       $('#trailer').animatescroll({padding:navbar})
-      player('play')
+      player.api('play')
     }
     else
       $('#entertainment').animatescroll({padding:navbar})
