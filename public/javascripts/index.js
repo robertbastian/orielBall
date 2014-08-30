@@ -54,8 +54,7 @@ $(document).ready(function(){
 
   // When the player is ready, add listener for finish
   player.addEvent('ready', function() {
-    player.addEvent('pause',function(){})
-    player.addEvent('playProgress',function(){})
+    alert('hi')
     player.addEvent('finish', function(){
       $('#entertainment').animatescroll({padding:navbar})       
     })
