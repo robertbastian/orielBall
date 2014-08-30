@@ -175,7 +175,12 @@ html
         .col-xs-10.col-xs-offset-1.text-center
           .row
             h5 
-              small <a href="javascript:$('#aboutModal').modal('show')">Committee</a> • <a>Jobs</a><br>&copy; 2014 Oriel College Commemoration Ball
+              small
+                a(href="javascript:$('#aboutModal').modal('show')") Committee
+                | &nbsp;&nbsp;•&nbsp;&nbsp; 
+                a(href="javascript:$('#tacModal').modal('show')") Terms &amp; Conditions
+                br
+                | &copy; 2014 Oriel College Commemoration Ball
 
 
     .modal.fade#aboutModal(tabindex="-1",role="dialog")
@@ -185,7 +190,7 @@ html
             button.close(type="button",data-dismiss="modal")
               span(aria-hidden="true")&times;
               span.sr-only Close
-            h3.modal-title Committee
+            h3.modal-title(style='margin-left:18px;') Committee
           if committee
             table.table.table-condensed.modal-body
              - for (var i = 0; i < 16; i = i + 2) {
@@ -205,6 +210,20 @@ html
           else
             .modal-body
               h4 An error occured while loading the committee.
+    
+
+    .modal.fade#tacModal(tabindex="-1",role="dialog")
+      .modal-dialog
+        .modal-content.text-center
+          .modal-header
+            button.close(type="button",data-dismiss="modal")
+              span(aria-hidden="true")&times;
+              span.sr-only Close
+            h3.modal-title(style='margin-left:18px;') Terms &amp; Conditions
+          .modal-body
+            include tac
+
+
 
     .modal.fade#emailModal(tabindex="-1",role="dialog")
       .modal-dialog.modal-sm
