@@ -2,7 +2,13 @@ var navbar = 50
 $(document).ready(function(){
   //Init scrollspy
   $('body').scrollspy({target:'.navbar-collapse',offset:navbar})
-
+  if ('safari' in window && 'pushNotification' in window.safari)
+    adjustButton()
+  else
+  {
+    $('#pushBtn').addClass('disabled')
+    $('#pushBtn').parent().tooltip({title: "Push notifications require Safari",placement:'left'})
+  }
 
   function adjustToScreenSize()
   {
@@ -49,20 +55,22 @@ $(document).ready(function(){
     updateLogo()
   }
 
-  // Vimeo player api
-  var player = $f($('#vimeo')[0])
+  if ($('#vimeo').length)
+  {
+    // Vimeo player api
+    var player = $f($('#vimeo')[0])
 
-  // When the player is ready, add listener for finish
-  player.addEvent('ready', function() {
-    alert('hi')
-    player.addEvent('finish', function(){
-      $('#entertainment').animatescroll({padding:navbar})       
+    // When the player is ready, add listener for finish
+    player.addEvent('ready', function() {
+      player.addEvent('finish', function(){
+        $('#entertainment').animatescroll({padding:navbar})       
+      })
     })
-  })
+  }
 
   // Enter button scrolls down to trailer or entertainment if there is no trailer
   $('#enter').click(function(){
-    if ($('#trailer').length)
+    if ($('#vimeo').length)
     {
       $('#trailer').animatescroll({padding:navbar})
       player.api('play')
@@ -87,6 +95,10 @@ $(document).ready(function(){
 
   $(window).resize(adjustToScreenSize)
   adjustToScreenSize()
+
+  $('#emailBtn').click(subscribeEmail)
+
+
 })
 
 validateEmail = function()
@@ -95,7 +107,7 @@ validateEmail = function()
 
   $('#emailFeedback').removeClass('has-error') 
   $('.form-control-feedback').addClass('hidden')
-  if(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test(inp.val()))
+  if(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/.test(inp.val()))
     return true
   $('#emailFeedback').addClass('has-error')
   $('.glyphicon-remove').removeClass('hidden')
@@ -108,12 +120,7 @@ subscribeEmail = function()
   {
     var btn = $(this)
     btn.button('loading')
-    $.ajax({
-      url: '/subscribe',
-      data: { 
-        email: $('#emailInput').val()
-      }
-    })
+    $.ajax('/subscribe?email='+$('#emailInput').val())
     .done(function(){
       btn.html('Success!')
       setTimeout(function(){
@@ -125,5 +132,23 @@ subscribeEmail = function()
     .fail(function(){
       alert("An error occured. Please try again")
     })
+  }
+}
+subscribePush = function()
+{
+  window.safari.pushNotification.requestPermission(
+    'https://www.orielball.uk',
+    'web.uk.orielball',
+    {},
+    adjustButton
+  )
+}
+adjustButton = function()
+{
+  var permission = window.safari.pushNotification.permission('web.uk.orielball').permission
+  if (permission !== 'default') 
+  {
+    $('#pushBtn').addClass('disabled')
+    $('#pushBtn').parent().tooltip({title: (permission === 'granted') ? "Already subscribed" : "Adjust your subscription in Safari settings",placement:'bottom'})
   }
 }

@@ -8,6 +8,9 @@
     .navbar .navbar-collapse {
         text-align: center;
     }
+    #emailModal {
+      padding-top: 15%;
+    }
 }
 
 html body {
@@ -73,5 +76,14 @@ nav {
 
 p {
   font-size: 12px;
+}
+
+.modal a  
+{
+  color: none;
+}
+
+#pushBtn.disabled {
+  color: gray;
 }
 
