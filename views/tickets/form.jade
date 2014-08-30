@@ -5,6 +5,8 @@ html
     include ../imports
     meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
     link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
+    link(rel='stylesheet', href='/stylesheets/selectize.bootstrap3.css')
+    script(type='text/javascript', src='/javascripts/selectize.js')
     script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
     script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
     script(type='text/javascript').
@@ -25,6 +27,15 @@ html
       })
 
       $(document).ready(function(){
+        $('#bodcardHelp').tooltip({placement: 'left'})
+        $('#college select').selectize({
+          maxItems: 1,
+          sortField: {
+            field: 'text',
+            direction: 'asc'
+          },
+          dropdownParent: 'body'
+        })
         $('#totalCounter').flipcountdown({
           tick: function(){ return parseInt(left[0]) },
           size: 'sm'
@@ -35,29 +46,34 @@ html
         })
         updateTickets()
 
-        $('#addcc').click(function(){
+        $('#pay').click(function(){
           var valid = true
-          $('#emailWarning, #bodcardWarning, #nameWarning').addClass('hidden')
-          if (!/^.+ .+$/.test($('#name').val()))
+          $('#name,#email,#bodcard,#college').removeClass('has-error')
+          if (!/^.+ .+$/.test($('#name input').val()))
           {
-            $('#nameWarning').removeClass('hidden')
+            $('#name').addClass('has-error')
             valid = false
           }
-          if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test($('#email').val()))
+          if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test($('#email input').val()))
           {
-            $('#emailWarning').removeClass('hidden')
+            $('#email').addClass('has-error')
             valid = false
           }
-          if (!/^[0-9]{7}$/.test($('#bodcard').val()))
+          if (!/^[0-9]{7}$/.test($('#bodcard input').val()))
           {
-            $('#bodcardWarning').removeClass('hidden')
+            $('#bodcard').addClass('has-error')
+            valid = false
+          }
+          if ($('#college select').val() == '')
+          {
+            $('#college').addClass('has-error')
             valid = false
           }
           if (valid)
           {
             var type = $('input[name=type]:checked').val()
             handler.open({
-              email: $('#email').val(),
+              email: $('#email input').val(),
               description: (type === 'standard') ? '1 Standard Ticket' : '1 Dining Ticket',
               amount: prices[type] * 100
               })
@@ -79,36 +95,57 @@ html
         })
       }
   body
-    .content
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+          ul.nav.navbar-nav
+            li
+              a(href="javascript:window.history.back()")
+                i.fa.fa-arrow-left
+                | &nbsp;Back
+    .container-fluid
+      img(src='/images/logo.png',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")#logo
       .row(style='padding-top:100px')
-        .col-xs-12.col-sm-4.col-sm-offset-4
+        .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
           form#payment-form.form(role='form',method='POST',autocomplete='on',action='/tickets')
-            .form-group
-              label(for='name') Name
-              input#name.form-control(name='name',type='text',placeholder='Enter name')
-              #nameWarning.alert.alert-danger.hidden(role="alert") Please enter your name
-            .form-group
-              label(for='email') Email address
-              input#email.form-control(name='email',type='email',placeholder='Enter .ox.ac.uk email')
-              #emailWarning.alert.alert-danger.hidden(role="alert") Incorrect email. Please use your college email address
-            .form-group
-              label(for='bodcard') Bodleian card number
-              input#bodcard.form-control(name='bodcard',type='text',placeholder='Enter card number', pattern='[0-9]*')
-              #bodcardWarning.alert.alert-danger.hidden(role="alert") This should be a seven-digit number
-              p.help-block Your card number is the number above the barcode
-            .form-group
-              .btn-group(data-toggle="buttons")
-                label.btn.active.btn-default
+            .form-group#name
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-user.fa-fw
+                input.form-control(name='name',type='text',placeholder='Name')
+            .form-group#email
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-at.fa-fw
+                input.form-control(name='email',type='email',placeholder='University email address')
+            .form-group#bodcard
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-credit-card.fa-fw
+                input.form-control(name='bodcard',type='text',placeholder='Bodcard number', pattern='[0-9]*')
+                span.input-group-addon#bodcardHelp(title='This is the seven-digit number above the barcode') ? 
+              p.help-block 
+            .form-group#college
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-university.fa-fw
+                select(name='college', placeholder="College")
+                  option 
+                  option Oriel
+                  option University
+            .form-group.text-center()
+              .btn-group(data-toggle="buttons",style="width:100%")
+                label.btn.active.btn-default(style="width:50%")
                   input(type="radio", name="type", value='standard', checked)
-                  x Standard
-                label.btn.btn-default#diningToggle
+                  h5 
+                    | Standard <br>
+                    small £165
+                label.btn.btn-default#diningToggle(style="width:50%")
                   input(type="radio", name="type", value="dining")
-                  x Dining
-            .text-center
-              button#addcc.btn.btn-primary.btn-lg(style='margin-top:30px;width=200px') Proceed to payment
-              br
-              a(href='https://stripe.com',target='_blank')
-                img(src='/images/stripe.png',width='119',height='26',style='margin-top:10px')
+                  h5 
+                    | Dining <br>
+                    small £185
+          .text-center
+              button#pay.btn.btn-primary.btn-lg(style='margin-top:30px;width=200px') Proceed to payment
           .text-center  
             br 
             br
