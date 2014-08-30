@@ -10,7 +10,7 @@ $(document).ready(function(){
     $('#top').css('height', (window.innerHeight-navbar)+'px')
 
     // Minimize letterboxing for trailer (in both directions)
-    $('#trailer').css('height', Math.min(9/16*window.innerWidth, window.innerHeight-navbar))
+    $('#trailer').css('height', Math.min(window.innerWidth*9/16, window.innerHeight-navbar))
 
     // Give the logo 80% of the space between the navbar and the opening text
     var spaceForLogo = Math.min(window.innerHeight-navbar-$('#top .col-md-6').height(),window.innerWidth)
@@ -27,6 +27,9 @@ $(document).ready(function(){
       $('#navbarGap').css('width',80-top*80/logoY)
     }
 
+    var m = (logoSize-80)/(logoY-420)
+    var n = 80-m*420
+
     var updateLogo = function()
     {
       var off = window.pageYOffset
@@ -41,31 +44,24 @@ $(document).ready(function(){
         positionLogo(0,80)
     }
 
-    positionLogo(logoY,logoSize)
-
     // Resizes on scrolling
-    var m = (logoSize-80)/(logoY-420)
-    var n = 80-m*420
     $(window).scroll(updateLogo)
     updateLogo()
   }
 
-  // Logo is an anchor to return to the very top
-  $('#logo').click(function(){
-    $('body').animatescroll({padding:navbar})
-    player('pause')
-  })
-  
+  // Vimeo player api
   var player = $f($('#vimeo')[0])
 
-  // When the player is ready, add listeners for pause, finish, and playProgress
+  // When the player is ready, add listener for finish
   player.addEvent('ready', function() {
+    player.addEvent('pause',function(){})
+    player.addEvent('playProgress',function(){})
     player.addEvent('finish', function(){
       $('#entertainment').animatescroll({padding:navbar})       
     })
   })
 
-  // Enter button scrolls down to trailer (or entertainment if there is no trailer)
+  // Enter button scrolls down to trailer or entertainment if there is no trailer
   $('#enter').click(function(){
     if ($('#trailer').length)
     {
@@ -81,12 +77,19 @@ $(document).ready(function(){
   {
     e.preventDefault()
     $(this.hash).animatescroll({padding:navbar-5})
-    player('pause')
+    player.api('pause')
+  })
+
+  // Logo is an anchor to return to the very top
+  $('#logo').click(function(){
+    $('body').animatescroll({padding:navbar})
+    player.api('pause')
   })
 
   $(window).resize(adjustToScreenSize)
   adjustToScreenSize()
 })
+
 validateEmail = function()
 {
   var inp = $('#emailInput')
