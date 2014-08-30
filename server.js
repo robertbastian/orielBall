@@ -39,17 +39,7 @@ server.all('*',function(req,res,next){
 /* ROUTES */
 
 // Index
-server.get('/',function(req,res){
-  db.query(
-    'SELECT position, name, email FROM committee ORDER BY id ASC',
-    function(err,rows,fields)
-    {
-      res.render('old',{committee: (!err) ? rows : false})
-    }
-  )
-})
-
-server.get('/new', function(req, res){
+server.get('/', function(req, res){
   db.query(
     'SELECT position, name, email FROM committee ORDER BY id ASC',
     function(err,rows,fields)
