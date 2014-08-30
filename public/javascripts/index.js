@@ -137,7 +137,7 @@ subscribeEmail = function()
 subscribePush = function()
 {
   window.safari.pushNotification.requestPermission(
-    'https://www.orielball.uk',
+    'https://draft.orielball.uk',
     'web.uk.orielball',
     {},
     adjustButton
