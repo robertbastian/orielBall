@@ -1,0 +1,80 @@
+@media (min-width: 768px) {
+  .navbar .navbar-nav {
+      display: inline-block;
+      float: none;
+      vertical-align: top;
+  }
+
+  .navbar .navbar-collapse {
+      text-align: center;
+  }
+  #emailModal {
+    padding-top: 15%;
+  }
+}
+.navbar-inverse .navbar-nav>li>a {
+  color: #aaa;
+}
+
+body {
+  margin-top: 50px;
+  position: relative;
+  //font-family: 'Droid Serif';
+}
+
+.col-centered{
+float: none;
+margin: 0 auto;
+}
+
+
+.btn-gold { 
+  color: #ffffff; 
+  background-color: #FFD65E; 
+  border-color: #FFD65E; 
+} 
+ 
+.btn-gold:hover, 
+.btn-gold:focus, 
+.btn-gold:active, 
+.btn-gold.active, 
+.open .dropdown-toggle.btn-gold { 
+  color: #ffffff; 
+  background-color: #FFCD36; 
+  border-color: #FFD65E; 
+} 
+ 
+.btn-gold:active, 
+.btn-gold.active, 
+.open .dropdown-toggle.btn-gold { 
+  background-image: none; 
+} 
+ 
+.btn-gold.disabled, 
+.btn-gold[disabled], 
+fieldset[disabled] .btn-gold, 
+.btn-gold.disabled:hover, 
+.btn-gold[disabled]:hover, 
+fieldset[disabled] .btn-gold:hover, 
+.btn-gold.disabled:focus, 
+.btn-gold[disabled]:focus, 
+fieldset[disabled] .btn-gold:focus, 
+.btn-gold.disabled:active, 
+.btn-gold[disabled]:active, 
+fieldset[disabled] .btn-gold:active, 
+.btn-gold.disabled.active, 
+.btn-gold[disabled].active, 
+fieldset[disabled] .btn-gold.active { 
+  background-color: #FFD65E; 
+  border-color: #FFD65E; 
+} 
+ 
+.btn-gold .badge { 
+  color: #FFD65E; 
+  background-color: #ffffff; 
+}
+ 
+.btn-gold .badge { 
+  color: #F3D883; 
+  background-color: #FFFFFF; 
+}

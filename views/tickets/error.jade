@@ -1,15 +1,40 @@
 doctype html
 html
   head
+    include ../imports
     title Oriel College Commemoration Ball 2015 - Tickets
-    include imports
+    meta(name='robots',content='noindex nofollow')
   body
-    .content
-      .row.text-center(style='padding-top:20%')
-        if type == 'payment'
-          .alert.alert-danger(role='alert')= message
-          button.btn.btn-default(type='button',onclick='window.history.back()') Back
-        else
-          .alert.alert-warning(role='alert') Your payment succeded, but there was an error entering your ticket into the database. Please email tickets@orielball.uk with a screenshot of this page
-          .well=charge
-          .well=error
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+          ul.nav.navbar-nav.navbar-left.hidden-xs 
+            li
+              a(href='/')
+                i.fa.fa-angle-left
+                | &nbsp;Back
+    a(href='/')
+      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    .container-fluid
+      .row
+        .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
+          if type == 'payment'
+            span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-credit-card.fa-stack-2x
+            h1 Payment error
+            -var m = (message) ? 'Our payment provider returned the following error:<br>' + message : 'An error occured while communicating with our payment provider.'
+            .alert.alert-danger(role='alert') !{m}
+            p Your card was not charged and your ticket purchase did not succeed.
+          else if type == 'connection'
+            span.fa-stack.fa-lg.fa-5x
+              i.fa.fa-cloud.fa-stack-2x
+              i.fa.fa-gears.fa-flip-horizontal.fa-stack-1x.fa-inverse
+            h1 Server error
+            .alert.alert-danger(role='alert') The ticket page cannot be displayed because no connection to the ticket server can be established. Please try again in a little while.
+          else
+            span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-database.fa-stack-2x
+            h1 Database Error
+            .alert.alert-warning(role='alert').
+              Your ticket purchase succeded, but there was an error entering your details into our database. We are aware of this error and will be in contact with you after we have fixed this. To be safe, please keep a screenshot of this page for your record. We apologise for the inconvenience.
+            .well=charge
+            .well=error

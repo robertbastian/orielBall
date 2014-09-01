@@ -1,16 +1,17 @@
 doctype html
 html
   head
-    title Oriel College Commemoration Ball 2015
     include imports
+    title Oriel College Commemoration Ball 2015
+    meta(name='description',content='Some speculate that the Hanging Gardens of Babylon existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer them as yours to explore...')
     link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic')
     link(rel='stylesheet', href='/stylesheets/index.css')
     script(src='/javascripts/animatescroll.min.js')
     script(src='//f.vimeocdn.com/js/froogaloop2.min.js')
     script(src='/javascripts/index.js')
     |<!--[if lt IE 9]>
-    |    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    |    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    |    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    |    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     |<![endif]-->
   body
     nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
@@ -36,14 +37,14 @@ html
             li 
               a(href="#news") News
     .container-fluid
-      img(src='/images/logo.png')#logo
+      img(src='/images/logo.svg', alt='Logo')#logo
       #top.row
         .col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center
           h1(style="font-variant:small-caps;font-size:3.5em;") Gardens of Babylon
           h4 The  Oriel College Commemoration Ball 2015
           p.hidden-xs.
             Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which lingers longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
-          #enter.btn.btn-primary.btn-lg Enter
+          #enterBtn.btn.btn-gold.btn-lg Enter
       if trailer
         #trailer.row
           .col-xs-12.text-center
@@ -55,59 +56,40 @@ html
             .col-sm-7
               h1 Entertainment
               p.
-                On our main stage we welcome live performances from THE HOOSIERS and ELIZA AND THE BEAR as well as a DJ set by PENDULUM ft Verse MC.Beside musical entertainment, we have the renowned magician Alan Hudson, who will be performing close up magic at our ball! Alan is an associate of the inner magic circle, London, has appeared on ITV’s hit Saturday night show Penn &amp; Teller: Fool Us with Jonathan Ross, BBC2’s Culture Show, ITV1’s Sooty Show, and BBC1’s The Holiday Show. Check out this video of Alan in action, prepare to be amazed! We will also be welcoming a trio of comedians including Joel Dommet, who many of you will know as DC Sweeney from Skins. He will be appearing as our headline comedy act along with Naz Osmanoglu and Ben Van Der Velde. There will be a fairground, a ceilidh, and many photo opportunities! If you need to refresh yourself or powder your nose, you will be able to make your way to our Powder Room where beauticians and masseuses will be on hand to help.
+                With two stages and a large variety of talented acts, our musical line up promises to get everybody moving. Early in the evening a classical ensemble will provide the perfect backdrop for ballroom dances. As the evening progresses both stages will come alive with acts spanning from jazz a cappella to house and electronic music. When the sun starts to rise and night turns to morning, you will be reinvigorated by the arrival of a silent disco with two top DJs keeping you pumped. Silent disco not your thing? After 3am, our second stage will become a hub for acoustic artists and comedians, allowing you to sit back and enjoy yourself without having to move a muscle. Whatever your taste, we will have you enthralled and immersed in the music for the entirety of the evening.
             .col-sm-4.col-sm-offset-1
-              img.img-thumbnail(src='/images/index/entertainment1.jpg')
+              img.img-thumbnail(src='/images/index/entertainment1.jpg',alt='Entertainment')
       #fooddrink.row
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
             .col-sm-4
-              img.img-thumbnail(src='/images/index/entertainment1.jpg')
+              img.img-thumbnail(src='/images/index/entertainment1.jpg',alt='Food & Drink')
             .col-sm-7.col-sm-offset-1
               h1 Food &amp; Drink
               p.
-                On our main stage we welcome live performances from THE HOOSIERS and ELIZA AND THE BEAR as well as a DJ set by PENDULUM ft Verse MC.Beside musical entertainment, we have the renowned magician Alan Hudson, who will be performing close up magic at our ball! Alan is an associate of the inner magic circle, London, has appeared on ITV’s hit Saturday night show Penn &amp; Teller: Fool Us with Jonathan Ross, BBC2’s Culture Show, ITV1’s Sooty Show, and BBC1’s The Holiday Show. Check out this video of Alan in action, prepare to be amazed! We will also be welcoming a trio of comedians including Joel Dommet, who many of you will know as DC Sweeney from Skins. He will be appearing as our headline comedy act along with Naz Osmanoglu and Ben Van Der Velde. There will be a fairground, a ceilidh, and many photo opportunities! If you need to refresh yourself or powder your nose, you will be able to make your way to our Powder Room where beauticians and masseuses will be on hand to help.
+                adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
       #sponsoring.row
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
-            .col-xs-12.text-center
-              h1 Our sponsors
-          .row.text-center
-            .col-md-2.col-sm-4.col-xs-6
-              a(href='http://elastichosts.co.uk',target='_blank')            
-                img.img-thumbnail(src='/images/index/elastichosts.jpg')
+            .col-xs-12
+              h1 Sponsoring
+          .row
+            .col-sm-12
               p.
-                Elastichosts are generously hosting our website on their new Elastic Servers
-            .col-md-2.col-sm-4.col-xs-6
-              a(href='#',target='_blank')            
-                img.img-thumbnail(src='/images/index/emtpy.jpg')
+                The Oriel College Commemoration Ball 2015 is looking for sponsorship partners to contribute to the cost of running the Ball and ensure the evening is a success. It is set to be the Oxford University event of the year as it is the only white tie Ball taking place in summer 2015. Oriel is offering sponsors a rare opportunity for exposure to an exclusive audience; not only to the 1100 guests attending the Ball but to Oxford University’s extended student population of 30,000 and, significantly, to countless alumni. 
               p.
-                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
-            .col-md-2.col-sm-4.col-xs-6
-              a(href='#',target='_blank')            
-                img.img-thumbnail(src='/images/index/emtpy.jpg')
+                Your brand will benefit from the dedication of our marketing and design teams whose publicity campaign will ensure anticipation for the Ball heightens over the course of the academic year. This will reach its crescendo on the night of the Ball itself when there will be even more fantastic opportunities to give your brand targeted exposure to this unique audience.
               p.
-                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
-            .col-md-2.col-sm-4.col-xs-6
-              a(href='#',target='_blank')            
-                img.img-thumbnail(src='/images/index/emtpy.jpg')
-              p.
-                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
-            .col-md-2.col-sm-4.col-xs-6
-              a(href='#',target='_blank')            
-                img.img-thumbnail(src='/images/index/emtpy.jpg')
-              p.
-                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
-            .col-md-2.col-sm-4.col-xs-6
-              a(href='#',target='_blank')            
-                img.img-thumbnail(src='/images/index/emtpy.jpg')
-              p.
-                dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo 
-
-
+                If you would like to discuss this exceptional opportunity, please contact <a href='mailto:sponsoring@orielball.uk'>sponsoring@orielball.uk</a>.
           .row
             .col-xs-12.text-center
-              h6 Want to become a sponsor? Email us at <a href='mailto:sponsoring@orielball.uk'>sponsoring@orielball.uk</a>
+              h3 Our sponsors
+          .row.text-center
+            .col-md-3.col-sm-4.col-xs-6.col-centered
+              a(href='http://elastichosts.co.uk',target='_blank')            
+                img.img-thumbnail(src='/images/index/elastichosts.jpg',alt='Elastichosts')
+              br
+              small Elastichosts are generously hosting our website on their new Elastic Containers
       #tickets.row
         .col-xs-10.col-xs-offset-1.text-center
           h1 Tickets
@@ -124,22 +106,20 @@ html
             .col-sm-4
               i.fa.fa-glass.fa-2x
               h3 
-                | Standard Ticket <br>
+                | Non-dining Ticket <br>
                 small &pound;!{(pricesPublic)?prices['standard']:'TBD'}
               p.
                 Bla bla no 5 course meal for you bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
               br
               br
-          if showTicketLinks 
-            a.btn.btn-lg.btn-primary(href='/tickets',style='margin:-10px 0px 10px 0px') Buy Tickets
-          else
-            a.btn.btn-lg.btn-primary.disabled(href='/tickets',style='margin-bottom:-20px') Buy Tickets
+          a.btn.btn-lg.btn-gold(href='/tickets',style='margin-bottom:-20px') Booking system
+          if bookingDateString 
             h3 
               small Tickets go on sale on !{bookingDateString}
       #news.row
         .col-xs-10.col-xs-offset-1
           .row
-            .col-md-4.hidden-sm.hidden-xs.
+            .col-md-4.hidden-sm.hidden-xs(style='overflow:hidden').
               <iframe overflow=hidden src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Forielball&amp;height=395&amp;colorscheme=light&amp;show_faces=false&amp;header=false&amp;stream=true&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:395px; background: #fff;width:100%;" allowTransparency="true"></iframe>
             .col-md-4.col-sm-6.col-xs-12.text-center
               h3.text-center Keep up to date
@@ -158,7 +138,7 @@ html
                         i.fa.fa-facebook.fa-stack-1x.fa-inverse
                 tr
                   td(style='text-align:right;')
-                    a(href="javascript:$('#emailModal').modal('show')")
+                    a(href="#emailModal",data-toggle='modal')
                       span.fa-stack.fa-4x
                         i.fa.fa-square.fa-stack-2x
                         i.fa.fa-envelope.fa-stack-1x.fa-inverse
@@ -176,54 +156,59 @@ html
           .row
             h5 
               small
-                a(href="javascript:$('#aboutModal').modal('show')") Committee
-                | &nbsp;&nbsp;•&nbsp;&nbsp; 
-                a(href="javascript:$('#tacModal').modal('show')") Terms &amp; Conditions
-                br
                 | &copy; 2014 Oriel College Commemoration Ball
+                br
+                a#committeLink(href='#committeeModal',data-toggle="modal") Committee
+                | &nbsp; • &nbsp; 
+                a#tacLink(href='#tacModal',data-toggle="modal") Terms &amp; Conditions
+                | &nbsp; • &nbsp;
+                a#jobLink(href='#jobModal',data-toggle="modal") Jobs
 
 
-    .modal.fade#aboutModal(tabindex="-1",role="dialog")
+    .modal.fade#committeeModal(tabindex="-1",role="dialog")
       .modal-dialog
         .modal-content.text-center
           .modal-header
             button.close(type="button",data-dismiss="modal")
-              span(aria-hidden="true")&times;
+              span(aria-hidden="true") &times;
               span.sr-only Close
             h3.modal-title(style='margin-left:18px;') Committee
-          if committee
-            table.table.table-condensed.modal-body
-             - for (var i = 0; i < 16; i = i + 2) {
-               tr
-                td(width='50%')
+          table.table.table-condensed.modal-body
+            - var committee = [['President','Markian Mysko von Schultze','president@orielball.uk' ],['Vice President','Imogen Duffy','vicepresident@orielball.uk'],['Secretary','Jessica Collins','secretary@orielball.uk'],['Treasurer','Benjamin Mason','treasurer@orielball.uk'],['Food','Peter Corden','food@orielball.uk'],['Drinks','Emily Burdett','drinks@orielball.uk'],['IT','Robert Bastian','it@orielball.uk'],['Technology','Charlotte Meakin','tech@orielball.uk'],['Sponsorship','Rufus Stirling','sponsoring@orielball.uk'],['Tickets','Charlie Cornish','tickets@orielball.uk'],['Security','Maks Adach','security@orielball.uk'],['Musical Entz','Reece Lunstone','entertainment@orielball.uk'],['Decorations','Helena Jackson<br>Alice Correia Morton','decorations@orielball.uk'],['Non-Musical Entz','Amy Lineham<br>Jacob Warn','entertainment@orielball.uk'],['Marketing','Shini Pattni<br>Eleanor Sharman','marketing@orielball.uk'],['Facilities','Sophie Barnes<br>Emma Williams','facilities@orielball.uk']]
+            - for (var i = 0; i < 16; i = i + 2) {
+              tr
+                td(style='width:50%')
                   a(href='mailto:'+committee[i]['email'])
                     h4 !{committee[i]['position']}
                       br
                       small !{committee[i]['name']}
-                td(width='50%')
+                td(style='width:50%')
                   a(href='mailto:'+committee[i+1]['email'])
                     h4 !{committee[i+1]['position']}
                       br
                       small !{committee[i+1]['name']}
-                tr
-             - }
-          else
-            .modal-body
-              h4 An error occured while loading the committee.
-    
+            - }    
 
     .modal.fade#tacModal(tabindex="-1",role="dialog")
       .modal-dialog
         .modal-content.text-center
           .modal-header
             button.close(type="button",data-dismiss="modal")
-              span(aria-hidden="true")&times;
+              span(aria-hidden="true") &times;
               span.sr-only Close
             h3.modal-title(style='margin-left:18px;') Terms &amp; Conditions
           .modal-body
             include tac
 
-
+    .modal.fade#jobModal(tabindex="-1",role="dialog")
+      .modal-dialog
+        .modal-content.text-center
+          .modal-header
+            button.close(type="button",data-dismiss="modal")
+              span(aria-hidden="true") &times;
+              span.sr-only Close
+            h3.modal-title(style='margin-left:18px;') Jobs
+          .modal-body
 
     .modal.fade#emailModal(tabindex="-1",role="dialog")
       .modal-dialog.modal-sm
@@ -234,4 +219,4 @@ html
                 label.sr-only Email
                 input.form-control#emailInput(type=email,placeholder='University email address')
                 span.glyphicon.glyphicon-remove.form-control-feedback.hidden
-              #emailBtn.btn.btn-primary(data-loading-text="Loading...",style="width: 100%") Subscribe to emails
+              #emailBtn.btn.btn-primary.btn-block(data-loading-text="Loading...") Subscribe to emails

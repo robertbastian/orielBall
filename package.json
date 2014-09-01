@@ -10,7 +10,8 @@
         "body-parser":"1.4.3",
         "nodemailer":"0.7.0",
         "email-templates":"1.1.1",
-        "stripe":"x",
-        "moment":"2.4.0"
+        "stripe":"*",
+        "moment":"2.4.0",
+        "ip-check":"*"
     }
 }

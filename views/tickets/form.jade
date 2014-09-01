@@ -1,160 +1,80 @@
 doctype html
 html
   head
-    title Oriel College Commemoration Ball 2015 - Tickets
     include ../imports
-    meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
-    link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
+    title Oriel College Commemoration Ball 2015 – Tickets
+    meta(name='description', content="Excited for the Oriel College Commemoration Ball 2015? Get your tickets here. The Gardens of Babylon are wating for you...")
+    
+    //- Selectize.js for college selector
     link(rel='stylesheet', href='/stylesheets/selectize.bootstrap3.css')
     script(type='text/javascript', src='/javascripts/selectize.js')
-    script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
+    
+    //- Stripe for payment
     script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
+
     script(type='text/javascript').
-      var left = !{JSON.stringify(left)}
-      /* Changing the price here will just make your payment fail ;) */
       var prices = !{JSON.stringify(prices)}
       var stripe = !{JSON.stringify(stripe)}
-      var handler = StripeCheckout.configure({
-        key: stripe,
-        currency: 'gbp',
-        name: 'Oriel College Ball',
-        image: '/images/logo.png',
-        allowRememberMe: false,
-        token: function(token){
-          $('#payment-form').append($('<input type="hidden" name="stripeToken" />').val(token.id))
-          $('#payment-form').get(0).submit()
-        }
-      })
+    script(type='text/javascript', src='/javascripts/form.js')
 
-      $(document).ready(function(){
-        $('#bodcardHelp').tooltip({placement: 'left'})
-        $('#college select').selectize({
-          maxItems: 1,
-          sortField: {
-            field: 'text',
-            direction: 'asc'
-          },
-          dropdownParent: 'body'
-        })
-        $('#totalCounter').flipcountdown({
-          tick: function(){ return parseInt(left[0]) },
-          size: 'sm'
-        })
-        $('#diningCounter').flipcountdown({
-          tick: function(){ return parseInt(left[1]) },
-          size: 'sm'
-        })
-        updateTickets()
-
-        $('#pay').click(function(){
-          var valid = true
-          $('#name,#email,#bodcard,#college').removeClass('has-error')
-          if (!/^.+ .+$/.test($('#name input').val()))
-          {
-            $('#name').addClass('has-error')
-            valid = false
-          }
-          if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-.]+\.ox\.ac\.uk$/.test($('#email input').val()))
-          {
-            $('#email').addClass('has-error')
-            valid = false
-          }
-          if (!/^[0-9]{7}$/.test($('#bodcard input').val()))
-          {
-            $('#bodcard').addClass('has-error')
-            valid = false
-          }
-          if ($('#college select').val() == '')
-          {
-            $('#college').addClass('has-error')
-            valid = false
-          }
-          if (valid)
-          {
-            var type = $('input[name=type]:checked').val()
-            handler.open({
-              email: $('#email input').val(),
-              description: (type === 'standard') ? '1 Standard Ticket' : '1 Dining Ticket',
-              amount: prices[type] * 100
-              })
-          }
-          return false
-        })
-
-      })
-
-      updateTickets = function()
-      {
-        $.ajax('/ticketsLeft').done(function(json){
-          left = json
-          if (left[0] == 0)
-            location.reload()
-          if (left[1] == 0)
-            $('#diningToggle').addClass('disabled')
-          setTimeout(updateTickets,10000)
-        })
-      }
   body
+    
+    //- Navbar
     nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
       .container-fluid
-          ul.nav.navbar-nav
+          ul.nav.navbar-nav.navbar-left.hidden-xs 
             li
-              a(href="javascript:window.history.back()")
-                i.fa.fa-arrow-left
-                | &nbsp;Back
+              a(href='/')
+                i.fa.fa-angle-left &nbsp; Back
+          ul.nav.navbar-nav.navbar-right.hidden-xs 
+            li
+              a Tickets left:
+                i.fa.fa-glass#nonDiningLeft(style='margin:0px 20px 0px 20px') &nbsp;?
+                i.fa.fa-cutlery#diningLeft &nbsp;?
+    a(href='/')
+      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    
+    //- Content
     .container-fluid
-      img(src='/images/logo.png',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")#logo
-      .row(style='padding-top:100px')
+      .row(style='margin-top:10%')
         .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
-          form#payment-form.form(role='form',method='POST',autocomplete='on',action='/tickets')
-            .form-group#name
+          form.form#payment-form(role='form',method='POST',autocomplete='on',action='/tickets')
+            #name.form-group
               .input-group
                 span.input-group-addon
                   i.fa.fa-user.fa-fw
                 input.form-control(name='name',type='text',placeholder='Name')
-            .form-group#email
+            #email.form-group
               .input-group
                 span.input-group-addon
                   i.fa.fa-at.fa-fw
                 input.form-control(name='email',type='email',placeholder='University email address')
-            .form-group#bodcard
+            #bodcard.form-group
               .input-group
                 span.input-group-addon
                   i.fa.fa-credit-card.fa-fw
                 input.form-control(name='bodcard',type='text',placeholder='Bodcard number', pattern='[0-9]*')
                 span.input-group-addon#bodcardHelp(title='This is the seven-digit number above the barcode') ? 
               p.help-block 
-            .form-group#college
+            #college.form-group
               .input-group
                 span.input-group-addon
                   i.fa.fa-university.fa-fw
-                select(name='college', placeholder="College")
-                  option 
-                  option Oriel
-                  option University
-            .form-group.text-center()
-              .btn-group(data-toggle="buttons",style="width:100%")
-                label.btn.active.btn-default(style="width:50%")
-                  input(type="radio", name="type", value='standard', checked)
-                  h5 
-                    | Standard <br>
-                    small £165
-                label.btn.btn-default#diningToggle(style="width:50%")
-                  input(type="radio", name="type", value="dining")
-                  h5 
-                    | Dining <br>
-                    small £185
+                select(name='college',placeholder='College')
+                  option
+                  each college in ["All Souls","Balliol","Blackfriars","Brasenose","Campion Hall","Christ Church","Corpus Christi","Exeter","Green Templeton","Harris Manchester","Hertford","Jesus","Keble","Kellogg","Lady Margaret Hall","Linacre","Lincoln","Magdalen","Mansfield","Merton","New","Nuffield","Oriel","Pembroke","Queen's","Regent's Park","Somerville","St Anne's","St Anthony's","St Benet's Hall","St Catherine's","St Cross","St Edmund Hall","St Hilda's","St Hugh's","St John's","St Peter's","St Stephen's House","Trinity","University","Wadham","Wolfson","Worcester","Wycliffe Hall"]
+                    option(value=college) !{college}
+            #type.form-group.text-center
+              .btn-group.btn-block(data-toggle="buttons")
+                label#nonDiningToggle.btn.btn-default(style="width:50%")
+                  input(type="radio", name="type", value='Non-dining')
+                  b Non-dining
+                  br
+                  small £!{prices['Non-dining']}
+                label#diningToggle.btn.btn-default(style="width:50%")
+                  input(type="radio", name="type", value="Dining")
+                  b Dining 
+                  br
+                  small £!{prices['Dining']}
           .text-center
-              button#pay.btn.btn-primary.btn-lg(style='margin-top:30px;width=200px') Proceed to payment
-          .text-center  
-            br 
-            br
-            br
-            h4 Tickets left
-              .row
-                .col-xs-6
-                  h7 Total
-                  #totalCounter
-                .col-xs-6
-                  h7 Dining
-                  #diningCounter
+            button#pay.btn.btn-gold.btn-lg(style='margin-top:30px;width=200px') Proceed to payment

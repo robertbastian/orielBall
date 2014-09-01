@@ -3,25 +3,44 @@ html
   head
     title Oriel College Commemoration Ball 2015 - Tickets
     include ../imports
-    link(rel='stylesheet', href='/stylesheets/jquery.flipcountdown.css')
-    script(type='text/javascript', src='/javascripts/jquery.flipcountdown.js')
+    link(rel='stylesheet', href='/stylesheets/flipclock.css')
+    script(type='text/javascript', src='/javascripts/flipclock.min.js')
     script(type='text/javascript').
+      var offset = !{date.valueOf()} - Date.now()
       $(document).ready(function(){
-          $('#timecountdown').flipcountdown({
-            size: 'lg',
-            beforeDateTime: !{'\''+(date.getMonth()+1) + '/' + date.getDate() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()+'\''}
-          }) 
-          $('.xdsoft_space').addClass('xdsoft_separator')
-          $('.xdsoft_space').removeClass('xdsoft_space')
-        })
+        var countdown = $('#countdown').FlipClock(offset/1000,{
+          countdown: true,
+          clockFace: 'DailyCounter'
+          })
+        if (offset > 100 * 24 * 60 * 60 *1000)
+          $('.col-centered').css('width','785px')
+      })
   body
-    .content
-      .row.text-center(style='padding-top:20%')
-        h1 Tickets open in 
-        #timecountdown
-        h5 You will need your Bod card and a credit or debit card
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+          ul.nav.navbar-nav.navbar-left.hidden-xs 
+            li
+              a(href="javascript:window.history.back()")
+                i.fa.fa-angle-left
+                | &nbsp;Back
+    a(href='/')
+      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    .container-fluid
+      .row
+        .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
+          span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-ticket.fa-stack-2x
           br
-          if (date-Date.now() < 3600000)
-            small This page will automatically update
-            script.
-              setTimeout(function(){location.reload()},!{date-Date.now()})
+          h1 Tickets open in:
+      .row
+        .col-xs-12(style='width:715px;margin-top:20px').col-centered
+            .well
+              #countdown
+      if (date-Date.now() < 60*60*1000)
+        .row
+          .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center
+            h5 You will need your Bod card and a credit or debit card
+              br
+              small This page will automatically update
+              script.
+                setTimeout(function(){location.reload()},offset+500)

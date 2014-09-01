@@ -1,19 +1,29 @@
 doctype html
 html
   head
-    title Oriel College Commemoration Ball 2015 - Tickets
     include ../imports
-    script(type='text/javascript', src='https://addthisevent.com/libs/1.5.8/ate.min.js')
+    title Oriel College Commemoration Ball 2015 - Tickets
+    meta(name='robots',content='noindex nofollow')
   body
-    h2 Success
-    p.
-      Your ticket purchase was successful. You should receive a confirmation email shortly
-    a.addthisevent(href='http://example.com/link-to-your-event' title='Add to Calendar')
-      Add to Calendar
-      span._start 26-06-2015 18:30:00
-      span._end 27-06-2015 06:00:00
-      span._zonecode 36
-      span._location Oriel College
-      span._summary Oriel College Commemoration Ball
-      span._description Desc.
-      span._facebook_event http://www.facebook.com/events/160427380695693
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+          ul.nav.navbar-nav.navbar-left.hidden-xs 
+            li
+              a(href='/')
+                i.fa.fa-angle-left
+                | &nbsp;Back
+    a(href='/')
+      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    .container-fluid
+      .row
+        .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
+          span.fa-stack.fa-5x.fa-lg
+            i.fa.fa-check-square-o.fa-stack-2x
+          h1 Congratulations
+          .alert.alert-success.
+            You successfully purchased a !{type.toLowerCase()} ticket for the 2015&nbsp;Oriel&nbsp;Commemoration&nbsp;Ball! You will receive a confirmation email shortly. In the meantime, check out the links below. We cannot wait to celebrate with you! 
+          .row
+            .col-xs-6
+              a(href='http://ate.so/?0ScenBG+ical').btn.btn-lg.btn-default.btn-block Add to calendar
+            .col-xs-6
+             a(href='#').btn.btn-lg.btn-default.btn-block Hire a suit

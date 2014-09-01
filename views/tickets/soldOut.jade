@@ -1,7 +1,72 @@
 doctype html
 html
   head
-    title Oriel College Commemoration Ball 2015 - Tickets
     include ../imports
+    title Oriel College Commemoration Ball 2015 - Tickets
+    script.
+      $(document).ready(function()
+      {
+        $('#join').click(function()
+        {
+          $('.has-error').removeClass('has-error')
+          // Name has to be at least two words
+          if (!/^.+ .+$/.test($('#name input').val()))
+            $('#name').addClass('has-error')
+          // Email 
+          if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/.test($('#email input').val()))
+            $('#email').addClass('has-error')
+          if ($('.has-error').length == 0)
+          {
+            var btn = $(this)
+            btn.button('loading')
+            $.post('/subscribeWaitinglist',{
+              name: $('#name input').val(),
+              email: $('#email input').val()
+            }).done(function(){
+              btn.html('Success!')
+              setTimeout(function(){
+                $('#emailModal').modal('hide')
+                $('#emailInput').val('')
+                btn.button('reset')
+              },1000)
+            }).fail(function(){
+              btn.html('Error, not subscribed')
+              setTimeout(function(){btn.button('reset')},2000)
+            })
+          }
+        })
+      })
   body
-    h2 Sold out
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+          ul.nav.navbar-nav.navbar-left.hidden-xs 
+            li
+              a(href='/')
+                i.fa.fa-angle-left
+                | &nbsp;Back
+    a(href='/')
+      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    .container-fluid
+      .row
+        .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
+          span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-frown-o.fa-stack-2x
+          br
+          h1 Sold out
+          .alert.alert-info.
+            Good for us, bad for you: this batch of tickets has sold out. If you want to join the waiting list, use the form below.
+      .row
+        .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
+          form.form(role='form')
+            #name.form-group
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-user.fa-fw
+                input.form-control(name='name',type='text',placeholder='Name')
+            #email.form-group
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-at.fa-fw
+                input.form-control(name='email',type='email',placeholder='University email address')
+          .text-center
+            button#join.btn.btn-gold.btn-lg(data-loading-text="Loading...",style='margin-top:10px;width=200px') Join waiting list

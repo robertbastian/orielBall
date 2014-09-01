@@ -1,21 +1,4 @@
-@media (min-width: 768px) {
-    .navbar .navbar-nav {
-        display: inline-block;
-        float: none;
-        vertical-align: top;
-    }
-
-    .navbar .navbar-collapse {
-        text-align: center;
-    }
-    #emailModal {
-      padding-top: 15%;
-    }
-}
-
-html body {
-  margin-top: 50px;
-  position: relative;
+body {
   font-family: Droid Serif;
 }
 .container-fluid .row {
@@ -43,9 +26,22 @@ nav {
   z-index:1031;
   position: fixed;
   left: 50%;
-  top: 100px;
+  top: 0px;
+  width:80px;
+  height:80px;
+  margin-left:-40px;
   cursor: pointer; 
   cursor: hand;
+  -webkit-filter: drop-shadow( 0px 0px 15px #333333 );
+}
+
+#navbarGap {
+  width:80px;
+}
+
+#enterBtn {
+  width: 150px;
+  margin: 20px;
 }
 
 #trailer {
@@ -70,20 +66,29 @@ nav {
 }
 
 #sponsoring img {
-  width:100%;
-  margin: 0px 0px 20px 0px;
+  width:80%;
+  margin: 0px 0px 10px 0px;
 }
 
-p {
-  font-size: 12px;
+#sponsoring a {
+  color: #333;
 }
 
-.modal a  
-{
+#footer {
+  padding: 0;
+  background: #333;
+}
+
+#footer small {
+  color: #ccc;
+}
+#footer a {
+  color: #ccc;
+}
+.modal a {
   color: none;
 }
 
 #pushBtn.disabled {
   color: gray;
 }
-

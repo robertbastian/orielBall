@@ -1,14 +1,16 @@
-var constants = require('./constants')
+var c = require('./constants')
+
+/********************************** Setup *************************************/
 
 // Email template service
 var jade = require('jade')
 // Mail service
-var mailer = require('nodemailer').createTransport('direct')
+var mailer = require('nodemailer').createTransport("SMTP",c.smtp)
 
 // Payment service
-var stripe = require('stripe')(constants.stripe.secret)
+var stripe = require('stripe')(c.stripe.secret)
 // Database service
-var db = require('mysql').createConnection(constants.mysql)
+var db = require('mysql').createConnection(c.mysql)
 // Date formatting
 var moment = require('moment')
 
@@ -22,201 +24,286 @@ server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({extended:false}))
 
 // Setting jade as view engine
-server.set('view engine', 'jade')
+server.set('view engine','jade')
 
 // Directory for static files
 var path = require('path')
 server.use(express.static(path.join(__dirname, 'public')))
 
-// Redirecting everything to https://www.orielball.uk (missing www., .co.uk, http://)
+// Redirecting everything to https://www.orielball.uk/...
 server.all('*',function(req,res,next){
-  if (req.headers.host != constants.host || !req.secure)
-    res.redirect('https://' + constants.host + req.url)
-  else
+  if (req.headers.host == c.host && req.secure) 
     next()
+  else 
+    res.redirect('https://' + c.host + req.url)
 })
 
-/* ROUTES */
+// Locating user
+var inOriel = function(req){
+  return false
+}
 
-// Index
+/********************************* Home page ***********************************/
+
 server.get('/', function(req, res){
-  db.query(
-    'SELECT position, name, email FROM committee ORDER BY id ASC',
-    function(err,rows,fields)
-    {
-      res.render('index',{
-        committee: (!err) ? rows : false,
-        bookingDateString: moment(constants.tickets.date).format('dddd, DD MMMM [at] h a'),
-        // is the trailer public
-        trailer: constants.trailer,
-        // are the prices public
-        pricesPublic: constants.tickets.public,
-        // ticket prices
-        prices: constants.tickets.prices,
-        // activate the ticket button on the day of booking
-        showTicketLinks: new Date(constants.tickets.date.setHours(0,0,0,0)) <= Date.now()
-      })
-    }
-  )
+  var date = (inOriel(req)) ? c.tickets.orielDate : c.tickets.date
+  res.render('index',{
+    trailer: c.trailer,
+    pricesPublic: c.tickets.pricesPublic,
+    prices: c.tickets.prices,
+    // Show date when booking opens, if in the future
+    bookingDateString: (Date.now() < date) ? moment(date).format('dddd, DD MMMM [at] h:mm a') : false
+  })
 })
 
-// Tickets
+/******************************* Ticket server *********************************/
+
+// Ticket booking form
 server.get('/tickets',function(req,res){
-  // After release date
-  if (Date.now() > constants.tickets.date || constants.ticketdebug)
-  {
-    ticketsLeft(res, function(total,dining){
+  var date = (inOriel(req)) ? c.tickets.orielDate : c.tickets.date
+  ticketsLeft(function(error,nonDining,dining){
+    // Tickets released
+    if (Date.now() > date || c.ticketdebug) {
+      // Can't sell tickets because database is offline
+      if (error)
+        res.render('tickets/error',{type:'connection'})
       // Tickets sold out
-      if (total <= 0)
+      else if (nonDining <= 0 && dining <= 0)
         res.render('tickets/soldOut')
       // Tickets available
       else
         res.render('tickets/form',{ 
-          left: [total,dining],
-          prices: constants.tickets.prices,
-          stripe: constants.stripe.public
+          prices: c.tickets.prices,
+          stripe: c.stripe.public
         })
-    })
-  } 
-  // Before release date 
-  else
-    res.render('tickets/countdown',{ date: constants.tickets.date }) 
-  
-})
-
-// Send the numbers of remaining tickets
-server.get('/ticketsLeft',function(req,res){
-  ticketsLeft(res,function(total,dining){
-    res.json(200,[total,dining])
+    }
+    // Tickets not yet released
+    else
+      res.render('tickets/countdown',{date:date})
   })
 })
 
-var ticketsLeft = function(res,callback)
-{
-  db.query(
-    'SELECT (SELECT COUNT(*) FROM bookings) AS total, (SELECT COUNT(*) FROM bookings WHERE type = "dining") AS dining',
-    function(err,rows,fields){
-      if (err)
-        res.send(500,err)
-      else
-        callback(constants.tickets.total - rows[0]['total'],constants.tickets.dining - rows[0]['dining'])
-    }
-  )
-}
-
 // Reply from ticket form & payment processing
 server.post('/tickets',function(req,res){
-  var charge = stripe.charges.create(
-    {
-      amount: constants.tickets.prices[req.body.type]*100,
+  var r = req.body
+  stripe.charges.create({
+      amount: c.tickets.prices[r.type]*100,
       currency: 'gbp',
-      card: req.body.stripeToken,
-      description: req.body.email,
-      statement_description: (req.body.type == 'standard') ? 'Ticket' : 'Dining Ticket'
+      card: r.stripeToken,
+      description: r.email,
+      statement_description: '1x ' + r.type.toLowerCase()
     },
-    function(err, charge){
-      if (err || !charge.paid)
-      {
-        if(err.type == 'card_error')
-          res.render('tickets/error',{type: 'payment', message:err.message})
-        else
-          res.render('tickets/error',{type: 'payment', message:'Server error'})
+    function(error, charge){
+      // Stripe/card error. Nothing charged, no ticket bought
+      if (error || !charge.paid) {
+        if (error.type == 'card_error')
+          res.render('tickets/error',{type:'payment', message: error.message})
+        else {
+          console.log('+++ Stripe error: %s, %s',error.message,r.name)
+          res.render('tickets/error',{type:'payment'})
+        }
       }
-      else
-      {
+      else {
         db.query(
-          'INSERT INTO bookings (name,email,bodcard,charge,type) VALUES (?,?,?,?,?)',
-          [req.body.name,req.body.email,req.body.bodcard,charge.id,req.body.type],
-          function(error,rows,fields)
-          {
-            if (error)
-              res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
-            else
-            {
-              mailer.sendMail(
-              {
+          'INSERT INTO bookings (name,email,bodcard,college,type,charge) VALUES (?,?,?,?,?,?)',
+          [r.name,r.email,r.bodcard,r.college,r.type,charge.id],
+          function(error,rows,fields){
+            // BIG ERROR. CUSTOMER WAS CHARGED BUT NOT ENTERED INTO THE DATABASE
+            if (error) {
+              console.log('+++++ Database error: %s; %s; %s',error,charge,r)
+              mailer.sendMail({
                 from: 'Oriel College Ball <no-reply@orielball.uk>',
-                to: (req.body.name + '<' + req.body.email + '>'),
-                subject: 'Ticket confirmation',
-                html: 'html',
-                text: 'text'
+                to: 'Robert Bastian <it@orielball.uk>',
+                subject: 'Database error',
+                text: 'Error:\n' + error + '\n\n' + 'Charge:\n' + charge.id + '\n\n' + 'Request:\n' + JSON.stringify(r)
               })
-              res.render('tickets/success',{type:req.body.type})
+              res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
+            }
+            // All good, send confirmation mail
+            else {
+              mailer.sendMail({
+                from: 'Oriel College Ball <no-reply@orielball.uk>',
+                to: r.name + '<'+r.email+'>',
+                subject: 'Ticket confirmation',
+                text: '' // TODO
+              })
+              res.render('tickets/success',{type:r.type})
             }
           }
         )
       }
-  })
-})
-
-// Email subscription processing
-server.get('/subscribe', function(req,res) {
-  db.query(
-    'INSERT IGNORE INTO mailingList (email,type) VALUES (?,?)',
-    [req.query['email'],(/^.+@oriel\.ox\.ac\.uk$/.test(req.query['email']))?'oriel':'oxford'],
-    function(err, rows, fields) { res.send((err) ? 500 : 200) }
-    )
-})
-
-// Unsubscribe email processing (not accessible from website)
-server.get('/unsubscribe/:email',function(req,res){
-  var email = req.param('email')
-  db.query(
-    'DELETE FROM mailingList WHERE email = ?',
-    [email],
-    function(err,rows,fields){
-      if (err) 
-        res.send(500, "error")
-      else
-        res.send(200, email+" unsubscribed")
-    })
-})
-
-// Display subscription email
-server.get('/updates/:number',function(req,res){
-  db.query(
-    'SELECT text FROM updates WHERE id = ?',
-    [req.param('number')],
-    function(err,rows,fields)
-    {
-      if (!err)
-        res.render('update',rows[0]['text'])
-      else 
-        res.send('Database error')
     }
   )
 })
 
-// Serving push package
+// Remaining tickets helper function
+server.post('/ticketsLeft',function(req,res){
+  if (!c.tickets.amountPublic)
+    res.status(403).end()
+  else
+    ticketsLeft(function(error,nonDining,dining){
+      if (error) 
+        res.status(500).end()
+      else 
+        res.json([nonDining,dining])
+    })
+})
+var ticketsLeft = function(callback){
+  db.query(
+    'SELECT (SELECT COUNT(*) FROM bookings) AS total, (SELECT COUNT(*) FROM bookings WHERE type = "Dining") AS dining',
+    function(error,rows,fields){
+      if (error)
+      {
+        console.log('+++ Database error: %s',error)
+        callback(error,0,0)
+      }
+      else
+      {
+        var totalLeft = c.tickets.total - rows[0]['total']
+        var diningLeft = c.tickets.dining - rows[0]['dining']
+        callback(false,Math.max(0,totalLeft-diningLeft),Math.max(0,diningLeft))
+      }
+    }
+  )
+}
+
+/******************************* Mailing lists *********************************/
+
+// Email subscription processing
+server.post('/subscribeEmail', function(req,res){
+  db.query(
+    'INSERT IGNORE INTO mailingList (email,type) VALUES (?,?)',
+    [req.body.email,(/^.+@oriel\.ox\.ac\.uk$/.test(req.body.email))?'oriel':'oxford'],
+    function(error, rows, fields){
+      if (error) {
+        console.log('+++ Database error: %s',error)
+        res.status(500).end() 
+      }
+      else {
+        console.log('Added %s to mailing list',req.body.email)
+        res.status(200).end()
+      }
+    }
+  )
+})
+
+
+// Email unsubscription processing
+server.get('/unsubscribe/:email',function(req,res){
+  db.query(
+    'DELETE FROM mailingList WHERE email = ?',
+    [req.param('email')],
+    function(error,rows,fields){
+      if (error)
+        console.log('+++ Database error: %s',error)
+      else
+        console.log('Removed %s from mailing list',req.param('email'))
+      res.render('emailUnsubscribed',{error:error,email:req.param('email')})
+    }
+  )
+})
+
+// Waiting list processing
+server.post('/subscribeWaitingList',function(req,res){
+  db.query(
+    'INSERT INTO waitingList (email,name) VALUES (?,?)',
+    [req.body.email,req.body.name],
+    function(error,rows,fields){ 
+      if (error) {
+        console.log('+++ Database error: %s',error)
+        res.status(500).end()
+      }
+      else {
+        console.log('Added %s, %s to waiting list',req.body.name,req.body.email)
+        res.status(200).end()
+      }
+    }
+  )
+})
+
+/**************************** Push notifications ******************************/
+
+// Push package
 server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
   res.sendfile('public/pushPackage.zip')
 })
-
-// Registering device
+// Registering
 server.post('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
-    'INSERT IGNORE INTO pushList (device) VALUE (?)',
+    'INSERT IGNORE INTO pushList device VALUE ?',
     [req.param('token')],
-    function(err, rows, fields) { res.send((err) ? 500 : 200) }
-    )
+    function(error, rows, fields){
+      if (error) {
+        console.log('+++ Database error: %s',error)
+        res.status(500).end()
+      }
+      else {
+        console.log('Added %s to push list',req.param('token'))
+        res.status(200).end()
+      }
+    }
+  )
 })
-
-// Deleting device
+// Deleting
 server.delete('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
     'DELETE FROM pushList WHERE device = ?',
     [req.param('token')],
-    function(err, rows, fields) { res.send((err) ? 500 : 200) }
-    )
+    function(error, rows, fields){
+      if (error) {
+        console.log('+++ Database error: %s',error)
+        res.status(500).end()
+      }
+      else {
+        console.log('Removed %s from push list',req.param('token'))
+        res.status(200).end()
+      }
+    }
+  )
+})
+// Logging
+server.post('/v1/log',function(req,res){
+  console.log('+++ Push log: %s',req.body.logs)
 })
 
-// Push logs
-server.post('/v1/log', function(req,res){
-  console.log(req.body.logs)
+/********************************** Debug *************************************/
+
+server.get('/ticketerror1',function(req,res){
+  res.render('tickets/error',{type:'connection'})
 })
 
+server.get('/ticketerror2',function(req,res){
+  res.render('tickets/error',{type:'database', charge:'ch_asfj8a948j23j8rqpfjf2', error: 'AAAAHRGH'})
+})
+
+server.get('/ticketerror3',function(req,res){
+  res.render('tickets/error',{type: 'payment', message: 'Your card was declined'})  
+})
+
+server.get('/ticketsuccess',function(req,res){
+  res.render('tickets/success',{type:'non-dining'})
+})
+
+server.get('/ticketcountdown',function(req,res){
+  res.render('tickets/countdown',{date:c.tickets.orielDate})
+})
+
+server.get('/ticketsoldout',function(req,res){
+  res.render('tickets/soldOut')
+})
+
+server.get('/robots.txt',function(req,res){
+  res.send('User-agent: *\nDisallow: /')
+})
+
+/********************************** Server *************************************/
+
+// 404 errors
+server.use(function(req,res){
+  res.status(404).render('404')
+})
 // HTTPS server
-require('https').createServer(constants.ssl,server).listen(443,function(){
+require('https').createServer(c.ssl,server).listen(443,function(){
   console.log('Listening for HTTPS requests on port 443')
 })
 
