@@ -20,8 +20,13 @@ html
           span.fa-stack.fa-5x.fa-lg
             i.fa.fa-check-square-o.fa-stack-2x
           h1 Congratulations
-          .alert.alert-success.
-            You successfully purchased a !{type.toLowerCase()} ticket for the 2015&nbsp;Oriel&nbsp;Commemoration&nbsp;Ball! You will receive a confirmation email shortly. In the meantime, check out the links below. We cannot wait to celebrate with you! 
+          .alert.alert-success
+            if amount > 1
+              p You successfully purchased <b>!{['two','three','four','five','six','seven','eight','nine'][amount-2]} !{type.toLowerCase()} tickets</b> for !{guests.join(', ')} and yourself.
+            else
+              p You successfully purchased a  <b>!{type.toLowerCase()} ticket</b>.
+            p A confirmation email was sent to !{email}.
+            p We cannot wait to welcome you at the 2015&nbsp;Oriel&nbsp;Commemoration&nbsp;Ball!
           .row
             .col-xs-6
               a(href='http://ate.so/?0ScenBG+ical').btn.btn-lg.btn-default.btn-block Add to calendar

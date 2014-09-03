@@ -1,4 +1,4 @@
-var c = require('./constants')
+const c = require('./constants')
 
 /********************************** Setup *************************************/
 
@@ -21,38 +21,54 @@ var server = express()
 // Bodyparser to parse post requests
 var bodyParser = require('body-parser')
 server.use(bodyParser.json())
-server.use(bodyParser.urlencoded({extended:false}))
+server.use(bodyParser.urlencoded({extended:true}))
 
 // Setting jade as view engine
 server.set('view engine','jade')
 
-// Directory for static files
-var path = require('path')
-server.use(express.static(path.join(__dirname, 'public')))
+// Minifying, compressing and serving static files
+var compression = require('compression')
+server.use(compression())
+var minify = require('express-minify')
+//server.use(minify({cache: __dirname + '/public/cache'}))
+server.use(express.static(__dirname + '/public'))
 
 // Redirecting everything to https://www.orielball.uk/...
 server.all('*',function(req,res,next){
-  if (req.headers.host == c.host && req.secure) 
+  if (req.headers.host == c.host && !req.secure) 
     next()
   else 
-    res.redirect('https://' + c.host + req.url)
+    res.redirect('http://' + c.host + req.url)
 })
 
 // Locating user
 var inOriel = function(req){
-  return false
+  return true//(req.ip == '93.217.81.241')
 }
+
+// Logging
+var logError = function(type,error,action,info){
+  console.error('********** %s UTC',moment(Date.now()).format('DD/MM HH:mm:ss'))
+  console.error('+++ '+type+' error: %s',error)
+  if (action && info)
+    console.error('+++ %s : %j',action,info)
+  console.error('**********')  
+}
+
 
 /********************************* Home page ***********************************/
 
 server.get('/', function(req, res){
-  var date = (inOriel(req)) ? c.tickets.orielDate : c.tickets.date
   res.render('index',{
     trailer: c.trailer,
     pricesPublic: c.tickets.pricesPublic,
     prices: c.tickets.prices,
     // Show date when booking opens, if in the future
-    bookingDateString: (Date.now() < date) ? moment(date).format('dddd, DD MMMM [at] h:mm a') : false
+    bookingDate:{
+      public: (Date.now() < c.tickets.date) ? moment(c.tickets.date).format('dddd, DD MMMM [at] h:mm a') : false,
+      oriel: (Date.now() < c.tickets.orielDate) ? moment(c.tickets.orielDate).format('dddd, DD MMMM [at] h:mm a') : false
+    },
+    committee: c.committee
   })
 })
 
@@ -68,13 +84,15 @@ server.get('/tickets',function(req,res){
       if (error)
         res.render('tickets/error',{type:'connection'})
       // Tickets sold out
-      else if (nonDining <= 0 && dining <= 0)
+      else if (nonDining + dining == 0)
         res.render('tickets/soldOut')
       // Tickets available
       else
         res.render('tickets/form',{ 
           prices: c.tickets.prices,
-          stripe: c.stripe.public
+          stripe: c.stripe.public,
+          orielOnly: (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate),
+          ticketsLeft: [nonDining,dining]
         })
     }
     // Tickets not yet released
@@ -85,49 +103,70 @@ server.get('/tickets',function(req,res){
 
 // Reply from ticket form & payment processing
 server.post('/tickets',function(req,res){
+ 
+  // r is going to be used a lot
   var r = req.body
+  r.guests = parseInt(r.guests)
+
+  // Verifying information
+    // { name: 'Robert Bastian',
+    // email: 'robert.bastian@oriel.ox.ac.uk',
+    // bodcard: '2844420',
+    // guestNames: [ 'Charlie Cornish' ],
+    // guestEmails: [ 'charlie.cornish@oriel.ox.ac.uk' ],
+    // type: 'Non-dining',
+    // guests: 1,
+    // stripeToken: 'tok_14YZ4k4wDzYYgcbQEwpBXzPd' }
+    // already bought tickets?
+    // oriel only?
+    // email address college match?
+
   stripe.charges.create({
-      amount: c.tickets.prices[r.type]*100,
+      amount: c.tickets.prices[r.type]*100*(1+r.guests),
       currency: 'gbp',
       card: r.stripeToken,
       description: r.email,
-      statement_description: '1x ' + r.type.toLowerCase()
+      statement_description: (1+r.guests)+'x ' + r.type.toLowerCase()
     },
     function(error, charge){
       // Stripe/card error. Nothing charged, no ticket bought
       if (error || !charge.paid) {
-        if (error.type == 'card_error')
-          res.render('tickets/error',{type:'payment', message: error.message})
-        else {
-          console.log('+++ Stripe error: %s, %s',error.message,r.name)
-          res.render('tickets/error',{type:'payment'})
-        }
+        logError('Payment',error,'Processing purchase request',r)
+        res.render('tickets/error',{type:'payment', stripe: error})
       }
       else {
+        var data = [[r.name,r.email,r.college,r.bodcard,'Stripe: '+charge.id,r.type]]
+        for (var i = 0; i < r.guests; i++)
+          data.push([r.guestNames[i],r.guestEmails[i],'N/A','N/A','Guest of: '+r.email,r.type])
         db.query(
-          'INSERT INTO bookings (name,email,bodcard,college,type,charge) VALUES (?,?,?,?,?,?)',
-          [r.name,r.email,r.bodcard,r.college,r.type,charge.id],
+          'INSERT INTO bookings (name,email,college,bodcard,payment,type) VALUES ?',
+          [data],
           function(error,rows,fields){
             // BIG ERROR. CUSTOMER WAS CHARGED BUT NOT ENTERED INTO THE DATABASE
             if (error) {
-              console.log('+++++ Database error: %s; %s; %s',error,charge,r)
+              logError('Database',error,'Trying to insert',data)
               mailer.sendMail({
                 from: 'Oriel College Ball <no-reply@orielball.uk>',
                 to: 'Robert Bastian <it@orielball.uk>',
                 subject: 'Database error',
-                text: 'Error:\n' + error + '\n\n' + 'Charge:\n' + charge.id + '\n\n' + 'Request:\n' + JSON.stringify(r)
+                text: 'Error:\n' + error + '\n\n' + 'Data:\n' + data
               })
               res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
             }
             // All good, send confirmation mail
             else {
-              mailer.sendMail({
-                from: 'Oriel College Ball <no-reply@orielball.uk>',
-                to: r.name + '<'+r.email+'>',
-                subject: 'Ticket confirmation',
-                text: '' // TODO
+              // mailer.sendMail({
+              //   from: 'Oriel College Ball <no-reply@orielball.uk>',
+              //   to: r.name + '<'+r.email+'>',
+              //   subject: 'Ticket confirmation',
+              //   text: '' // TODO
+              // })
+              res.render('tickets/success',{
+                type:r.type,
+                email:r.email,
+                amount: 1+r.guests,
+                guests:r.guestNames
               })
-              res.render('tickets/success',{type:r.type})
             }
           }
         )
@@ -148,17 +187,16 @@ server.post('/ticketsLeft',function(req,res){
         res.json([nonDining,dining])
     })
 })
+
 var ticketsLeft = function(callback){
   db.query(
     'SELECT (SELECT COUNT(*) FROM bookings) AS total, (SELECT COUNT(*) FROM bookings WHERE type = "Dining") AS dining',
     function(error,rows,fields){
-      if (error)
-      {
-        console.log('+++ Database error: %s',error)
+      if (error) {
+        logError('Database',error,'Trying to count','tickets')
         callback(error,0,0)
       }
-      else
-      {
+      else {
         var totalLeft = c.tickets.total - rows[0]['total']
         var diningLeft = c.tickets.dining - rows[0]['dining']
         callback(false,Math.max(0,totalLeft-diningLeft),Math.max(0,diningLeft))
@@ -176,7 +214,7 @@ server.post('/subscribeEmail', function(req,res){
     [req.body.email,(/^.+@oriel\.ox\.ac\.uk$/.test(req.body.email))?'oriel':'oxford'],
     function(error, rows, fields){
       if (error) {
-        console.log('+++ Database error: %s',error)
+        logError('Database',error,'Trying to add to mailing list',req.body.email)
         res.status(500).end() 
       }
       else {
@@ -194,8 +232,8 @@ server.get('/unsubscribe/:email',function(req,res){
     'DELETE FROM mailingList WHERE email = ?',
     [req.param('email')],
     function(error,rows,fields){
-      if (error)
-        console.log('+++ Database error: %s',error)
+      if (error) 
+        logError('Database',error,'Triying to unsubscribe from mailing list',req.param('email'))
       else
         console.log('Removed %s from mailing list',req.param('email'))
       res.render('emailUnsubscribed',{error:error,email:req.param('email')})
@@ -210,7 +248,7 @@ server.post('/subscribeWaitingList',function(req,res){
     [req.body.email,req.body.name],
     function(error,rows,fields){ 
       if (error) {
-        console.log('+++ Database error: %s',error)
+        logError('Database',error,'Trying to add to waiting list',req.body.email)
         res.status(500).end()
       }
       else {
@@ -234,7 +272,7 @@ server.post('/v1/devices/:token/registrations/web.uk.orielball',function(req,res
     [req.param('token')],
     function(error, rows, fields){
       if (error) {
-        console.log('+++ Database error: %s',error)
+        logError('Database',error,'Trying to add to push list',req.param('token'))
         res.status(500).end()
       }
       else {
@@ -251,7 +289,7 @@ server.delete('/v1/devices/:token/registrations/web.uk.orielball',function(req,r
     [req.param('token')],
     function(error, rows, fields){
       if (error) {
-        console.log('+++ Database error: %s',error)
+        logError('Database',error,'Trying to remove from push list',req.param('token'))
         res.status(500).end()
       }
       else {
@@ -281,7 +319,21 @@ server.get('/ticketerror3',function(req,res){
 })
 
 server.get('/ticketsuccess',function(req,res){
-  res.render('tickets/success',{type:'non-dining'})
+  res.render('tickets/success',{
+    type:'Dining',
+    email:'peter@pan.uk',
+    amount: 1,
+    guests:['Friend One','Friend Two','Friend 3']
+  })
+})
+
+server.get('/ticketsuccess2',function(req,res){
+  res.render('tickets/success',{
+    type:'Dining',
+    email:'peter@pan.uk',
+    amount: 4,
+    guests:['Friend One','Friend Two','Friend 3']
+  })
 })
 
 server.get('/ticketcountdown',function(req,res){

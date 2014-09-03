@@ -12,6 +12,7 @@
         "email-templates":"1.1.1",
         "stripe":"*",
         "moment":"2.4.0",
-        "ip-check":"*"
+        "ip-check":"*",
+        "express-minify":"*"
     }
 }

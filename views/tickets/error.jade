@@ -21,9 +21,14 @@ html
             span.fa-stack.fa-5x.fa-lg
               i.fa.fa-credit-card.fa-stack-2x
             h1 Payment error
-            -var m = (message) ? 'Our payment provider returned the following error:<br>' + message : 'An error occured while communicating with our payment provider.'
-            .alert.alert-danger(role='alert') !{m}
-            p Your card was not charged and your ticket purchase did not succeed.
+            if (stripe.message.indexOf("You cannot use a Stripe token more than once") > -1) 
+              .alert.alert-warning(role='alert') You have resubmitted the booking form, probably because you reloaded the confirmation page. This means that your ticket booking was attempted again, including charging your card. This second purchased did not succeed, however, this error has nothing to do with a previous purchase. Your previous purchase succeeded if you saw the confirmation page or received a confirmation email.
+            else if (stripe.type == 'StripeCardError')
+              .alert.alert-danger(role='alert') Our payment provider replied with a card error:<br>!{stripe.message}
+              p Your card was not charged and your ticket purchase did not succeed.
+            else
+              .alert.alert-danger(role='alert') An error occured communicating with our payment provider.
+              p Your card was not charged and your ticket purchase did not succeed.
           else if type == 'connection'
             span.fa-stack.fa-lg.fa-5x
               i.fa.fa-cloud.fa-stack-2x

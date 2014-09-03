@@ -113,9 +113,15 @@ html
               br
               br
           a.btn.btn-lg.btn-gold(href='/tickets',style='margin-bottom:-20px') Booking system
-          if bookingDateString 
-            h3 
-              small Tickets go on sale on !{bookingDateString}
+          h3 
+            if bookingDate.oriel
+              small Tickets for Oriel members go on sale on !{bookingDate.oriel} <br>
+            else if bookingDate.public
+              small Tickets for Oriel members are now available <br>
+            if bookingDate.public 
+              small Public tickets go on sale on !{bookingDate.public}
+            else
+              small Tickets are now on sale!
       #news.row
         .col-xs-10.col-xs-offset-1
           .row
@@ -174,19 +180,18 @@ html
               span.sr-only Close
             h3.modal-title(style='margin-left:18px;') Committee
           table.table.table-condensed.modal-body
-            - var committee = [['President','Markian Mysko von Schultze','president@orielball.uk' ],['Vice President','Imogen Duffy','vicepresident@orielball.uk'],['Secretary','Jessica Collins','secretary@orielball.uk'],['Treasurer','Benjamin Mason','treasurer@orielball.uk'],['Food','Peter Corden','food@orielball.uk'],['Drinks','Emily Burdett','drinks@orielball.uk'],['IT','Robert Bastian','it@orielball.uk'],['Technology','Charlotte Meakin','tech@orielball.uk'],['Sponsorship','Rufus Stirling','sponsoring@orielball.uk'],['Tickets','Charlie Cornish','tickets@orielball.uk'],['Security','Maks Adach','security@orielball.uk'],['Musical Entz','Reece Lunstone','entertainment@orielball.uk'],['Decorations','Helena Jackson<br>Alice Correia Morton','decorations@orielball.uk'],['Non-Musical Entz','Amy Lineham<br>Jacob Warn','entertainment@orielball.uk'],['Marketing','Shini Pattni<br>Eleanor Sharman','marketing@orielball.uk'],['Facilities','Sophie Barnes<br>Emma Williams','facilities@orielball.uk']]
             - for (var i = 0; i < 16; i = i + 2) {
               tr
                 td(style='width:50%')
-                  a(href='mailto:'+committee[i]['email'])
-                    h4 !{committee[i]['position']}
+                  a(href='mailto:'+committee[i][2])
+                    h4 !{committee[i][0]}
                       br
-                      small !{committee[i]['name']}
+                      small !{committee[i][1]}
                 td(style='width:50%')
-                  a(href='mailto:'+committee[i+1]['email'])
-                    h4 !{committee[i+1]['position']}
+                  a(href='mailto:'+committee[i+1][2])
+                    h4 !{committee[i+1][0]}
                       br
-                      small !{committee[i+1]['name']}
+                      small !{committee[i+1][1]}
             - }    
 
     .modal.fade#tacModal(tabindex="-1",role="dialog")

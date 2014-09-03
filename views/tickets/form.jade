@@ -6,17 +6,37 @@ html
     meta(name='description', content="Excited for the Oriel College Commemoration Ball 2015? Get your tickets here. The Gardens of Babylon are wating for you...")
     
     //- Selectize.js for college selector
-    link(rel='stylesheet', href='/stylesheets/selectize.bootstrap3.css')
-    script(type='text/javascript', src='/javascripts/selectize.js')
+    link(rel='stylesheet', href='/stylesheets/bootstrap-select.min.css')
+    script(type='text/javascript', src='/javascripts/bootstrap-select.min.js')
     
     //- Stripe for payment
     script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
 
     script(type='text/javascript').
-      var prices = !{JSON.stringify(prices)}
-      var stripe = !{JSON.stringify(stripe)}
+      var remaining = {
+        'Dining': !{ticketsLeft[0]},
+        'Non-dining': !{ticketsLeft[1]}
+      }
+      var MAX_GUEST_NUMBER = 10
+      var PRICES = !{JSON.stringify(prices)}
+      var STRIPE = !{JSON.stringify(stripe)}
+      var ORIEL_ONLY = !{JSON.stringify(orielOnly)}
     script(type='text/javascript', src='/javascripts/form.js')
-
+    style.
+      html{
+        min-height: 100%
+      }
+      body{
+        padding: 0px;
+        background: #eeeeee;
+        background: -moz-linear-gradient(top,  #eeeeee 0%, #dddddd 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#dddddd));
+        background: -webkit-linear-gradient(top,  #eeeeee 0%,#dddddd 100%);
+        background: -o-linear-gradient(top,  #eeeeee 0%,#dddddd 100%);
+        background: -ms-linear-gradient(top,  #eeeeee 0%,#dddddd 100%);
+        background: linear-gradient(to bottom,  #eeeeee 0%,#dddddd 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#dddddd',GradientType=0 );
+      }
   body
     
     //- Navbar
@@ -36,10 +56,11 @@ html
     
     //- Content
     .container-fluid
-      .row(style='margin-top:10%')
+      .row(style='margin-top:10%;margin-bottom:7%')
         .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
           form.form#payment-form(role='form',method='POST',autocomplete='on',action='/tickets')
             #name.form-group
+              h5 Your info
               .input-group
                 span.input-group-addon
                   i.fa.fa-user.fa-fw
@@ -48,24 +69,35 @@ html
               .input-group
                 span.input-group-addon
                   i.fa.fa-at.fa-fw
-                input.form-control(name='email',type='email',placeholder='University email address')
+                input.form-control(name='email',type='email',placeholder='College email address')
             #bodcard.form-group
               .input-group
                 span.input-group-addon
                   i.fa.fa-credit-card.fa-fw
                 input.form-control(name='bodcard',type='text',placeholder='Bodcard number', pattern='[0-9]*')
-                span.input-group-addon#bodcardHelp(title='This is the seven-digit number above the barcode') ? 
+                span.input-group-btn
+                  a.btn.btn-default#bodcardHelp
+                    i.fa.fa-question 
               p.help-block 
             #college.form-group
               .input-group
                 span.input-group-addon
                   i.fa.fa-university.fa-fw
-                select(name='college',placeholder='College')
-                  option
-                  each college in ["All Souls","Balliol","Blackfriars","Brasenose","Campion Hall","Christ Church","Corpus Christi","Exeter","Green Templeton","Harris Manchester","Hertford","Jesus","Keble","Kellogg","Lady Margaret Hall","Linacre","Lincoln","Magdalen","Mansfield","Merton","New","Nuffield","Oriel","Pembroke","Queen's","Regent's Park","Somerville","St Anne's","St Anthony's","St Benet's Hall","St Catherine's","St Cross","St Edmund Hall","St Hilda's","St Hugh's","St John's","St Peter's","St Stephen's House","Trinity","University","Wadham","Wolfson","Worcester","Wycliffe Hall"]
-                    option(value=college) !{college}
-            #type.form-group.text-center
-              .btn-group.btn-block(data-toggle="buttons")
+                select.selectpicker(name='college',data-live-search='true',data-width='90%',data-size='10')
+                  option Select college...
+                  each college in ["All Souls","Balliol","Blackfriars","Brasenose","Campion Hall","Christ Church","Corpus Christi","Exeter","Green Templeton","Harris Manchester","Hertford","Jesus","Keble","Kellogg","Lady Margaret Hall","Linacre","Lincoln","Magdalen","Mansfield","Merton","New","Nuffield","Oriel","Pembroke","Queen's","Regent's Park","Somerville","St Anne's","St Antony's","St Benet's Hall","St Catherine's","St Cross","St Edmund Hall","St Hilda's","St Hugh's","St John's","St Peter's","St Stephen's House","Trinity","University","Wadham","Wolfson","Worcester","Wycliffe Hall"]
+                    option(data-content='<img src="images/colleges/'+college+'.png" style="margin: -3px 5px 0px 0px"/>&nbsp;'+college,value=college) !{college}
+            #guests
+              h5 Your guests
+              #guestList
+              .text-center
+                button.btn.btn-default#addGuest
+                  i.fa.fa-plus
+                  | &nbsp;
+                  i.fa.fa-user
+            #type.form-group
+              h5 Your tickets
+              .btn-group.btn-block.text-center(data-toggle="buttons")
                 label#nonDiningToggle.btn.btn-default(style="width:50%")
                   input(type="radio", name="type", value='Non-dining')
                   b Non-dining
@@ -77,4 +109,4 @@ html
                   br
                   small £!{prices['Dining']}
           .text-center
-            button#pay.btn.btn-gold.btn-lg(style='margin-top:30px;width=200px') Proceed to payment
+            button#pay.btn.btn-gold.btn-lg(style='margin:50px;width=200px',data-loading-text='Loading...') Proceed to payment
