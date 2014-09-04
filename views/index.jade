@@ -4,25 +4,28 @@ html
     include imports
     title Oriel College Commemoration Ball 2015
     meta(name='description',content='Some speculate that the Hanging Gardens of Babylon existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer them as yours to explore...')
+
     link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic')
     link(rel='stylesheet', href='/stylesheets/index.css')
-    script(src='/javascripts/animatescroll.min.js')
+
     script(src='//f.vimeocdn.com/js/froogaloop2.min.js')
     script(src='/javascripts/index.js')
+
     |<!--[if lt IE 9]>
     |    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     |    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     |<![endif]-->
+
   body
     nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
       .container-fluid
         .navbar-header
-          button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target="#navbar-collapse-1")
+          button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target=".navbar-collapse")
             span.sr-only Toggle navigation
             span.icon-bar
             span.icon-bar
             span.icon-bar
-        .collapse.navbar-collapse#navbar-collapse-1
+        .collapse.navbar-collapse
           ul.nav.navbar-nav
             li
               a(href="#entertainment") Entertainment
@@ -36,10 +39,10 @@ html
               a(href="#tickets") Tickets
             li 
               a(href="#news") News
+    img(src='/icons/logo.svg', alt='Logo')#logo
     .container-fluid
-      img(src='/images/logo.svg', alt='Logo')#logo
       #top.row
-        .col-lg-4.col-lg-offset-4.col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center
+        .col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center
           h1(style="font-variant:small-caps;font-size:3.5em;") Gardens of Babylon
           h4 The  Oriel College Commemoration Ball 2015
           p.hidden-xs.
@@ -49,25 +52,26 @@ html
         #trailer.row
           .col-xs-12.text-center
             iframe#vimeo(src="//player.vimeo.com/video/"+trailer+"?title=0&amp;byline=0&amp;portrait=0&amp;color=e5ca6f&amp;api=1&amp;player_id=vimeo", width="100%", height="100%", frameborder="0", webkitallowfullscreen, mozallowfullscreen, allowfullscreen)
-
       #entertainment.row
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
-            .col-sm-7
+            .col-lg-8.col-md-7.col-sm-12.col-xs-12
               h1 Entertainment
               p.
                 With two stages and a large variety of talented acts, our musical line up promises to get everybody moving. Early in the evening a classical ensemble will provide the perfect backdrop for ballroom dances. As the evening progresses both stages will come alive with acts spanning from jazz a cappella to house and electronic music. When the sun starts to rise and night turns to morning, you will be reinvigorated by the arrival of a silent disco with two top DJs keeping you pumped. Silent disco not your thing? After 3am, our second stage will become a hub for acoustic artists and comedians, allowing you to sit back and enjoy yourself without having to move a muscle. Whatever your taste, we will have you enthralled and immersed in the music for the entirety of the evening.
-            .col-sm-4.col-sm-offset-1
-              img.img-thumbnail(src='/images/index/entertainment1.jpg',alt='Entertainment')
+            .col-lg-4.col-md-5.col-md-offset-0.col-sm-8.col-sm-offset-2.col-xs-12
+              img.img-thumbnail.img-responsive(src='/images/entertainment1.jpg',alt='Entertainment',style='margin:25px 0px 25px 0px')
       #fooddrink.row
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
-            .col-sm-4
-              img.img-thumbnail(src='/images/index/entertainment1.jpg',alt='Food & Drink')
-            .col-sm-7.col-sm-offset-1
+            .col-lg-4.col-md-5.hidden-sm.hidden-xs
+              img.img-thumbnail.img-responsive(src='/images/food.jpg',alt='Entertainment',style='margin:25px 0px 25px 0px')
+            .col-lg-8.col-md-7.col-sm-12.col-xs-12
               h1 Food &amp; Drink
               p.
-                adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+                With two stages and a large variety of talented acts, our musical line up promises to get everybody moving. Early in the evening a classical ensemble will provide the perfect backdrop for ballroom dances. As the evening progresses both stages will come alive with acts spanning from jazz a cappella to house and electronic music. When the sun starts to rise and night turns to morning, you will be reinvigorated by the arrival of a silent disco with two top DJs keeping you pumped. Silent disco not your thing? After 3am, our second stage will become a hub for acoustic artists and comedians, allowing you to sit back and enjoy yourself without having to move a muscle. Whatever your taste, we will have you enthralled and immersed in the music for the entirety of the evening.
+            .hidden-lg.hidden-md.col-sm-8.col-sm-offset-2.col-xs-12
+              img.img-thumbnail.img-responsive(src='/images/food.jpg',alt='Entertainment',style='margin:25px 0px 25px 0px')
       #sponsoring.row
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
@@ -87,7 +91,7 @@ html
           .row.text-center
             .col-md-3.col-sm-4.col-xs-6.col-centered
               a(href='http://elastichosts.co.uk',target='_blank')            
-                img.img-thumbnail(src='/images/index/elastichosts.jpg',alt='Elastichosts')
+                img.img-thumbnail(src='/images/sponsors/elastichosts.png',alt='Elastichosts')
               br
               small Elastichosts are generously hosting our website on their new Elastic Containers
       #tickets.row
@@ -112,7 +116,7 @@ html
                 Bla bla no 5 course meal for you bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
               br
               br
-          a.btn.btn-lg.btn-gold(href='/tickets',style='margin-bottom:-20px') Booking system
+          a.btn.btn-lg.btn-gold#ticketBtn(href='/tickets',style='margin-bottom:-20px') Booking system
           h3 
             if bookingDate.oriel
               small Tickets for Oriel members go on sale on !{bookingDate.oriel} <br>
@@ -133,23 +137,23 @@ html
               table(style='width:224px;margin-left:-112px;left:50%;position:relative')
                 tr
                   td
-                    a(href='https://twitter.com/orielball',target='_blank')
-                      span.fa-stack.fa-4x
-                        i.fa.fa-square.fa-stack-2x
-                        i.fa.fa-twitter.fa-stack-1x.fa-inverse
-                  td
-                    a(href='https://facebook.com/orielball',target='_blank',data-toggle="tooltip" data-placement="right" title="Facebook")
+                    a#facebookBtn(href='https://facebook.com/orielball',target='_blank')
                       span.fa-stack.fa-4x
                         i.fa.fa-square.fa-stack-2x
                         i.fa.fa-facebook.fa-stack-1x.fa-inverse
+                  td
+                    a#twitterBtn(href='https://twitter.com/orielball',target='_blank')
+                      span.fa-stack.fa-4x
+                        i.fa.fa-square.fa-stack-2x
+                        i.fa.fa-twitter.fa-stack-1x.fa-inverse
                 tr
                   td(style='text-align:right;')
-                    a(href="#emailModal",data-toggle='modal')
+                    a#newsletterBtn(href="#newsletterModal",data-toggle='modal')
                       span.fa-stack.fa-4x
                         i.fa.fa-square.fa-stack-2x
                         i.fa.fa-envelope.fa-stack-1x.fa-inverse
                   td
-                    a#pushBtn(href="javascript:subscribePush()")
+                    a#pushBtn.disabled(href="#")
                       span.fa-stack.fa-4x
                         i.fa.fa-square.fa-stack-2x
                         i.fa.fa-certificate.fa-stack-1x.fa-inverse
@@ -215,13 +219,13 @@ html
             h3.modal-title(style='margin-left:18px;') Jobs
           .modal-body
 
-    .modal.fade#emailModal(tabindex="-1",role="dialog")
+    .modal.fade#newsletterModal(tabindex="-1",role="dialog")
       .modal-dialog.modal-sm
         .modal-content
           .modal-body
             .form
               .form-group.has-feedback#emailFeedback
                 label.sr-only Email
-                input.form-control#emailInput(type=email,placeholder='University email address')
+                input.form-control#emailInput(type=email,placeholder='Email address')
                 span.glyphicon.glyphicon-remove.form-control-feedback.hidden
-              #emailBtn.btn.btn-primary.btn-block(data-loading-text="Loading...") Subscribe to emails
+              #joinNewsletterBtn.btn.btn-primary.btn-block(data-loading-text="Loading...") Subscribe to newsletter

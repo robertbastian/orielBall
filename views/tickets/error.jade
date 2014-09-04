@@ -10,10 +10,10 @@ html
           ul.nav.navbar-nav.navbar-left.hidden-xs 
             li
               a(href='/')
-                i.fa.fa-angle-left
-                | &nbsp;Back
+                i.fa.fa-angle-left &nbsp; 
+                | Back
     a(href='/')
-      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+      img#logo(src='/icons/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
     .container-fluid
       .row
         .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
@@ -35,6 +35,18 @@ html
               i.fa.fa-gears.fa-flip-horizontal.fa-stack-1x.fa-inverse
             h1 Server error
             .alert.alert-danger(role='alert') The ticket page cannot be displayed because no connection to the ticket server can be established. Please try again in a little while.
+          else if type == 'databaseCount'
+            span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-database.fa-stack-2x
+            h1 Database Error
+            .alert.alert-danger(role='alert')
+              Our server encountered an error connecting to the database. Your purchase did not succeed and your card was not charged. 
+          else if type == 'duplicate'
+            span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-files-o.fa-stack-2x
+            h1 Repeated purchase
+            .alert.alert-danger(role='alert').
+              You already bought !{number} ticket!{(number>1)?'s':''} using this email address. If you'd like to add more guest tickets, email <a class='alert-link' href='mailto:tickets@orielball.uk'>tickets@orielball.uk</a>.     
           else
             span.fa-stack.fa-5x.fa-lg
               i.fa.fa-database.fa-stack-2x

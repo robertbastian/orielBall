@@ -21,6 +21,7 @@ html
       var PRICES = !{JSON.stringify(prices)}
       var STRIPE = !{JSON.stringify(stripe)}
       var ORIEL_ONLY = !{JSON.stringify(orielOnly)}
+      var COLLEGES = !{JSON.stringify(colleges)}
     script(type='text/javascript', src='/javascripts/form.js')
     style.
       html{
@@ -45,14 +46,17 @@ html
           ul.nav.navbar-nav.navbar-left.hidden-xs 
             li
               a(href='/')
-                i.fa.fa-angle-left &nbsp; Back
+                i.fa.fa-angle-left &nbsp; 
+                | Back
           ul.nav.navbar-nav.navbar-right.hidden-xs 
             li
               a Tickets left:
-                i.fa.fa-glass#nonDiningLeft(style='margin:0px 20px 0px 20px') &nbsp;?
-                i.fa.fa-cutlery#diningLeft &nbsp;?
+                i.fa.fa-glass(style='margin-left:10px') &nbsp;
+                span#nonDiningLeft ?
+                i.fa.fa-cutlery(style='margin-left:10px') &nbsp;
+                span#diningLeft ?
     a(href='/')
-      img#logo(src='/images/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+      img#logo(src='/icons/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
     
     //- Content
     .container-fluid
@@ -70,6 +74,11 @@ html
                 span.input-group-addon
                   i.fa.fa-at.fa-fw
                 input.form-control(name='email',type='email',placeholder='College email address')
+            #college.form-group
+              .input-group
+                span.input-group-addon
+                  i.fa.fa-university.fa-fw
+                input.form-control(name='college',type='text',placeholder='College',disabled)
             #bodcard.form-group
               .input-group
                 span.input-group-addon
@@ -79,14 +88,6 @@ html
                   a.btn.btn-default#bodcardHelp
                     i.fa.fa-question 
               p.help-block 
-            #college.form-group
-              .input-group
-                span.input-group-addon
-                  i.fa.fa-university.fa-fw
-                select.selectpicker(name='college',data-live-search='true',data-width='90%',data-size='10')
-                  option Select college...
-                  each college in ["All Souls","Balliol","Blackfriars","Brasenose","Campion Hall","Christ Church","Corpus Christi","Exeter","Green Templeton","Harris Manchester","Hertford","Jesus","Keble","Kellogg","Lady Margaret Hall","Linacre","Lincoln","Magdalen","Mansfield","Merton","New","Nuffield","Oriel","Pembroke","Queen's","Regent's Park","Somerville","St Anne's","St Antony's","St Benet's Hall","St Catherine's","St Cross","St Edmund Hall","St Hilda's","St Hugh's","St John's","St Peter's","St Stephen's House","Trinity","University","Wadham","Wolfson","Worcester","Wycliffe Hall"]
-                    option(data-content='<img src="images/colleges/'+college+'.png" style="margin: -3px 5px 0px 0px"/>&nbsp;'+college,value=college) !{college}
             #guests
               h5 Your guests
               #guestList

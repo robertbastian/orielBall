@@ -1,81 +1,63 @@
-var navbar = 50
 $(document).ready(function(){
+  // Height of navbar for offsets
+  var navbar = 50
+
   //Init scrollspy
   $('body').scrollspy({target:'.navbar-collapse',offset:navbar})
-
-  if ($('#vimeo').length)
-  {
-    // Vimeo player api
+  
+  // Initalizes Vimeo API if trailer exists
+  if ($('#vimeo').length) {
     var player = $f($('#vimeo')[0])
-
     // When the player is ready, add listener for finish
     player.addEvent('ready', function() {
-      player.addEvent('finish', function(){
-        $('#entertainment').animatescroll({padding:navbar})       
+      var fired = false
+      player.addEvent('playProgress', function(progress){
+        if (progress.seconds > 111 && !fired) {
+          fired = true
+          $('html, body').stop().animate({'scrollTop':$('#entertainment').offset().top-navbar+5},1600,'swing',function(){
+            fired = false})
+        }
       })
     })
   }
 
-  // Enter button scrolls down to trailer or entertainment if there is no trailer
+  // Animates scrolling to element
+  var scrollTo = function(elem){
+    $('html, body').stop().animate({'scrollTop':elem.offset().top-navbar+5},600)
+		if (player)
+		  player.api('pause')
+  }
+  // Animating menu
+  $(".navbar-collapse ul li a[href^='#']").click(function(e){
+    e.preventDefault()
+    scrollTo($($(this).attr('href')))
+  })  
+  $('#logo').click(function(){
+    scrollTo($('html'))
+  })
+  
+  // Enter button scrolls down and starts trailer if it exists
   $('#enterBtn').click(function(){
-    if ($('#vimeo').length)
-    {
-      $('#trailer').animatescroll({padding:navbar})
+    if ($('#vimeo').length) {
+      scrollTo($('#trailer'))
       player.api('play')
     }
     else
-      $('#entertainment').animatescroll({padding:navbar})
+      scrollTo($('#entertainment'))
   })
 
-  // Using animatescroll for the navigation links
-  $("#navbar-collapse-1 ul li a[href^='#']").click(function(e)
-  {
-    e.preventDefault()
-    $(this.hash).animatescroll({padding:navbar-5})
-    player.api('pause')
-  })
-
-  // Logo is an anchor to return to the very top
-  $('#logo').click(function(){
-    $('body').animatescroll({padding:navbar})
-    player.api('pause')
-  })
-
-  $(window).resize(adjustToScreenSize)
-  adjustToScreenSize()
-
-  $('#emailBtn').click(subscribeEmail)
-
-    if ('safari' in window && 'pushNotification' in window.safari)
-    adjustButton()
-  else
-  {
-    $('#pushBtn').addClass('disabled')
-    $('#pushBtn').parent().tooltip({title: "Push notifications require Safari",placement:'bottom'})
-  }
-
-})
-
-validateEmail = function()
-{
-  var inp = $('#emailInput')
-
-  $('#emailFeedback').removeClass('has-error') 
-  $('.form-control-feedback').addClass('hidden')
-  if(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/.test(inp.val()))
-    return true
-  $('#emailFeedback').addClass('has-error')
-  $('.glyphicon-remove').removeClass('hidden')
-  inp.focus()
-  return false
-}
-subscribeEmail = function()
-{
-  if (validateEmail())
-  {
+  // Various buttons
+  $('#joinNewsletterBtn').click(function(){
+    var email = $('#emailInput').val()
+    $('#emailFeedback').removeClass('has-error') 
+    if(!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/.test(email)){
+      $('#emailFeedback').addClass('has-error')
+      $('#emailInput').focus()
+      return false
+    }
     var btn = $(this)
     btn.button('loading')
-    $.post('/subscribeEmail',$('#emailInput').val())
+    $.post('/subscribeEmail',{email:email})
     .done(function(){
       btn.html('Success!')
       setTimeout(function(){
@@ -88,35 +70,44 @@ subscribeEmail = function()
       btn.html('Error, not subscribed')
       setTimeout(function(){btn.button('reset')},2000)
     })
+  }) 
+  adjustPushBtn = function(){
+    if ('safari' in window && 'pushNotification' in window.safari) {
+      if(window.safari.pushNotification.permission('web.uk.orielball').permission === 'default') {
+        $('#pushBtn').removeClass('disabled')
+        $('#pushBtn').parent().tooltip({title:'Push notifications',placement:'bottom',container:'body'})
+      }
+      else
+        $('#pushBtn').parent().tooltip({title:"Adjust in Safari settings",placement:'bottom',container:'body'}) 
+    }
+    else 
+      $('#pushBtn').parent().tooltip({title:"Push notifications require Safari",placement:'bottom',container:'body'}) 
   }
-}
-subscribePush = function()
-{
-  window.safari.pushNotification.requestPermission(
-    'https://www.orielball.uk',
-    'web.uk.orielball',
-    {},
-    adjustButton
-  )
-}
-adjustButton = function()
-{
-  var permission = window.safari.pushNotification.permission('web.uk.orielball').permission
-  if (permission !== 'default') 
-  {
-    $('#pushBtn').addClass('disabled')
-    $('#pushBtn').parent().tooltip({title: (permission === 'granted') ? "Already subscribed" : "Adjust your subscription in Safari settings",placement:'bottom'})
-  }
-}
-
-function adjustToScreenSize()
-  { 
+  $('#pushBtn').click(function(){
+    if ('safari' in window)
+      window.safari.pushNotification.requestPermission('https://www.orielball.uk','web.uk.orielball',{},adjustPushBtn)
+    return false
+  })
+  $('#ticketBtn').click(function(){
+    $('html,body').stop().animate({opacity:0},500,'swing',function(){
+      window.location = '/tickets'
+    })
+    return false
+  })
+  
+  $('#facebookBtn').parent().tooltip({title:'Facebook',placement:'top',container:'body'})
+  $('#twitterBtn').parent().tooltip({title:'Twitter',placement:'top',container:'body'})
+  $('#newsletterBtn').parent().tooltip({title:'Newsletter',placement:'bottom',container:'body'})
+  adjustPushBtn()
+  
+  var windowResize = function(){ 
     // First section = height of viewport
     $('#top').css('height', (window.innerHeight-navbar)+'px')
-
+  
     // Minimize letterboxing for trailer (in both directions)
     $('#trailer').css('height', Math.min(window.innerWidth*9/16, window.innerHeight-navbar))
    
+    // Only animate logo on non-touch devices
     if(!('ontouchstart' in window))
     {
       // Give the logo 80% of the space between the navbar and the opening text
@@ -124,27 +115,16 @@ function adjustToScreenSize()
       var logoSize = Math.max(spaceForLogo*0.8,80)
       var logoY = (spaceForLogo-logoSize)*0.5+navbar
   
+      // Mathematical functions computing logo diameter, spacing and menu gap from scroll position
       var size = function(offset){
         if (offset <= logoY) return logoSize
         else if (offset < logoY + logoSize - 80) return logoSize-(offset-logoY)
         else return 80
-      } 
-  
+      }   
       var pos = function(offset){
         if (offset <= logoY) return logoY-offset
         else return 0
       }
-  
-      /* gap() is this beautiful polynomial: http://www.wolframalpha.com/input/?i=x*a%5E2%2By*a+%3D+0.6*b%2C+x*%28a%2Bb-80%29%5E2%2By%28a%2Bb-80%29%3D80+solve+for+x%2Cy where logoY=a, logoSize=b, x=ga, y=gb
-      var ga = (-3*logoY*logoSize+400*logoY-3*logoSize*logoSize+240*logoSize)/(5*logoY*(logoSize-80)*(logoY+logoSize-80))
-      var gb = (3*logoY*logoY*logoSize-400*logoY*logoY+6*logoY*logoSize*logoSize-480*logoY*logoSize+3*logoSize*logoSize*logoSize-480*logoSize*logoSize+19200*logoSize)/(5*logoY*(logoSize-80)*(logoY+logoSize-80))
-      
-      var gap = function(offset){
-        if (offset <= logoY + logoSize - 80) return ga*offset*offset + gb * offset
-        else return 80
-      }
-      */
-  
       var gap = function(offset){
         var n = navbar - 10
         if (offset <= logoY - n) return 0
@@ -153,8 +133,8 @@ function adjustToScreenSize()
         else return 80
       }
   
-      var updateLogo = function()
-      {
+      // Resizes on scrolling
+      var windowScroll = function(){
         var offset = window.pageYOffset
         var s = Math.round(size(offset)), p = Math.round(pos(offset)), g = Math.round(gap(offset))
         $('#logo').css('top',p)
@@ -163,11 +143,13 @@ function adjustToScreenSize()
         $('#logo').css('margin-left',-s/2)
         $('#navbarGap').css('width',g)
       }      
-  
-      // Resizes on scrolling
-      $(window).scroll(updateLogo)
-      updateLogo()
+      $(window).scroll(windowScroll)
+      windowScroll()
     }
+    // On touchscreens, move the text up to not make the screen look empty
     else 
-      $('#top .col-md-6').css('bottom','15%')
+      $('#top .col-md-6').css('bottom','25%')
   }
+  $(window).resize(windowResize)
+  windowResize()
+})

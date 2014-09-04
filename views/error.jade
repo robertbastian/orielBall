@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    include imports
+    title Oriel College Commemoration Ball 2015 - Error
+  body
+    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+          ul.nav.navbar-nav.navbar-left.hidden-xs 
+            li
+              a(href='/')
+                i.fa.fa-angle-left
+                | &nbsp;Back
+    a(href='/')
+      img#logo(src='/icons/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    .container-fluid
+      .row
+        .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
+          span.fa-stack.fa-5x.fa-lg
+            i.fa.fa-times-circle-o.fa-stack-2x
+          h1 #{type} #{(type == 404)?'Not found':'Server'} error
+          .alert.alert-danger(role='alert')= error

@@ -6,6 +6,8 @@ const c = require('./constants')
 var jade = require('jade')
 // Mail service
 var mailer = require('nodemailer').createTransport("SMTP",c.smtp)
+// HTTP request sender
+var request = require('request');
 
 // Payment service
 var stripe = require('stripe')(c.stripe.secret)
@@ -30,7 +32,7 @@ server.set('view engine','jade')
 var compression = require('compression')
 server.use(compression())
 var minify = require('express-minify')
-//server.use(minify({cache: __dirname + '/public/cache'}))
+server.use(minify({cache: __dirname + '/public/cache'}))
 server.use(express.static(__dirname + '/public'))
 
 // Redirecting everything to https://www.orielball.uk/...
@@ -43,7 +45,7 @@ server.all('*',function(req,res,next){
 
 // Locating user
 var inOriel = function(req){
-  return true//(req.ip == '93.217.81.241')
+  return false//(req.ip == '93.217.81.241')
 }
 
 // Logging
@@ -54,7 +56,6 @@ var logError = function(type,error,action,info){
     console.error('+++ %s : %j',action,info)
   console.error('**********')  
 }
-
 
 /********************************* Home page ***********************************/
 
@@ -92,84 +93,109 @@ server.get('/tickets',function(req,res){
           prices: c.tickets.prices,
           stripe: c.stripe.public,
           orielOnly: (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate),
-          ticketsLeft: [nonDining,dining]
+          ticketsLeft: [nonDining,dining],
+          colleges: c.colleges
         })
     }
     // Tickets not yet released
     else
-      res.render('tickets/countdown',{date:date})
+      res.render('tickets/countdown',{date:date,orielOnly:(Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)})
   })
 })
 
 // Reply from ticket form & payment processing
 server.post('/tickets',function(req,res){
  
-  // r is going to be used a lot
+  // req.body is going to be used a lot
   var r = req.body
   r.guests = parseInt(r.guests)
+  var orielOnly = (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)
 
-  // Verifying information
-    // { name: 'Robert Bastian',
-    // email: 'robert.bastian@oriel.ox.ac.uk',
-    // bodcard: '2844420',
-    // guestNames: [ 'Charlie Cornish' ],
-    // guestEmails: [ 'charlie.cornish@oriel.ox.ac.uk' ],
-    // type: 'Non-dining',
-    // guests: 1,
-    // stripeToken: 'tok_14YZ4k4wDzYYgcbQEwpBXzPd' }
-    // already bought tickets?
-    // oriel only?
-    // email address college match?
-
-  stripe.charges.create({
-      amount: c.tickets.prices[r.type]*100*(1+r.guests),
-      currency: 'gbp',
-      card: r.stripeToken,
-      description: r.email,
-      statement_description: (1+r.guests)+'x ' + r.type.toLowerCase()
-    },
-    function(error, charge){
-      // Stripe/card error. Nothing charged, no ticket bought
-      if (error || !charge.paid) {
-        logError('Payment',error,'Processing purchase request',r)
-        res.render('tickets/error',{type:'payment', stripe: error})
+  // Checking: correct name, .ox.ac.uk email, email matches college, tickets are open to college, bodcard, number of guests
+  var emailTest = /^.+@(.+)\.ox\.ac\.uk$/.exec(r.email)
+  if (!/.+ .+/.test(r.name) || !emailTest || c.colleges[emailTest[1]] != r.college || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && r.guestNames.length != r.guests)){
+    res.render('tickets/error',{type:'input'})
+    return false
+  }
+  
+  // Checking if tickets were previously bought
+  db.query('SELECT COUNT(*) AS count FROM bookings WHERE email = ? OR payment = ?',
+    [r.email,'Guest of: '+r.email],
+    function(error,rows,fields){
+      if (error){
+        logError('Database',error,'Trying to get ticket count for',r.email)
+        res.render('tickest/errror',{type:'databaseCount'})
       }
+      if (rows[0]['count'] > 0)
+        res.render('tickets/error',{type:'duplicate',number:rows[0]['count']})
       else {
-        var data = [[r.name,r.email,r.college,r.bodcard,'Stripe: '+charge.id,r.type]]
-        for (var i = 0; i < r.guests; i++)
-          data.push([r.guestNames[i],r.guestEmails[i],'N/A','N/A','Guest of: '+r.email,r.type])
-        db.query(
-          'INSERT INTO bookings (name,email,college,bodcard,payment,type) VALUES ?',
-          [data],
-          function(error,rows,fields){
-            // BIG ERROR. CUSTOMER WAS CHARGED BUT NOT ENTERED INTO THE DATABASE
-            if (error) {
-              logError('Database',error,'Trying to insert',data)
-              mailer.sendMail({
-                from: 'Oriel College Ball <no-reply@orielball.uk>',
-                to: 'Robert Bastian <it@orielball.uk>',
-                subject: 'Database error',
-                text: 'Error:\n' + error + '\n\n' + 'Data:\n' + data
-              })
-              res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
-            }
-            // All good, send confirmation mail
-            else {
-              // mailer.sendMail({
-              //   from: 'Oriel College Ball <no-reply@orielball.uk>',
-              //   to: r.name + '<'+r.email+'>',
-              //   subject: 'Ticket confirmation',
-              //   text: '' // TODO
-              // })
-              res.render('tickets/success',{
-                type:r.type,
-                email:r.email,
-                amount: 1+r.guests,
-                guests:r.guestNames
-              })
-            }
+        // Charging the customer
+        stripe.charges.create({
+          amount: c.tickets.prices[r.type]*100*(1+r.guests),
+          currency: 'gbp',
+          card: r.stripeToken,
+          description: r.email,
+          statement_description: (1+r.guests)+'x ' + r.type.toLowerCase()
+        },
+        function(error, charge){
+          // Stripe/card error. Nothing charged, no ticket bought
+          if (error || !charge.paid) {
+            logError('Payment',error,'Processing purchase request',r)
+            res.render('tickets/error',{type:'payment', stripe: error})
           }
-        )
+          else {
+            // Inserting customer + guests into DB
+            var data = [[r.name,r.email,r.college,r.bodcard,'Stripe: '+charge.id,r.type]]
+            for (var i = 0; i < r.guests; i++)
+              data.push([r.guestNames[i],r.guestEmails[i],'N/A','N/A','Guest of: '+r.email,r.type])
+            db.query(
+              'INSERT INTO bookings (name,email,college,bodcard,payment,type) VALUES ?',
+              [data],
+              function(error,rows,fields){
+                // Big error: customer was charged but not entered into DB
+                if (error) {
+                  logError('Database',error,'Trying to insert',data)
+                  mailer.sendMail({
+                    from: 'Oriel College Ball <no-reply@orielball.uk>',
+                    to: 'Robert Bastian <it@orielball.uk>',
+                    subject: 'Database error',
+                    text: 'Error:\n' + error + '\n\n' + 'Data:\n' + data
+                  })
+                  res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
+                }
+                // All good, send confirmation mail
+                else {
+/*
+                  mailer.sendMail({
+                    from: 'Oriel College Ball <no-reply@orielball.uk>',
+                    to: r.name + '<'+r.email+'>',
+                    subject: 'Ticket confirmation',
+                    text: '' // TODO
+                  })
+*/
+                  res.render('tickets/success',{
+                    type:r.type,
+                    email:r.email,
+                    amount: 1+r.guests,
+                    guests:r.guestNames
+                  })
+                  
+                  // Adding to ticket holder mailing list
+                  var users = [{email:{email:r.email},merge_vars:{NAME: r.name,TYPE: r.type}}]
+                  for (var i = 0; i < r.guests; i++)
+                    users.push({email:{email:r.guestEmails[i]},merge_vars:{NAME: r.guestNames[i],TYPE: r.type}})
+                      
+                  mailchimp(users,'a52cfddcf4',function(error,response,body){
+                    if (!error && response.statusCode == 200)
+                      console.log('Added %s and guests to ticket holder email list',r.email)
+                    else 
+                      logError('Mailchimp',error || body.error,'Trying to add to ticket holder list',r.email)
+                  })
+                }
+              }
+            )
+          }
+        })
       }
     }
   )
@@ -207,38 +233,34 @@ var ticketsLeft = function(callback){
 
 /******************************* Mailing lists *********************************/
 
+var mailchimp = function(batch,id,callback){
+  request({
+      uri: 'https://us9.api.mailchimp.com/2.0/lists/batch-subscribe',
+      method: 'POST',
+      json: {
+        apikey: c.mailchimp,
+        id:id,
+        batch:batch,
+        double_optin:false,
+        update_existing:true
+      }
+    }, 
+    callback
+  )
+}
+
 // Email subscription processing
 server.post('/subscribeEmail', function(req,res){
-  db.query(
-    'INSERT IGNORE INTO mailingList (email,type) VALUES (?,?)',
-    [req.body.email,(/^.+@oriel\.ox\.ac\.uk$/.test(req.body.email))?'oriel':'oxford'],
-    function(error, rows, fields){
-      if (error) {
-        logError('Database',error,'Trying to add to mailing list',req.body.email)
-        res.status(500).end() 
-      }
-      else {
-        console.log('Added %s to mailing list',req.body.email)
-        res.status(200).end()
-      }
+  mailchimp([{email:{email:req.body.email},merge_vars:{}}],'6f63740421',function(error,response,body){
+    if (!error && response.statusCode == 200) {
+      console.log('Added %s to mailing list',req.body.email)
+      res.status(200).end()
     }
-  )
-})
-
-
-// Email unsubscription processing
-server.get('/unsubscribe/:email',function(req,res){
-  db.query(
-    'DELETE FROM mailingList WHERE email = ?',
-    [req.param('email')],
-    function(error,rows,fields){
-      if (error) 
-        logError('Database',error,'Triying to unsubscribe from mailing list',req.param('email'))
-      else
-        console.log('Removed %s from mailing list',req.param('email'))
-      res.render('emailUnsubscribed',{error:error,email:req.param('email')})
-    }
-  )
+    else {
+      logError('Mailchimp',error || body.error,'Trying to add to mailing list',req.body.email)
+      res.status(500).end() 
+    }  
+  }) 
 })
 
 // Waiting list processing
@@ -304,56 +326,18 @@ server.post('/v1/log',function(req,res){
   console.log('+++ Push log: %s',req.body.logs)
 })
 
-/********************************** Debug *************************************/
-
-server.get('/ticketerror1',function(req,res){
-  res.render('tickets/error',{type:'connection'})
-})
-
-server.get('/ticketerror2',function(req,res){
-  res.render('tickets/error',{type:'database', charge:'ch_asfj8a948j23j8rqpfjf2', error: 'AAAAHRGH'})
-})
-
-server.get('/ticketerror3',function(req,res){
-  res.render('tickets/error',{type: 'payment', message: 'Your card was declined'})  
-})
-
-server.get('/ticketsuccess',function(req,res){
-  res.render('tickets/success',{
-    type:'Dining',
-    email:'peter@pan.uk',
-    amount: 1,
-    guests:['Friend One','Friend Two','Friend 3']
-  })
-})
-
-server.get('/ticketsuccess2',function(req,res){
-  res.render('tickets/success',{
-    type:'Dining',
-    email:'peter@pan.uk',
-    amount: 4,
-    guests:['Friend One','Friend Two','Friend 3']
-  })
-})
-
-server.get('/ticketcountdown',function(req,res){
-  res.render('tickets/countdown',{date:c.tickets.orielDate})
-})
-
-server.get('/ticketsoldout',function(req,res){
-  res.render('tickets/soldOut')
-})
-
-server.get('/robots.txt',function(req,res){
-  res.send('User-agent: *\nDisallow: /')
-})
-
 /********************************** Server *************************************/
 
 // 404 errors
 server.use(function(req,res){
-  res.status(404).render('404')
+  res.status(404).render('error',{type:404,error:'The requested page does not exist'})
 })
+
+// 500 errors
+server.use(function(error,req,res,next){
+  res.status(500).render('error',{type:error.status || 500, error:error.toString().slice(7,error.length)})
+})
+
 // HTTPS server
 require('https').createServer(c.ssl,server).listen(443,function(){
   console.log('Listening for HTTPS requests on port 443')

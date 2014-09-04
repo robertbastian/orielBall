@@ -9,6 +9,7 @@ var handler = StripeCheckout.configure({
   // Callback function: appends the charge token and send the form
   token: function(token){
     if (adjustGuests()){
+      $('#payment-form').append($('<input type="hidden" name="college" />').val($('#college input').val()))
       $('#payment-form').append($('<input type="hidden" name="guests" />').val(guestNumber))
       $('#payment-form').append($('<input type="hidden" name="stripeToken" />').val(token.id))
       $('#payment-form').get(0).submit()
@@ -20,26 +21,20 @@ var handler = StripeCheckout.configure({
 })
 
 $(document).ready(function(){
-  // Initializes bodcard tooltip
+
   $('#bodcardHelp').tooltip({
     placement: 'top',
     title:'This is the seven-digit number above the barcode',
     container:'body'
   })
-  
-  // Initializes college selector
-  $('.selectpicker').selectpicker()
-  if (ORIEL_ONLY) {
-    $('.selectpicker').selectpicker('val', 'Oriel')
-    $('.selectpicker').prop('disabled',true)
-    $('.selectpicker').selectpicker('refresh')
-    $('#payment-form').append($('<input type="hidden" name="college" value="Oriel" />'))
-  }
 
   $('#pay').click(function(){
-    if (verifyInput()) {
+    if($('.alert').length > 0)
+      $('.alert').remove();
+    ['name','email','college','bodcard'].forEach(function(x){$('#'+x+' input').trigger('change') })
+    
+    if ($('.has-error').length == 0) {
       $(this).button('loading')
-      // Opens the stripe window
       handler.open({
         email: $('#email input').val(),
         name: $('#name input').val(),
@@ -49,14 +44,13 @@ $(document).ready(function(){
     }
     else 
       $('body').scrollTop(0)
-    // Disables actually submitting the form
     return false
   })
 
   $('#addGuest').click(function(){
     if (moreGuestsAllowed()){
       guestNumber++
-      $('#guestList').append($('<div class="form-group"><div class="input-group"><span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input name="guestNames['+guestNumber+']" type="text" placeholder="Name" class="form-control"><span class="input-group-btn"><button class="btn btn-default" id="removeGuest'+guestNumber+'" type="button"><i class="fa fa-minus"></i></button></span></div><div class="input-group"><span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span><input name="guestEmails['+guestNumber+']" type="email" placeholder="Email address" class="form-control"></div></div>'))
+      $('#guestList').append($('<div class="form-group"><div class="input-group"><span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input name="guestNames['+guestNumber+']" type="text" placeholder="Name as on ID" class="form-control"><span class="input-group-btn"><button class="btn btn-default" id="removeGuest'+guestNumber+'" type="button"><i class="fa fa-minus"></i></button></span></div><div class="input-group"><span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span><input name="guestEmails['+guestNumber+']" type="email" placeholder="Email address" class="form-control"></div></div>'))
       $('#removeGuest'+guestNumber).click(function(){
         $(this).parent().parent().parent().remove()
         guestNumber--
@@ -66,14 +60,58 @@ $(document).ready(function(){
     return false
   })
 
+  $('#name input').change(function(){
+    if (/.+ .+/.test($(this).val()))
+      $(this).parent().parent().removeClass('has-error')
+    else 
+      $(this).parent().parent().addClass('has-error')
+    console.log('Hi')
+  })
 
+  $('#email input').change(function(){
+    var test = /^.+@(.+)\.ox\.ac\.uk$/.exec($(this).val())
+    if(test && COLLEGES[test[1]]){
+      // Sets college
+      //$('.selectpicker').selectpicker('val',COLLEGES[test[1]])
+      $('#college input').val(COLLEGES[test[1]])
+      $('#college input').trigger('change')
+      $(this).parent().parent().removeClass('has-error')
+    }
+    else
+      $(this).parent().parent().addClass('has-error')    
+  })
+  
+  $('#college input').change(function(){
+    if ($(this).val() != '') {
+      if (ORIEL_ONLY && $(this).val() != 'Oriel') {
+        $('#orielWarning').remove()
+        var alert = $('<div class="alert alert-danger" id="orielWarning">Booking is only open to Oriel College members right now!<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
+        alert.alert()
+        alert.insertAfter($('#college'))
+        $('#college').addClass('has-error')
+      }
+      else {
+        $('#college').removeClass('has-error')
+        $('#orielWarning').remove()
+      }
+    }
+    else
+      $('#college').addClass('has-error')
+  })
+  
+  $('#bodcard input').change(function(){
+    if (/^[0-9]{7}$/.test($(this).val()))
+      $(this).parent().parent().removeClass('has-error')
+    else 
+      $(this).parent().parent().addClass('has-error')
+  })
+    
   $('#type label').change(function(){
     type = $('input[name=type]:checked').val()
     adjustGuests()
   })
+  
   $('#nonDiningToggle').click()
-
-  // Start updating tickets
   updateTickets()
 })
 
@@ -94,39 +132,6 @@ var moreGuestsAllowed = function(){
   return false
 }
 
-// Verifies inputs
-var verifyInput = function(){
-  // Assumes everything went alright
-  $('.has-error').removeClass('has-error')
-  $('.alert').alert('close')
-  // Name has to be first and last name
-  if (!/^.+ .+$/.test($('#name input').val()))
-    $('#name').addClass('has-error')
-
-  // Bodcard has to be seven digits
-  if (!/^[0-9]{7}$/.test($('#bodcard input').val()))
-    $('#bodcard').addClass('has-error')
-
-  // College has to be non-empty and the correct email
-  var college = $('#college select').val()
-  var domains = {"All Souls":"all-souls","Balliol":"balliol","Blackfriars":"bfriars","Brasenose":"bnc","Campion Hall":"campion","Christ Church":"chch","Corpus Christi":"ccc","Exeter":"exeter","Green Templeton":"gtc","Harris Manchester":"hmc","Hertford":"hertford","Jesus":"jesus","Keble":"keble","Kellogg":"kellog","Lady Margaret Hall":"","Linacre":"linacre","Lincoln":"lincoln","Magdalen":"magd","Mansfield":"mansfield","Merton":"merton","New":"new","Nuffield":"nuffield","Oriel":"oriel","Pembroke":"pmb","Queen's":"queens","Regent's Park":"regents","Somerville":"some","St Anne's":"st-annes","St Antony's":"sant","St Benet's Hall":"stb","St Catherine's":"stcatz","St Cross":"stx","St Edmund Hall":"seh","St Hilda's":"sthildas","St Hugh's":"st-hughs","St John's":"sjc","St Peter's":"spc","St Stephen's House":"ssho","Trinity":"trinity","University":"univ","Wadham":"wadh","Wolfson":"wolfson","Worcester":"worc","Wycliffe Hall":"wycliffe","":""}
-  if (college == 'Select college...')
-    $('#college').addClass('has-error')
-  
-  // Email has to .ox.ac.uk
-  if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9_.+-]+\.ox\.ac\.uk$/.test($('#email input').val()))
-    $('#email').addClass('has-error')
-  else if (!(new RegExp('@'+domains[college]+'.ox.ac.uk').test($('#email input').val())))
-  {
-    var alert = $('<div class="alert alert-danger">Your email doesn\'t match your college<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
-    alert.alert()
-    alert.insertAfter($('#email'))
-    $('#email').addClass('has-error')
-  }
-  // Everything ok
-  return $('.has-error').length == 0
-}
-
 var adjustGuests = function(){
   var tooMany = ($('#guestList .form-group').length + 1) - remaining[type]
   if (tooMany > 0)
@@ -144,7 +149,6 @@ var adjustGuests = function(){
 }
 
 var adjustButtons = function(){
-  
   // Selected ticket just sold out, shows error message
   if (remaining['Non-dining'] == 0 && type == 'Non-dining' || remaining['Dining'] == 0 && type == 'Dining'){
     var alert = $('<div class="alert alert-danger">Your ticket type was changed because '+type.toLowerCase()+' tickets just sold out. <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
@@ -181,8 +185,8 @@ var updateTickets = function(){
     adjustGuests()
 
     // Update menubar
-    $('#nonDiningLeft').html('&nbsp;'+remaining['Non-dining'])
-    $('#diningLeft').html('&nbsp;'+remaining['Dining'])
+    $('#nonDiningLeft').html(remaining['Non-dining'])
+    $('#diningLeft').html(remaining['Dining'])
 
     // And load again in 10s
     setTimeout(updateTickets,10000)
