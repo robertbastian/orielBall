@@ -25,7 +25,7 @@ server.use(bodyParser.urlencoded({extended:true}))
 var compression = require('compression')
 server.use(compression())
 var minify = require('express-minify')
-//server.use(minify({cache: __dirname + '/public/cache'}))
+server.use(minify({cache: __dirname + '/public/cache'}))
 server.use(express.static(__dirname + '/public'))
 
 var inOriel = function(req){
@@ -48,7 +48,7 @@ server.all('*',function(req,res,next){
     res.redirect('http://' + c.host + req.url)
 })
 
-// !Home page
+// !Homepage
 server.get('/', function(req, res){
   res.render('index',{
     trailer: c.trailer,
@@ -99,7 +99,7 @@ server.post('/tickets',function(req,res){
   r.guests = parseInt(r.guests)
   var orielOnly = (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)
 
-  // Checking: correct name, .ox.ac.uk email, email matches college, tickets are open to college, bodcard, number of guests
+  // Checking: correct name, .ox.ac.uk email, email matches college, tickets are open to customer, bodcard, number of guests
   var emailTest = /^.+@(.+)\.ox\.ac\.uk$/.exec(r.email)
   if (!/.+ .+/.test(r.name) || !emailTest || c.colleges[emailTest[1]] != r.college || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && r.guestNames.length != r.guests)){
     res.render('tickets/error',{type:'input'})
@@ -308,6 +308,11 @@ server.delete('/v1/devices/:token/registrations/web.uk.orielball',function(req,r
 // !Logging push notifications
 server.post('/v1/log',function(req,res){
   console.log('+++ Push log: %s',req.body.logs)
+})
+
+server.get('/pushNotification/:id',function(req,res){
+  // Do something
+  res.status(200).end()
 })
 
 // !404 errors

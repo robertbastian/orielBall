@@ -31,9 +31,9 @@ $(document).ready(function(){
   $('#pay').click(function(){
     if($('.alert').length > 0)
       $('.alert').remove();
-    ['name','email','college','bodcard'].forEach(function(x){$('#'+x+' input').trigger('change') })
+    ['name','email','college','bodcard','terms'].forEach(function(x){$('#'+x+' input').trigger('change') })
     
-    if ($('.has-error').length == 0) {
+    if ($('.has-error').length == 0 && $('#terms input').is(':checked')) {
       $(this).button('loading')
       handler.open({
         email: $('#email input').val(),
@@ -103,6 +103,13 @@ $(document).ready(function(){
       $(this).parent().parent().removeClass('has-error')
     else 
       $(this).parent().parent().addClass('has-error')
+  })
+  
+  $('#terms input').change(function(){
+    if ($('#terms input').is(':checked'))
+      $('#pay').removeClass('disabled')
+    else
+      $('#pay').addClass('disabled')
   })
     
   $('#type label').change(function(){

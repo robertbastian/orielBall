@@ -44,7 +44,7 @@ html
     
     //- Content
     .container-fluid
-      .row(style='margin-top:10%;margin-bottom:7%')
+      .row(style='padding-top:7%;padding-bottom:30px')
         .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
           form.form#payment-form(role='form',method='POST',autocomplete='on',action='/tickets')
             #name.form-group
@@ -71,7 +71,6 @@ html
                 span.input-group-btn
                   a.btn.btn-default#bodcardHelp
                     i.fa.fa-question 
-              p.help-block 
             #guests
               h5 Your guests
               #guestList
@@ -93,5 +92,20 @@ html
                   b Dining 
                   br
                   small £!{prices['Dining']}
-          .text-center
-            button#pay.btn.btn-gold.btn-lg(style='margin:50px;width=200px',data-loading-text='Loading...') Proceed to payment
+          .row
+            .col-xs-8.col-xs-offset-2.text-center
+              button.disabled#pay.btn.btn-gold.btn-lg(style='margin-top:50px; width:100%',data-loading-text='Loading...') Proceed to payment
+              #terms.checkbox
+                label.control-label
+                  input(type="checkbox" value="")
+                  | Accept <a href='#tacModal' data-toggle='modal'>Terms &amp; Conditions</a>
+    .modal.fade#tacModal(tabindex="-1",role="dialog")
+      .modal-dialog
+        .modal-content.text-center
+          .modal-header
+            button.close(type="button",data-dismiss="modal")
+              span(aria-hidden="true") &times;
+              span.sr-only Close
+            h3.modal-title(style='margin-left:18px;') Terms &amp; Conditions
+          .modal-body
+            include ../tac                        
