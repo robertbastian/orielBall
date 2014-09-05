@@ -13,6 +13,6 @@
     "moment":"2.4.0",
     "express-minify":"*",
     "request":"*",
-    "compression","*"
+    "compression":"*"
   }
 }
