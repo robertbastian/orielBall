@@ -1,44 +1,55 @@
 $(document).ready(function(){
   // Height of navbar for offsets
-  var navbar = 50
-
-  //Init scrollspy
+  var navbar = 50;
+  
+  // !Scrollspy
   $('body').scrollspy({target:'.navbar-collapse',offset:navbar})
   
-  // Initalizes Vimeo API if trailer exists
+  // !Vimeo API
   if ($('#vimeo').length) {
     var player = $f($('#vimeo')[0])
     // When the player is ready, add listener for finish
     player.addEvent('ready', function() {
       var fired = false
+      // At 1:51 scroll down (only once though)
       player.addEvent('playProgress', function(progress){
         if (progress.seconds > 111 && !fired) {
           fired = true
-          $('html, body').stop().animate({'scrollTop':$('#entertainment').offset().top-navbar+5},1600,'swing',function(){
-            fired = false})
+          $('html, body').stop().animate({'scrollTop':$('#entertainment').offset().top-navbar},1600,'swing',function(){fired = false})
         }
+      })
+      // Repositions player if use starts manually
+      player.addEvent('play',function(){
+          $('html, body').stop().animate({'scrollTop':$('#trailer').offset().top-navbar},300)
       })
     })
   }
 
   // Animates scrolling to element
   var scrollTo = function(elem){
-    $('html, body').stop().animate({'scrollTop':elem.offset().top-navbar+5},600)
+    $('html, body').stop().animate({'scrollTop':elem.offset().top-navbar},600)
 		if (player)
 		  player.api('pause')
   }
-  // Animating menu
+  // !Animating menu
   $(".navbar-collapse ul li a[href^='#']").click(function(e){
     e.preventDefault()
-    scrollTo($($(this).attr('href')))
-  })  
+    scrollTo($($(this).attr('href'))) 
+  })
   $('#logo').click(function(){
     scrollTo($('html'))
   })
   
-  // Enter button scrolls down and starts trailer if it exists
+  // !Hiding mobile menu after click
+  $(document).click('.navbar-collapse.in',function(e){
+    if ($(e.target).is('a'))
+      $(this).collapse('hide')
+  })
+  
+  // !Enter button
   $('#enterBtn').click(function(){
-    if ($('#vimeo').length) {
+    // If trailer exists, show and start
+    if (player) {
       scrollTo($('#trailer'))
       player.api('play')
     }
@@ -46,7 +57,7 @@ $(document).ready(function(){
       scrollTo($('#entertainment'))
   })
 
-  // Various buttons
+  // !Email subscription
   $('#joinNewsletterBtn').click(function(){
     var email = $('#emailInput').val()
     $('#emailFeedback').removeClass('has-error') 
@@ -71,7 +82,9 @@ $(document).ready(function(){
       setTimeout(function(){btn.button('reset')},2000)
     })
   }) 
-  adjustPushBtn = function(){
+
+  // !Push notifications
+  var adjustPushBtn = function(){
     if ('safari' in window && 'pushNotification' in window.safari) {
       if(window.safari.pushNotification.permission('web.uk.orielball').permission === 'default') {
         $('#pushBtn').removeClass('disabled')
@@ -83,73 +96,70 @@ $(document).ready(function(){
     else 
       $('#pushBtn').parent().tooltip({title:"Push notifications require Safari",placement:'bottom',container:'body'}) 
   }
+  adjustPushBtn()
   $('#pushBtn').click(function(){
-    if ('safari' in window)
-      window.safari.pushNotification.requestPermission('https://www.orielball.uk','web.uk.orielball',{},adjustPushBtn)
-    return false
-  })
-  $('#ticketBtn').click(function(){
-    $('html,body').stop().animate({opacity:0},500,'swing',function(){
-      window.location = '/tickets'
-    })
-    return false
-  })
-  
+    if ('safari' in window && 'pushNotification' in window.safari)
+      window.safari.pushNotification.requestPermission('https://orielball.uk','web.uk.orielball',{},adjustPushBtn)
+  }) 
+   
+  // !News button tooltips
   $('#facebookBtn').parent().tooltip({title:'Facebook',placement:'top',container:'body'})
   $('#twitterBtn').parent().tooltip({title:'Twitter',placement:'top',container:'body'})
   $('#newsletterBtn').parent().tooltip({title:'Newsletter',placement:'bottom',container:'body'})
-  adjustPushBtn()
   
-  var windowResize = function(){ 
-    // First section = height of viewport
-    $('#top').css('height', (window.innerHeight-navbar)+'px')
-  
-    // Minimize letterboxing for trailer (in both directions)
-    $('#trailer').css('height', Math.min(window.innerWidth*9/16, window.innerHeight-navbar))
-   
-    // Only animate logo on non-touch devices
-    if(!('ontouchstart' in window))
-    {
+  var resize = function(){
+    $('#top,#trailer').css('height', (window.innerHeight-navbar)+'px')
+  }
+  resize()
+  $(window).resize(resize)
+
+  // !Animates logo on non-touchscreens
+  if(!('ontouchstart' in window)){
+    var gap,pos,size
+
+    // Repositions logo on scrolling
+    var moveLogo = function(){
+      var offset = window.pageYOffset
+      var s = Math.round(size(offset)), p = Math.round(pos(offset)), g = Math.round(gap(offset))
+      $('#logo').css('top',p)
+      $('#logo').css('width',s)
+      $('#logo').css('height',s)
+      $('#logo').css('margin-left',-s/2)
+      $('#navbarGap').css('width',g)
+    }  
+    $(window).scroll(moveLogo)
+
+    // Computes gap, pos, size functions on resize
+    var computeLogo = function(){ 
       // Give the logo 80% of the space between the navbar and the opening text
       var spaceForLogo = Math.min(window.innerHeight-navbar-$('#top .col-md-6').height(),window.innerWidth)
       var logoSize = Math.max(spaceForLogo*0.8,80)
       var logoY = (spaceForLogo-logoSize)*0.5+navbar
   
-      // Mathematical functions computing logo diameter, spacing and menu gap from scroll position
-      var size = function(offset){
+      size = function(offset){
         if (offset <= logoY) return logoSize
         else if (offset < logoY + logoSize - 80) return logoSize-(offset-logoY)
         else return 80
       }   
-      var pos = function(offset){
+      pos = function(offset){
         if (offset <= logoY) return logoY-offset
         else return 0
       }
-      var gap = function(offset){
+      gap = function(offset){
         var n = navbar - 10
         if (offset <= logoY - n) return 0
         else if (offset <= logoY) return -0.5*logoSize/n/n*(offset-logoY)*(offset-logoY) + 0.5*logoSize
         else if (offset <= logoY + logoSize - 80) return (0.5*logoSize-80)/(80-logoSize)*(offset-logoY)+0.5*logoSize
         else return 80
       }
-  
-      // Resizes on scrolling
-      var windowScroll = function(){
-        var offset = window.pageYOffset
-        var s = Math.round(size(offset)), p = Math.round(pos(offset)), g = Math.round(gap(offset))
-        $('#logo').css('top',p)
-        $('#logo').css('width',s)
-        $('#logo').css('height',s)
-        $('#logo').css('margin-left',-s/2)
-        $('#navbarGap').css('width',g)
-      }      
-      $(window).scroll(windowScroll)
-      windowScroll()
+      moveLogo()
     }
-    // On touchscreens, move the text up to not make the screen look empty
-    else 
-      $('#top .col-md-6').css('bottom','25%')
+    $(window).resize(computeLogo)
+    computeLogo()
   }
-  $(window).resize(windowResize)
-  windowResize()
+  // On touchscreens, move the text up to not make the screen look empty
+  else
+    $(window).resize(function(){
+      $('#top .col-md-6').css('top',(window.innerHeight-navbar-$('#top .col-md-6').height())/2)
+    })
 })

@@ -1,3 +1,4 @@
 constants.js
 assets/
-public/cache
+public/cache/
+node_modules/

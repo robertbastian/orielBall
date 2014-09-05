@@ -2,53 +2,36 @@ const c = require('./constants')
 
 /********************************** Setup *************************************/
 
-// Email template service
-var jade = require('jade')
-// Mail service
+// !Mail & request service
 var mailer = require('nodemailer').createTransport("SMTP",c.smtp)
-// HTTP request sender
 var request = require('request');
 
-// Payment service
+// !Payment, database and date formatting service
 var stripe = require('stripe')(c.stripe.secret)
-// Database service
 var db = require('mysql').createConnection(c.mysql)
-// Date formatting
 var moment = require('moment')
 
-// Creating server
+// !Creating server
 var express = require('express')
 var server = express()
+server.set('view engine','jade')
 
-// Bodyparser to parse post requests
+// !Bodyparser to parse post requests
 var bodyParser = require('body-parser')
 server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({extended:true}))
 
-// Setting jade as view engine
-server.set('view engine','jade')
-
-// Minifying, compressing and serving static files
+// !Minifying, compressing and serving static files
 var compression = require('compression')
 server.use(compression())
 var minify = require('express-minify')
-server.use(minify({cache: __dirname + '/public/cache'}))
+//server.use(minify({cache: __dirname + '/public/cache'}))
 server.use(express.static(__dirname + '/public'))
 
-// Redirecting everything to https://www.orielball.uk/...
-server.all('*',function(req,res,next){
-  if (req.headers.host == c.host && !req.secure) 
-    next()
-  else 
-    res.redirect('http://' + c.host + req.url)
-})
-
-// Locating user
 var inOriel = function(req){
   return false//(req.ip == '93.217.81.241')
 }
 
-// Logging
 var logError = function(type,error,action,info){
   console.error('********** %s UTC',moment(Date.now()).format('DD/MM HH:mm:ss'))
   console.error('+++ '+type+' error: %s',error)
@@ -57,8 +40,15 @@ var logError = function(type,error,action,info){
   console.error('**********')  
 }
 
-/********************************* Home page ***********************************/
+// !Redirecting everything to https://www.orielball.uk/...
+server.all('*',function(req,res,next){
+  if (req.headers.host == c.host && !req.secure) 
+    next()
+  else 
+    res.redirect('http://' + c.host + req.url)
+})
 
+// !Home page
 server.get('/', function(req, res){
   res.render('index',{
     trailer: c.trailer,
@@ -73,9 +63,7 @@ server.get('/', function(req, res){
   })
 })
 
-/******************************* Ticket server *********************************/
-
-// Ticket booking form
+// !Ticket booking form
 server.get('/tickets',function(req,res){
   var date = (inOriel(req)) ? c.tickets.orielDate : c.tickets.date
   ticketsLeft(function(error,nonDining,dining){
@@ -103,7 +91,7 @@ server.get('/tickets',function(req,res){
   })
 })
 
-// Reply from ticket form & payment processing
+// !Payment processing
 server.post('/tickets',function(req,res){
  
   // req.body is going to be used a lot
@@ -201,7 +189,7 @@ server.post('/tickets',function(req,res){
   )
 })
 
-// Remaining tickets helper function
+// !Remaining tickets helper function
 server.post('/ticketsLeft',function(req,res){
   if (!c.tickets.amountPublic)
     res.status(403).end()
@@ -231,8 +219,6 @@ var ticketsLeft = function(callback){
   )
 }
 
-/******************************* Mailing lists *********************************/
-
 var mailchimp = function(batch,id,callback){
   request({
       uri: 'https://us9.api.mailchimp.com/2.0/lists/batch-subscribe',
@@ -249,7 +235,7 @@ var mailchimp = function(batch,id,callback){
   )
 }
 
-// Email subscription processing
+// !Email subscription processing
 server.post('/subscribeEmail', function(req,res){
   mailchimp([{email:{email:req.body.email},merge_vars:{}}],'6f63740421',function(error,response,body){
     if (!error && response.statusCode == 200) {
@@ -263,7 +249,7 @@ server.post('/subscribeEmail', function(req,res){
   }) 
 })
 
-// Waiting list processing
+// !Waiting list processing
 server.post('/subscribeWaitingList',function(req,res){
   db.query(
     'INSERT INTO waitingList (email,name) VALUES (?,?)',
@@ -281,13 +267,11 @@ server.post('/subscribeWaitingList',function(req,res){
   )
 })
 
-/**************************** Push notifications ******************************/
-
-// Push package
+// !Push package
 server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
   res.sendfile('public/pushPackage.zip')
 })
-// Registering
+// !Registering push notification
 server.post('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
     'INSERT IGNORE INTO pushList device VALUE ?',
@@ -304,7 +288,7 @@ server.post('/v1/devices/:token/registrations/web.uk.orielball',function(req,res
     }
   )
 })
-// Deleting
+// !Deregistering push notifications
 server.delete('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
     'DELETE FROM pushList WHERE device = ?',
@@ -321,29 +305,27 @@ server.delete('/v1/devices/:token/registrations/web.uk.orielball',function(req,r
     }
   )
 })
-// Logging
+// !Logging push notifications
 server.post('/v1/log',function(req,res){
   console.log('+++ Push log: %s',req.body.logs)
 })
 
-/********************************** Server *************************************/
-
-// 404 errors
+// !404 errors
 server.use(function(req,res){
   res.status(404).render('error',{type:404,error:'The requested page does not exist'})
 })
 
-// 500 errors
+// !500 errors
 server.use(function(error,req,res,next){
   res.status(500).render('error',{type:error.status || 500, error:error.toString().slice(7,error.length)})
 })
 
-// HTTPS server
+// !HTTPS server
 require('https').createServer(c.ssl,server).listen(443,function(){
   console.log('Listening for HTTPS requests on port 443')
 })
 
-// HTTP SERVER
+// !HTTP SERVER
 require('http').createServer(server).listen(80,function(){
   console.log('Listening for HTTP requests on port 80')
 })

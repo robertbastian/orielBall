@@ -4,7 +4,7 @@ var type
 var handler = StripeCheckout.configure({
   key: STRIPE,
   currency: 'gbp',
-  image: 'https://www.orielball.uk/images/apple-touch-icon.png',
+  image: '/icons/apple-touch-icon.png',
   allowRememberMe: false,
   // Callback function: appends the charge token and send the form
   token: function(token){
@@ -65,7 +65,6 @@ $(document).ready(function(){
       $(this).parent().parent().removeClass('has-error')
     else 
       $(this).parent().parent().addClass('has-error')
-    console.log('Hi')
   })
 
   $('#email input').change(function(){

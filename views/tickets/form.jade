@@ -5,10 +5,6 @@ html
     title Oriel College Commemoration Ball 2015 – Tickets
     meta(name='description', content="Excited for the Oriel College Commemoration Ball 2015? Get your tickets here. The Gardens of Babylon are wating for you...")
     
-    //- Selectize.js for college selector
-    link(rel='stylesheet', href='/stylesheets/bootstrap-select.min.css')
-    script(type='text/javascript', src='/javascripts/bootstrap-select.min.js')
-    
     //- Stripe for payment
     script(type='text/javascript', src='https://checkout.stripe.com/checkout.js')
 
@@ -27,19 +23,7 @@ html
       html{
         min-height: 100%
       }
-      body{
-        padding: 0px;
-        background: #eeeeee;
-        background: -moz-linear-gradient(top,  #eeeeee 0%, #dddddd 100%);
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#dddddd));
-        background: -webkit-linear-gradient(top,  #eeeeee 0%,#dddddd 100%);
-        background: -o-linear-gradient(top,  #eeeeee 0%,#dddddd 100%);
-        background: -ms-linear-gradient(top,  #eeeeee 0%,#dddddd 100%);
-        background: linear-gradient(to bottom,  #eeeeee 0%,#dddddd 100%);
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#dddddd',GradientType=0 );
-      }
-  body
-    
+  body.gradientBackground
     //- Navbar
     nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
       .container-fluid

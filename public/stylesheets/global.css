@@ -4,12 +4,8 @@
       float: none;
       vertical-align: top;
   }
-
   .navbar .navbar-collapse {
       text-align: center;
-  }
-  #emailModal {
-    padding-top: 15%;
   }
 }
 .navbar-inverse .navbar-nav>li>a {
@@ -19,21 +15,43 @@
 body {
   margin-top: 50px;
   position: relative;
-  //font-family: 'Droid Serif';
 }
 
 .col-centered{
-float: none;
-margin: 0 auto;
+  float: none;
+  margin: 0 auto;
 }
 
+#logo {
+  z-index:1031;
+  position: fixed;
+  left: 50%;
+  top: 0px;
+  width:80px;
+  height:80px;
+  margin-left:-40px;
+  cursor: pointer; 
+  cursor: hand;
+  -webkit-filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+}
+
+.gradientBackground {
+  background: #eeeeee;
+  background: -moz-linear-gradient(top,  #eeeeee 0%, #cccccc 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#cccccc));
+  background: -webkit-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+  background: -o-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+  background: -ms-linear-gradient(top,  #eeeeee 0%,#cccccc 100%);
+  background: linear-gradient(to bottom,  #eeeeee 0%,#cccccc 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 );
+}
 
 .btn-gold { 
   color: #ffffff; 
   background-color: #FFD65E; 
   border-color: #FFD65E; 
 } 
- 
 .btn-gold:hover, 
 .btn-gold:focus, 
 .btn-gold:active, 
@@ -43,13 +61,11 @@ margin: 0 auto;
   background-color: #FFCD36; 
   border-color: #FFD65E; 
 } 
- 
 .btn-gold:active, 
 .btn-gold.active, 
 .open .dropdown-toggle.btn-gold { 
   background-image: none; 
 } 
- 
 .btn-gold.disabled, 
 .btn-gold[disabled], 
 fieldset[disabled] .btn-gold, 
@@ -68,12 +84,10 @@ fieldset[disabled] .btn-gold.active {
   background-color: #FFD65E; 
   border-color: #FFD65E; 
 } 
- 
 .btn-gold .badge { 
   color: #FFD65E; 
   background-color: #ffffff; 
 }
- 
 .btn-gold .badge { 
   color: #F3D883; 
   background-color: #FFFFFF; 

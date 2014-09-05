@@ -6,18 +6,38 @@ html
     meta(name='description',content='Some speculate that the Hanging Gardens of Babylon existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer them as yours to explore...')
 
     link(rel='stylesheet', type='text/css' href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic')
-    link(rel='stylesheet', href='/stylesheets/index.css')
-
+    style.
+      .container-fluid .row {
+        padding-bottom: 20px;
+        padding-top: 20px;
+      }
+      .container-fluid .row .row {
+        padding: 0px;
+      }
+      #sponsoring img {
+        width:80%;
+        margin: 0px 0px 10px 0px;
+      }
+      #footer small {
+        color: #ccc;
+      }
+      #footer a {
+        color: #ccc;
+      }
+      .modal a {
+        color: none;
+      }
+      #pushBtn.disabled {
+        color: gray;
+      }
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
     script(src='//f.vimeocdn.com/js/froogaloop2.min.js')
     script(src='/javascripts/index.js')
-
-    |<!--[if lt IE 9]>
-    |    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    |    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    |<![endif]-->
-
-  body
-    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
+  body(style='font-family:Droid Serif; background:#333')
+    nav.navbar.navbar-fixed-top.navbar-inverse(role="navigation")
       .container-fluid
         .navbar-header
           button.navbar-toggle.collapsed(type="button", data-toggle="collapse", data-target=".navbar-collapse")
@@ -31,28 +51,27 @@ html
               a(href="#entertainment") Entertainment
             li
               a(href="#fooddrink") Food &amp; Drink
-            li.hidden-xs#navbarGap
-              | &nbsp;
+            li.hidden-xs#navbarGap(style='width:80px') &nbsp;
             li
               a(href="#sponsoring") Sponsoring
             li
               a(href="#tickets") Tickets
             li 
               a(href="#news") News
-    img(src='/icons/logo.svg', alt='Logo')#logo
+    img#logo(src="/icons/logo.svg" onerror='this.src="/icons/logo.png"',alt='Logo')
     .container-fluid
-      #top.row
-        .col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center
+      #top.row(style='background: url("/images/bg.jpg"); color:white; position:relative; height:800px')
+        .col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-12.text-center(style='position:absolute; bottom:5%')
           h1(style="font-variant:small-caps;font-size:3.5em;") Gardens of Babylon
           h4 The  Oriel College Commemoration Ball 2015
           p.hidden-xs.
             Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which lingers longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
-          #enterBtn.btn.btn-gold.btn-lg Enter
+          #enterBtn.btn.btn-gold.btn-lg(style='width:150px; margin:20px;') Enter
       if trailer
-        #trailer.row
-          .col-xs-12.text-center
+        #trailer.row(style='background:black; padding:0px; height:600px;')
+          .col-xs-12.text-center(style='width:100%; height:100%; padding:0px')
             iframe#vimeo(src="//player.vimeo.com/video/"+trailer+"?title=0&amp;byline=0&amp;portrait=0&amp;color=e5ca6f&amp;api=1&amp;player_id=vimeo", width="100%", height="100%", frameborder="0", webkitallowfullscreen, mozallowfullscreen, allowfullscreen)
-      #entertainment.row
+      #entertainment.row.gradientBackground
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
             .col-lg-8.col-md-7.col-sm-12.col-xs-12
@@ -61,7 +80,7 @@ html
                 With two stages and a large variety of talented acts, our musical line up promises to get everybody moving. Early in the evening a classical ensemble will provide the perfect backdrop for ballroom dances. As the evening progresses both stages will come alive with acts spanning from jazz a cappella to house and electronic music. When the sun starts to rise and night turns to morning, you will be reinvigorated by the arrival of a silent disco with two top DJs keeping you pumped. Silent disco not your thing? After 3am, our second stage will become a hub for acoustic artists and comedians, allowing you to sit back and enjoy yourself without having to move a muscle. Whatever your taste, we will have you enthralled and immersed in the music for the entirety of the evening.
             .col-lg-4.col-md-5.col-md-offset-0.col-sm-8.col-sm-offset-2.col-xs-12
               img.img-thumbnail.img-responsive(src='/images/entertainment1.jpg',alt='Entertainment',style='margin:25px 0px 25px 0px')
-      #fooddrink.row
+      #fooddrink.row.gradientBackground
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
             .col-lg-4.col-md-5.hidden-sm.hidden-xs
@@ -72,7 +91,7 @@ html
                 With two stages and a large variety of talented acts, our musical line up promises to get everybody moving. Early in the evening a classical ensemble will provide the perfect backdrop for ballroom dances. As the evening progresses both stages will come alive with acts spanning from jazz a cappella to house and electronic music. When the sun starts to rise and night turns to morning, you will be reinvigorated by the arrival of a silent disco with two top DJs keeping you pumped. Silent disco not your thing? After 3am, our second stage will become a hub for acoustic artists and comedians, allowing you to sit back and enjoy yourself without having to move a muscle. Whatever your taste, we will have you enthralled and immersed in the music for the entirety of the evening.
             .hidden-lg.hidden-md.col-sm-8.col-sm-offset-2.col-xs-12
               img.img-thumbnail.img-responsive(src='/images/food.jpg',alt='Entertainment',style='margin:25px 0px 25px 0px')
-      #sponsoring.row
+      #sponsoring.row.gradientBackground
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
             .col-xs-12
@@ -84,7 +103,7 @@ html
               p.
                 Your brand will benefit from the dedication of our marketing and design teams whose publicity campaign will ensure anticipation for the Ball heightens over the course of the academic year. This will reach its crescendo on the night of the Ball itself when there will be even more fantastic opportunities to give your brand targeted exposure to this unique audience.
               p.
-                If you would like to discuss this exceptional opportunity, please contact <a href='mailto:sponsoring@orielball.uk'>sponsoring@orielball.uk</a>.
+                If you would like to discuss this exceptional opportunity, please contact <a href='mailto:sponsoring@orielball.uk' style='color: #333'>sponsoring@orielball.uk</a>.
           .row
             .col-xs-12.text-center
               h3 Our sponsors
@@ -94,29 +113,27 @@ html
                 img.img-thumbnail(src='/images/sponsors/elastichosts.png',alt='Elastichosts')
               br
               small Elastichosts are generously hosting our website on their new Elastic Containers
-      #tickets.row
+      #tickets.row.gradientBackground
         .col-xs-10.col-xs-offset-1.text-center
           h1 Tickets
           .row
-            .col-sm-4.col-sm-offset-2
+            .col-md-4.col-md-offset-2.col-sm-6
               i.fa.fa-cutlery.fa-2x
-              h3
-                | Dining Ticket <br>
+              h3 Dining&nbsp;Ticket <br>
                 small &pound;!{(pricesPublic)?prices['dining']:'TBD'}
               p.
                 Bla bla enjoy 5 course meal bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
               br
               br
-            .col-sm-4
+            .col-md-4.col-sm-6
               i.fa.fa-glass.fa-2x
-              h3 
-                | Non-dining Ticket <br>
+              h3 Non&#8209;dining&nbsp;Ticket <br>
                 small &pound;!{(pricesPublic)?prices['standard']:'TBD'}
               p.
                 Bla bla no 5 course meal for you bla bla adipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
               br
               br
-          a.btn.btn-lg.btn-gold#ticketBtn(href='/tickets',style='margin-bottom:-20px') Booking system
+          a#ticketBtn.btn.btn-lg.btn-gold(href='/tickets',style='margin-bottom:-20px') Booking system
           h3 
             if bookingDate.oriel
               small Tickets for Oriel members go on sale on !{bookingDate.oriel} <br>
@@ -126,15 +143,14 @@ html
               small Public tickets go on sale on !{bookingDate.public}
             else
               small Tickets are now on sale!
-      #news.row
+      #news.row.gradientBackground
         .col-xs-10.col-xs-offset-1
           .row
             .col-md-4.hidden-sm.hidden-xs(style='overflow:hidden').
               <iframe overflow=hidden src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Forielball&amp;height=395&amp;colorscheme=light&amp;show_faces=false&amp;header=false&amp;stream=true&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; height:395px; background: #fff;width:100%;" allowTransparency="true"></iframe>
             .col-md-4.col-sm-6.col-xs-12.text-center
               h3.text-center Keep up to date
-              br
-              table(style='width:224px;margin-left:-112px;left:50%;position:relative')
+              table(style='margin-top:40px;width:224px;margin-left:-112px;left:50%;position:relative')
                 tr
                   td
                     a#facebookBtn(href='https://facebook.com/orielball',target='_blank')
@@ -161,7 +177,7 @@ html
               <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>
               <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
             
-      #footer.row
+      #footer.row(style='padding:0; background: #333')
         .col-xs-10.col-xs-offset-1.text-center
           .row
             h5 
@@ -169,10 +185,10 @@ html
                 | &copy; 2014 Oriel College Commemoration Ball
                 br
                 a#committeLink(href='#committeeModal',data-toggle="modal") Committee
-                | &nbsp; • &nbsp; 
-                a#tacLink(href='#tacModal',data-toggle="modal") Terms &amp; Conditions
-                | &nbsp; • &nbsp;
-                a#jobLink(href='#jobModal',data-toggle="modal") Jobs
+                ///| &nbsp; • &nbsp; 
+                ///a#tacLink(href='#tacModal',data-toggle="modal") Terms &amp; Conditions
+                ///| &nbsp; • &nbsp;
+                ///a#jobLink(href='#jobModal',data-toggle="modal") Jobs
 
 
     .modal.fade#committeeModal(tabindex="-1",role="dialog")
@@ -219,7 +235,7 @@ html
             h3.modal-title(style='margin-left:18px;') Jobs
           .modal-body
 
-    .modal.fade#newsletterModal(tabindex="-1",role="dialog")
+    .modal.fade#newsletterModal(tabindex="-1",role="dialog",style='position: fixed;top: 30%')
       .modal-dialog.modal-sm
         .modal-content
           .modal-body
