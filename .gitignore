@@ -1,4 +1,4 @@
 constants.js
 assets/
 public/cache/
-ode_modules/
+node_modules/
