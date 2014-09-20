@@ -1,7 +1,5 @@
 const c = require('./constants')
 
-/********************************** Setup *************************************/
-
 // !Mail & request service
 var mailer = require('nodemailer').createTransport("SMTP",c.smtp)
 var request = require('request');
@@ -42,53 +40,56 @@ var logError = function(type,error,action,info){
 
 // !Redirecting everything to https://www.orielball.uk/...
 server.all('*',function(req,res,next){
-  if (req.headers.host == c.host && !req.secure) 
+  if (req.headers.host == c.host && req.secure) 
     next()
   else 
-    res.redirect('http://' + c.host + req.url)
+    res.redirect('https://' + c.host + req.url)
 })
 
 // !Homepage
 server.get('/', function(req, res){
   res.render('index',{
     trailer: c.trailer,
-    pricesPublic: c.tickets.pricesPublic,
-    prices: c.tickets.prices,
+    prices: c.tickets.pricesPublic ? c.tickets.prices : false,
     // Show date when booking opens, if in the future
-    bookingDate:{
-      public: (Date.now() < c.tickets.date) ? moment(c.tickets.date).format('dddd, DD MMMM [at] h:mm a') : false,
-      oriel: (Date.now() < c.tickets.orielDate) ? moment(c.tickets.orielDate).format('dddd, DD MMMM [at] h:mm a') : false
-    },
+    bookingDates: c.tickets.datesPublic ? {
+      normal: (Date.now() < c.tickets.dates.normal) ? moment(c.tickets.dates.normal).format('dddd, DD MMMM [at] h:mm a') : false,
+      oriel: (Date.now() < c.tickets.dates.oriel) ? moment(c.tickets.dates.oriel).format('dddd, DD MMMM [at] h:mm a') : false
+    } : false,
     committee: c.committee
   })
 })
 
 // !Ticket booking form
-server.get('/tickets',function(req,res){
-  var date = (inOriel(req)) ? c.tickets.orielDate : c.tickets.date
-  ticketsLeft(function(error,nonDining,dining){
-    // Tickets released
-    if (Date.now() > date || c.ticketdebug) {
-      // Can't sell tickets because database is offline
-      if (error)
-        res.render('tickets/error',{type:'connection'})
-      // Tickets sold out
-      else if (nonDining + dining == 0)
-        res.render('tickets/soldOut')
-      // Tickets available
+server.get('/tickets',function(req,res,next){
+  if (!c.tickets.datesPublic)
+    next()
+  else {
+    var date = (inOriel(req)) ? c.tickets.dates.oriel : c.tickets.dates.normal
+    ticketsLeft(function(error,nonDining,dining){
+      // Tickets released
+      if (Date.now() > date || c.ticketdebug) {
+        // Can't sell tickets because database is offline
+        if (error)
+          res.render('tickets/error',{type:'connection'})
+        // Tickets sold out
+        else if (nonDining + dining == 0)
+          res.render('tickets/soldOut')
+        // Tickets available
+        else
+          res.render('tickets/form',{ 
+            prices: c.tickets.prices,
+            stripe: c.stripe.public,
+            orielOnly: (Date.now() < c.tickets.dates.normal && Date.now() > c.tickets.dates.oriel),
+            ticketsLeft: [nonDining,dining],
+            colleges: c.colleges
+          })
+      }
+      // Tickets not yet released
       else
-        res.render('tickets/form',{ 
-          prices: c.tickets.prices,
-          stripe: c.stripe.public,
-          orielOnly: (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate),
-          ticketsLeft: [nonDining,dining],
-          colleges: c.colleges
-        })
-    }
-    // Tickets not yet released
-    else
-      res.render('tickets/countdown',{date:date,orielOnly:(Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)})
-  })
+        res.render('tickets/countdown',{date:date,orielOnly:(Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)})
+    })
+  }
 })
 
 // !Payment processing
@@ -189,6 +190,11 @@ server.post('/tickets',function(req,res){
   )
 })
 
+
+server.get('/ticketStatus',require('basic-auth-connect')('user','orielball'),function(req,res){
+  res.send('hi')
+})
+
 // !Remaining tickets helper function
 server.post('/ticketsLeft',function(req,res){
   if (!c.tickets.amountPublic)
@@ -211,8 +217,8 @@ var ticketsLeft = function(callback){
         callback(error,0,0)
       }
       else {
-        var totalLeft = c.tickets.total - rows[0]['total']
-        var diningLeft = c.tickets.dining - rows[0]['dining']
+        var totalLeft = c.tickets.amount.total - rows[0]['total']
+        var diningLeft = c.tickets.amount.dining - rows[0]['dining']
         callback(false,Math.max(0,totalLeft-diningLeft),Math.max(0,diningLeft))
       }
     }
@@ -313,6 +319,16 @@ server.post('/v1/log',function(req,res){
 server.get('/pushNotification/:id',function(req,res){
   // Do something
   res.status(200).end()
+})
+
+// !success
+server.get('/ticketsuccess',function(req,res){
+  res.render('tickets/success',{
+    type:'Dining',
+    email:'test@email.com',
+    amount: 3,
+    guests:['Guest One','Guest Two']
+  })
 })
 
 // !404 errors

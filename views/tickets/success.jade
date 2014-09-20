@@ -5,15 +5,7 @@ html
     title Oriel College Commemoration Ball 2015 - Tickets
     meta(name='robots',content='noindex nofollow')
   body
-    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
-      .container-fluid
-          ul.nav.navbar-nav.navbar-left.hidden-xs 
-            li
-              a(href='/')
-                i.fa.fa-angle-left &nbsp; 
-                | Back
-    a(href='/')
-      img#logo(src='/icons/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    include ../header
     .container-fluid
       .row
         .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')
@@ -32,3 +24,8 @@ html
               a(href='http://ate.so/?0ScenBG+ical').btn.btn-lg.btn-default.btn-block Add to calendar
             .col-xs-6
              a(href='#').btn.btn-lg.btn-default.btn-block Hire a suit
+          .row
+            .col-xs-6.
+              <a href="https://twitter.com/orielball" class="twitter-follow-button" data-show-count="true" data-show-screen-name="false">Follow @orielball</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+            .col-xs-6.
+              <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Ffacebook.com%2Forielball&amp;width=100&amp;layout=button_count&amp;action=like&amp;show_faces=true&amp;share=false&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>

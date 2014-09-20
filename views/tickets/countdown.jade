@@ -16,15 +16,7 @@ html
           $('.col-centered').css('width','785px')
       })
   body
-    nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
-      .container-fluid
-          ul.nav.navbar-nav.navbar-left.hidden-xs 
-            li
-              a(href="javascript:window.history.back()")
-                i.fa.fa-angle-left &nbsp; 
-                | Back
-    a(href='/')
-      img#logo(src='/icons/logo.svg',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
+    include ../header
     .container-fluid
       .row
         .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:10%')

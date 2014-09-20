@@ -3,7 +3,7 @@ $(document).ready(function(){
   var navbar = 50;
   
   // !Scrollspy
-  $('body').scrollspy({target:'.navbar-collapse',offset:navbar})
+  $('body').scrollspy({target:'.navbar-collapse',offset:navbar+1})
   
   // !Vimeo API
   if ($('#vimeo').length) {
@@ -100,6 +100,7 @@ $(document).ready(function(){
   $('#pushBtn').click(function(){
     if ('safari' in window && 'pushNotification' in window.safari)
       window.safari.pushNotification.requestPermission('https://orielball.uk','web.uk.orielball',{},adjustPushBtn)
+    return false
   }) 
    
   // !News button tooltips
@@ -107,12 +108,6 @@ $(document).ready(function(){
   $('#twitterBtn').parent().tooltip({title:'Twitter',placement:'top',container:'body'})
   $('#newsletterBtn').parent().tooltip({title:'Newsletter',placement:'bottom',container:'body'})
   
-  var resize = function(){
-    $('#top,#trailer').css('height', (window.innerHeight-navbar)+'px')
-  }
-  resize()
-  $(window).resize(resize)
-
   // !Animates logo on non-touchscreens
   if(!('ontouchstart' in window)){
     var gap,pos,size
@@ -156,10 +151,15 @@ $(document).ready(function(){
     }
     $(window).resize(computeLogo)
     computeLogo()
+    var resize = function(){
+      $('#top,#trailer').css('height', (window.innerHeight-navbar)+'px')
+    }
+    resize()
+    $(window).resize(resize)
   }
   // On touchscreens, move the text up to not make the screen look empty
-  else
-    $(window).resize(function(){
-      $('#top .col-md-6').css('top',(window.innerHeight-navbar-$('#top .col-md-6').height())/2)
-    })
+  else {
+    $('#top .col-md-6').css('top',(window.innerHeight-navbar-$('#top .col-md-6').height())/2)
+    $('#top,#trailer').css('height', (window.innerHeight-navbar)+'px')
+  }
 })
