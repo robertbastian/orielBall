@@ -72,7 +72,7 @@ $(document).ready(function(){
     .done(function(){
       btn.html('Success!')
       setTimeout(function(){
-        $('#emailModal').modal('hide')
+        $('#newsletterModal').modal('hide')
         $('#emailInput').val('')
         btn.button('reset')
       },1000)
