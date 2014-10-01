@@ -280,7 +280,7 @@ server.post('/v1/pushPackages/web.uk.orielball',function(req,res){
 // !Registering push notification
 server.post('/v1/devices/:token/registrations/web.uk.orielball',function(req,res){
   db.query(
-    'INSERT IGNORE INTO pushList device VALUE ?',
+    'INSERT IGNORE INTO pushList (device) VALUE (?)',
     [req.param('token')],
     function(error, rows, fields){
       if (error) {

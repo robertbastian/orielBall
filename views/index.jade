@@ -114,6 +114,16 @@ html
               p.
                 Expect only the most delicious drinks, from the familiar to the foreign. And, for the discerning, there might even be some surprises&hellip;          
             .col-lg-4.col-md-5.col-md-offset-0.col-sm-8.col-sm-offset-2.col-xs-12
+              img.img-thumbnail.img-responsive(src='/images/drinks.jpg',alt='Entertainment')
+          .row(style='margin-bottom:25px;')
+            .col-lg-4.col-md-5.hidden-sm.hidden-xs
+              img.img-thumbnail.img-responsive(src='/images/food.jpg',alt='Entertainment')
+            .col-lg-8.col-md-7.col-sm-12.col-xs-12
+              p.
+                Work your way through the Gardens&rsquo; distinct courts and taste everything that the majestic palace has to offer.  From fine wines and delicate canap&eacute;s to extravagant main courses and dainty desserts, treat yourself to the most exquisite feast that the Wonders of the World have to offer. A wealth of flavours is on offer, with a vast array of all foods from across the world. With something guaranteed for everyone, you&rsquo;ll have to be on the lookout for all of our surprises. Familiar favourites will be interspersed with some truly exotic treats, as we aim to satisfy your every culinary need. Come morning, all guests, both dining and non-dining, will then be treated to the survivors&rsquo; breakfast to keep the party going all night long.
+              p.
+                A full menu will soon be released to really whet your appetite.
+            .hidden-lg.hidden-md.col-sm-8.col-sm-offset-2.col-xs-12
               img.img-thumbnail.img-responsive(src='/images/food.jpg',alt='Entertainment')
       #sponsoring.row.gradientBackground
         .col-xs-12.col-sm-10.col-sm-offset-1
@@ -141,15 +151,15 @@ html
         .col-xs-12.text-center
           h1 Tickets
           .row
-            .col-md-4.col-md-offset-2.col-sm-6
+            .col-md-3.col-md-offset-3.col-sm-6
               br
               i.fa.fa-cutlery.fa-2x(style='margin-bottom:-10px;')
               h3 Dining&nbsp;Ticket <br>
                 small &pound;!{prices ? prices['Dining'] : 'TBD'}
               p.
-                For those of you wishing to experience the full luxury of the Gardens and the pinnacle of elegance, the dining ticket is the option for you. With a lavish banquet set in the grand hall of the Gardens&rsquo; most splendid court, you will truly relish all that the &ldquo;Marvel of Mankind&rdquo; has to offer. From fine wines and delicate entr&eacute;es to extravagant main courses and dainty desserts, treat yourself to the most exquisite feast that the Wonders of the World have to offer. A full menu will soon be released to really whet your appetite.
+                For those of you wishing to experience the full luxury of the Gardens with a lavish banquet set in the grand hall of our most splendid court.
               br
-            .col-md-4.col-sm-6
+            .col-md-3.col-sm-6
               br
               i.fa.fa-glass.fa-2x(style='margin-bottom:-10px;')
               h3 Non&#8209;dining&nbsp;Ticket <br>
@@ -158,7 +168,7 @@ html
                 else
                   small &pound;TBD
               p.
-                If a non-dining ticket is more suited to your night, then we are still offering you a culinary tour de force. Work your way through the Gardens&rsquo; distinct courts and taste everything that the majestic palace has to offer. A wealth of flavours is on offer, ranging from outstanding canap&eacute;s and peerless champagne in the Gardens&rsquo; most exquisite court to hearty meals and drinks in the forgotten corners via some more unusual flavours from around the world along the way. All guests, both dining and non-dining, will then be treated to the survivors&rsquo; breakfast to keep the party going all night long.
+                For those who want to enjoy a mouth-watering tour de force with a huge variety of choice on offer, without the formality of a sit down meal. 
               br
           if bookingDates
             a#ticketBtn.btn.btn-lg.btn-gold(href='/tickets',style='margin-bottom:-20px') Booking system
@@ -205,6 +215,11 @@ html
                       span.fa-stack.fa-4x
                         i.fa.fa-square.fa-stack-2x
                         i.fa.fa-certificate.fa-stack-1x.fa-inverse
+                tr
+                  td(colspan='2')
+                    br
+                    a#committeLink(href='#committeeModal',data-toggle="modal") Email the committee
+
             .col-md-4.col-sm-6.hidden-xs.
               <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>
               <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
@@ -214,12 +229,10 @@ html
           .row
             h5 
               small
-                a#committeLink(href='#committeeModal',data-toggle="modal") Committee
-                ///| &nbsp; • &nbsp; 
                 ///a#tacLink(href='#tacModal',data-toggle="modal") Terms &amp; Conditions
                 ///| &nbsp; • &nbsp;
                 ///a#jobLink(href='#jobModal',data-toggle="modal") Jobs
-                br
+                ///br
                 | &copy; 2014 Oriel College Commemoration Ball
                 br
                 | Photos by JDR Photography and Ollie Ford
