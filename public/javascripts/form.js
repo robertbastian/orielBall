@@ -31,15 +31,16 @@ $(document).ready(function(){
   $('#pay').click(function(){
     if($('.alert').length > 0)
       $('.alert').remove();
-    ['name','email','college','bodcard','terms'].forEach(function(x){$('#'+x+' input').trigger('change') })
+    $('#name input, #email input, #college input, #bodcard input').trigger('change')
     
     if ($('.has-error').length == 0 && $('#terms input').is(':checked')) {
       $(this).button('loading')
-      handler.open({
+      var amount = PRICES[($('#college input').val() == 'Oriel' && type == 'Non-dining') ? 'Oriel' : type] + PRICES[type] * guestNumber
+        handler.open({
         email: $('#email input').val(),
         name: $('#name input').val(),
-        description: (1+guestNumber) + ' ' + type.toLowerCase() + ' ticket' + ((guestNumber>0)?'s':''),
-        amount: PRICES[type] * 100 * (1+guestNumber)
+        description: (1+guestNumber) + ' ' + type.toLowerCase() + ' Ticket' + ((guestNumber>0)?'s':''),
+        amount: amount * 100
       })
     }
     else 
@@ -69,10 +70,16 @@ $(document).ready(function(){
 
   $('#email input').change(function(){
     var test = /^.+@(.+)\.ox\.ac\.uk$/.exec($(this).val())
-    if(test && COLLEGES[test[1]]){
+    $('#nonDiningToggle small').html('&pound;'+PRICES['Non-dining'])
+    if(test) {
       // Sets college
-      //$('.selectpicker').selectpicker('val',COLLEGES[test[1]])
-      $('#college input').val(COLLEGES[test[1]])
+      if (COLLEGES[test[1]]) {
+        $('#college input').val(COLLEGES[test[1]])
+        if (test[1] == 'oriel')
+          $('#nonDiningToggle small').html('&pound;'+PRICES['Oriel'])
+      }
+      else
+        $('#college input').val('No college')
       $('#college input').trigger('change')
       $(this).parent().parent().removeClass('has-error')
     }
@@ -123,8 +130,8 @@ $(document).ready(function(){
 
 // Checks whether a guest can be added
 var moreGuestsAllowed = function(){
-  if (guestNumber + 1 == MAX_GUEST_NUMBER) {
-    var alert = $('<div class="alert alert-danger">You can only buy a maximum of '+MAX_GUEST_NUMBER+' tickets <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
+  if (guestNumber + 1 == MAX_TICKET_NUMBER) {
+    var alert = $('<div class="alert alert-danger">You can only buy a maximum of '+MAX_TICKET_NUMBER+' tickets <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
     alert.alert()
     alert.insertAfter($('#guestList'))
   }

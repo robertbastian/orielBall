@@ -62,7 +62,7 @@ server.get('/', function(req, res){
 
 // !Ticket booking form
 server.get('/tickets',function(req,res,next){
-  if (!c.tickets.datesPublic)
+  if (!c.tickets.datesPublic && !c.ticketdebug)
     next()
   else {
     var date = (inOriel(req)) ? c.tickets.dates.oriel : c.tickets.dates.normal
@@ -100,9 +100,8 @@ server.post('/tickets',function(req,res){
   r.guests = parseInt(r.guests)
   var orielOnly = (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)
 
-  // Checking: correct name, .ox.ac.uk email, email matches college, tickets are open to customer, bodcard, number of guests
-  var emailTest = /^.+@(.+)\.ox\.ac\.uk$/.exec(r.email)
-  if (!/.+ .+/.test(r.name) || !emailTest || c.colleges[emailTest[1]] != r.college || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && r.guestNames.length != r.guests)){
+  // Checking: correct name, .ox.ac.uk email, tickets are open to customer, bodcard, number of guests
+  if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && r.guestNames.length != r.guests)){
     res.render('tickets/error',{type:'input'})
     return false
   }
@@ -113,14 +112,15 @@ server.post('/tickets',function(req,res){
     function(error,rows,fields){
       if (error){
         logError('Database',error,'Trying to get ticket count for',r.email)
-        res.render('tickest/errror',{type:'databaseCount'})
+        res.render('tickets/error',{type:'databaseCount'})
       }
       if (rows[0]['count'] > 0)
         res.render('tickets/error',{type:'duplicate',number:rows[0]['count']})
       else {
         // Charging the customer
+        var amount = c.tickets.prices[(r.college == 'Oriel' && r.type == 'Non-dining') ? 'Oriel' : r.type] + c.tickets.prices[r.type] * r.guests
         stripe.charges.create({
-          amount: c.tickets.prices[r.type]*100*(1+r.guests),
+          amount: amount*100,
           currency: 'gbp',
           card: r.stripeToken,
           description: r.email,
