@@ -216,12 +216,12 @@ server.post('/tickets',function(req,res){
   )
 })
 
-server.get('/committeeTickets',require('basic-auth-connect')('user',c.committeePassword),function(req,res){
+server.get('/backdoor',require('basic-auth-connect')(function(user,pw){return pw == c.backdoorPassword}),function(req,res){
   ticketsLeft(function(error,nonDining,dining){
     res.render('tickets/form',{ 
       prices: c.tickets.prices,
       stripe: c.stripe.public,
-      orielOnly: true,
+      orielOnly: false,
       ticketsLeft: [nonDining,dining],
       colleges: c.colleges
     })
