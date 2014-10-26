@@ -13,11 +13,12 @@ html
         'Dining': !{ticketsLeft[0]},
         'Non-dining': !{ticketsLeft[1]}
       }
-      var MAX_TICKET_NUMBER = 10
       var PRICES = !{JSON.stringify(prices)}
       var STRIPE = !{JSON.stringify(stripe)}
       var ORIEL_ONLY = !{JSON.stringify(orielOnly)}
+      var MAX_TICKET_NUMBER = ORIEL_ONLY ? 3 : 10
       var COLLEGES = !{JSON.stringify(colleges)}
+      
     script(type='text/javascript', src='/javascripts/form.js')
     style.
       html{
@@ -86,19 +87,19 @@ html
                   input(type="radio", name="type", value='Non-dining')
                   b Non-dining
                   br
-                  small £!{prices['Non-dining']}
+                  small £!{prices['Non-dining'][orielOnly]}
                 label#diningToggle.btn.btn-default(style="width:50%")
                   input(type="radio", name="type", value="Dining")
                   b Dining 
                   br
-                  small £!{prices['Dining']}
+                  small £!{prices['Dining'][orielOnly]}
           .row
             .col-xs-8.col-xs-offset-2.text-center
-              button.disabled#pay.btn.btn-gold.btn-lg(style='margin-top:50px; width:100%',data-loading-text='Loading...') Proceed to payment
               #terms.checkbox
-                label.control-label
+                label.control-label(style='margin-top:40px;')
                   input(type="checkbox" value="")
-                  | Accept <a href='#tacModal' data-toggle='modal'>Terms &amp; Conditions</a>
+                  | I&nbsp;accept&nbsp;the&nbsp;<a href='#tacModal' data-toggle='modal'>Terms&nbsp;&amp;&nbsp;Conditions</a>
+              button.disabled#pay.btn.btn-gold.btn-lg(style='width:100%;min-width:200px',data-loading-text='Loading...') Proceed to payment
     .modal.fade#tacModal(tabindex="-1",role="dialog")
       .modal-dialog
         .modal-content.text-center

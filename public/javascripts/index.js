@@ -8,18 +8,19 @@ $(document).ready(function(){
   // !Vimeo API
   if ($('#vimeo').length) {
     var player = $f($('#vimeo')[0])
+    var fired = true
     // When the player is ready, add listener for finish
     player.addEvent('ready', function() {
-      var fired = false
       // At 1:51 scroll down (only once though)
       player.addEvent('playProgress', function(progress){
-        if (progress.seconds > 111 && !fired) {
+        if (progress.seconds > 111 && progress.seconds < 113 && !fired) {
           fired = true
-          $('html, body').stop().animate({'scrollTop':$('#entertainment').offset().top-navbar},1600,'swing',function(){fired = false})
+          $('html, body').stop().animate({'scrollTop':$('#entertainment').offset().top-navbar},1600)
         }
       })
       // Repositions player if use starts manually
       player.addEvent('play',function(){
+          fired = false
           $('html, body').stop().animate({'scrollTop':$('#trailer').offset().top-navbar},300)
       })
     })

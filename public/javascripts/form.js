@@ -35,7 +35,7 @@ $(document).ready(function(){
     
     if ($('.has-error').length == 0 && $('#terms input').is(':checked')) {
       $(this).button('loading')
-      var amount = PRICES[($('#college input').val() == 'Oriel' && type == 'Non-dining') ? 'Oriel' : type] + PRICES[type] * guestNumber
+      var amount = PRICES[type][$('#college input').val() == 'Oriel'] + PRICES[type][false] * guestNumber
         handler.open({
         email: $('#email input').val(),
         name: $('#name input').val(),
@@ -73,11 +73,8 @@ $(document).ready(function(){
     $('#nonDiningToggle small').html('&pound;'+PRICES['Non-dining'])
     if(test) {
       // Sets college
-      if (COLLEGES[test[1]]) {
+      if (COLLEGES[test[1]])
         $('#college input').val(COLLEGES[test[1]])
-        if (test[1] == 'oriel')
-          $('#nonDiningToggle small').html('&pound;'+PRICES['Oriel'])
-      }
       else
         $('#college input').val('No college')
       $('#college input').trigger('change')
@@ -88,18 +85,19 @@ $(document).ready(function(){
   })
   
   $('#college input').change(function(){
-    if ($(this).val() != '') {
-      if (ORIEL_ONLY && $(this).val() != 'Oriel') {
-        $('#orielWarning').remove()
-        var alert = $('<div class="alert alert-danger" id="orielWarning">Booking is only open to Oriel College members right now!<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
+    var col = $(this).val()
+    if (col != '') {
+      $('#orielWarning').remove()
+      if (ORIEL_ONLY && col != 'Oriel') {
+        var alert = $('<div class="alert alert-danger" id="orielWarning">Booking is only open to Oriel College members!<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></div>')
         alert.alert()
         alert.insertAfter($('#college'))
         $('#college').addClass('has-error')
       }
-      else {
+      else
         $('#college').removeClass('has-error')
-        $('#orielWarning').remove()
-      }
+      $('#nonDiningToggle small').html('&pound;'+PRICES['Non-dining'][col == 'Oriel'])
+      $('#diningToggle small').html('&pound;'+PRICES['Dining'][col == 'Oriel'])
     }
     else
       $('#college').addClass('has-error')

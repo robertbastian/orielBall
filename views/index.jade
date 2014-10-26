@@ -53,11 +53,11 @@ html
               a(href="#fooddrink") Food &amp; Drink
             li.hidden-xs#navbarGap(style='width:80px') &nbsp;
             li
-              a(href="#sponsoring") Sponsoring
+              a(href="#sponsoring") Sponsorship
             li
               a(href="#tickets") Tickets
             li 
-              a(href="#news") News
+              a(href="#news") Contact
     img#logo(src="/icons/logo.svg", onerror='this.src="/icons/logo.png"',alt='Logo',style='-webkit-filter: drop-shadow(0px 0 10px rgba(0,0,0,0.5))')
     .container-fluid
       #top.row(style='background: url("/images/bg.jpg"); color:white; position:relative; height:800px')
@@ -65,7 +65,7 @@ html
           h1(style="font-variant:small-caps;font-size:3.5em;") Gardens of Babylon
           h4 The  Oriel College Commemoration Ball 2015
           p.hidden-xs.
-            Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which lingers longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
+            Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which linger longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
           #enterBtn.btn.btn-gold.btn-lg(style='width:150px; margin:20px;') Enter
       if trailer
         #trailer.row(style='background:black; padding:0px; height:600px;')
@@ -129,7 +129,7 @@ html
         .col-xs-12.col-sm-10.col-sm-offset-1
           .row
             .col-xs-12
-              h1 Sponsoring
+              h1 Sponsorship
           .row
             .col-sm-12
               p.
@@ -155,7 +155,10 @@ html
               br
               i.fa.fa-cutlery.fa-2x(style='margin-bottom:-10px;')
               h3 Dining&nbsp;Ticket <br>
-                small &pound;!{prices ? prices['Dining'] : 'TBD'}
+                if prices
+                  small &pound;!{prices['Dining'][false]} (&pound;!{prices['Dining'][true]} Oriel)
+                else
+                  small &pound;TBD 
               p.
                 For those of you wishing to experience the full luxury of the Gardens with a lavish banquet set in the grand hall of our most splendid court.
               br
@@ -164,7 +167,7 @@ html
               i.fa.fa-glass.fa-2x(style='margin-bottom:-10px;')
               h3 Non&#8209;dining&nbsp;Ticket <br>
                 if prices
-                  small &pound;!{prices['Non-dining']} / &pound;!{prices['Oriel']} Oriel
+                  small &pound;!{prices['Non-dining'][false]} (&pound;!{prices['Non-dining'][true]} Oriel)
                 else
                   small &pound;TBD
               p.
@@ -174,7 +177,7 @@ html
             a#ticketBtn.btn.btn-lg.btn-gold(href='/tickets',style='margin-bottom:-20px') Booking system
             h3 
               if bookingDates.oriel
-                small Tickets for Oriel members go on sale on !{bookingDates.oriel} <br>
+                small Oriel tickets go on sale on !{bookingDates.oriel} <br>
               else if bookingDates.normal
                 small Tickets for Oriel members are now available <br>
               if bookingDates.normal 

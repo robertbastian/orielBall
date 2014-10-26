@@ -1,7 +1,8 @@
 const c = require('./constants')
 
 // !Mail & request service
-var mailer = require('nodemailer').createTransport("SMTP",c.smtp)
+var m = require('mandrill-api/mandrill')
+var mandrill = new m.Mandrill(c.mandrill)
 var request = require('request');
 
 // !Payment, database and date formatting service
@@ -27,7 +28,7 @@ server.use(minify({cache: __dirname + '/public/cache'}))
 server.use(express.static(__dirname + '/public'))
 
 var inOriel = function(req){
-  return false//(req.ip == '93.217.81.241')
+  return (require('range_check').in_range(req.ip,c.orielIPs))
 }
 
 var logError = function(type,error,action,info){
@@ -62,10 +63,11 @@ server.get('/', function(req, res){
 
 // !Ticket booking form
 server.get('/tickets',function(req,res,next){
-  if (!c.tickets.datesPublic && !c.ticketdebug)
+  if (!c.tickets.datesPublic)
     next()
   else {
     var date = (inOriel(req)) ? c.tickets.dates.oriel : c.tickets.dates.normal
+    var orielOnly = Date.now() < c.tickets.dates.normal && Date.now() > c.tickets.dates.oriel
     ticketsLeft(function(error,nonDining,dining){
       // Tickets released
       if (Date.now() > date || c.ticketdebug) {
@@ -80,14 +82,14 @@ server.get('/tickets',function(req,res,next){
           res.render('tickets/form',{ 
             prices: c.tickets.prices,
             stripe: c.stripe.public,
-            orielOnly: (Date.now() < c.tickets.dates.normal && Date.now() > c.tickets.dates.oriel),
+            orielOnly: orielOnly,
             ticketsLeft: [nonDining,dining],
             colleges: c.colleges
           })
       }
       // Tickets not yet released
       else
-        res.render('tickets/countdown',{date:date,orielOnly:(Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)})
+        res.render('tickets/countdown',{date:date,orielOnly:orielOnly})
     })
   }
 })
@@ -101,7 +103,7 @@ server.post('/tickets',function(req,res){
   var orielOnly = (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)
 
   // Checking: correct name, .ox.ac.uk email, tickets are open to customer, bodcard, number of guests
-  if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && r.guestNames.length != r.guests)){
+  if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && (r.guestNames.length != r.guests || r.guests > 9 || (r.guests > 2 && orielOnly)))){
     res.render('tickets/error',{type:'input'})
     return false
   }
@@ -118,7 +120,7 @@ server.post('/tickets',function(req,res){
         res.render('tickets/error',{type:'duplicate',number:rows[0]['count']})
       else {
         // Charging the customer
-        var amount = c.tickets.prices[(r.college == 'Oriel' && r.type == 'Non-dining') ? 'Oriel' : r.type] + c.tickets.prices[r.type] * r.guests
+        var amount = c.tickets.prices[r.type][r.college == 'Oriel'] + c.tickets.prices[r.type][false] * r.guests
         stripe.charges.create({
           amount: amount*100,
           currency: 'gbp',
@@ -144,24 +146,48 @@ server.post('/tickets',function(req,res){
                 // Big error: customer was charged but not entered into DB
                 if (error) {
                   logError('Database',error,'Trying to insert',data)
-                  mailer.sendMail({
-                    from: 'Oriel College Ball <no-reply@orielball.uk>',
-                    to: 'Robert Bastian <it@orielball.uk>',
-                    subject: 'Database error',
-                    text: 'Error:\n' + error + '\n\n' + 'Data:\n' + data
-                  })
+                  mandrill.messages.send(
+                    {'message': 
+                      {
+                        'text': 'Error:\n' + error + '\n\n' + 'Data:\n' + data,
+                        'subject': 'Database error',
+                        'from_email': 'server@orielball.uk',
+                        'to': [{'email': 'it@orielball.uk'}],
+                      }
+                    }, function(result){}, 
+                    function(error) {
+                      logError('Mandrill',error,'Trying to email','about db error')
+                    }
+                  )
                   res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
                 }
                 // All good, send confirmation mail
                 else {
-/*
-                  mailer.sendMail({
-                    from: 'Oriel College Ball <no-reply@orielball.uk>',
-                    to: r.name + '<'+r.email+'>',
-                    subject: 'Ticket confirmation',
-                    text: '' // TODO
-                  })
-*/
+                  mandrill.messages.sendTemplate({
+                    'template_name':'confirmation',
+                    'template_content':[],
+                    'message': 
+                    {
+                      'to': [{'email': r.email,'name': r.name}],
+                      'subject': 'Ticket confirmation',
+                      'from_name': 'Oriel College Ball',
+                      'from_email': 'tickets@orielball.uk',
+                      'global_merge_vars': [
+                        {"name": 'TICKET_STRING', 'content': (1+r.guests)+' '+r.type+' Ticket'+(r.guests?'s':'')}
+                      ]
+                    }
+                    },
+                    function(result){
+                      if (result[0].status == 'sent')
+                        console.log('Sent confirmation to %s',r.email)
+                      else
+                        logError('Mandrill',result,'Trying to send confirmation to',r.name)
+                    }, 
+                    function(error) {
+                      logError('Mandrill',error,'Trying to send confirmation to',r.name)
+                    }
+                  )
+
                   res.render('tickets/success',{
                     type:r.type,
                     email:r.email,
@@ -170,10 +196,10 @@ server.post('/tickets',function(req,res){
                   })
                   
                   // Adding to ticket holder mailing list
-                  var users = [{email:{email:r.email},merge_vars:{NAME: r.name,TYPE: r.type}}]
+                  var users = [{email:{email:r.email},merge_vars:{NAME: r.name,TYPE: r.type,GUEST:'No'}}]
                   for (var i = 0; i < r.guests; i++)
-                    users.push({email:{email:r.guestEmails[i]},merge_vars:{NAME: r.guestNames[i],TYPE: r.type}})
-                      
+                    users.push({email:{email:r.guestEmails[i]},merge_vars:{NAME: r.guestNames[i],TYPE: r.type,GUEST:'Yes'}})
+
                   mailchimp(users,'a52cfddcf4',function(error,response,body){
                     if (!error && response.statusCode == 200)
                       console.log('Added %s and guests to ticket holder email list',r.email)
@@ -331,6 +357,15 @@ server.get('/ticketsuccess',function(req,res){
   })
 })
 
+
+server.get('/robots.txt',function(req,res){
+  res.type('text/plain')
+  if (c.host != 'orielball.uk') // Dev
+    res.send("User-agent: *\nDisallow: /")
+  else // Production
+    res.send('')
+  
+})
 // !404 errors
 server.use(function(req,res){
   res.status(404).render('error',{type:404,error:'The requested page does not exist'})

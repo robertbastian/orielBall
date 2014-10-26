@@ -8,12 +8,13 @@
     "jade": "~1.3.0",
     "mysql":"2.3.2",
     "body-parser":"1.4.3",
-    "nodemailer":"0.7.0",
+    "mandrill-api":"*",
     "stripe":"*",
     "moment":"2.4.0",
     "express-minify":"*",
     "request":"*",
     "compression":"*",
-    "basic-auth-connect":"*"
+    "basic-auth-connect":"*",
+    "range_check":"0.0.4"
   }
 }
