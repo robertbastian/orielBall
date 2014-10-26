@@ -51,7 +51,7 @@ $(document).ready(function(){
   $('#addGuest').click(function(){
     if (moreGuestsAllowed()){
       guestNumber++
-      $('#guestList').append($('<div class="form-group"><div class="input-group"><span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input name="guestNames['+guestNumber+']" type="text" placeholder="Name as on ID" class="form-control"><span class="input-group-btn"><button class="btn btn-default" id="removeGuest'+guestNumber+'" type="button"><i class="fa fa-minus"></i></button></span></div><div class="input-group"><span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span><input name="guestEmails['+guestNumber+']" type="email" placeholder="Email address" class="form-control"></div></div>'))
+      $('#guestList').append($('<div class="form-group"><div class="input-group"><span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input name="guestNames['+guestNumber+']" type="text" placeholder="Name" class="form-control"><span class="input-group-btn"><button class="btn btn-default" id="removeGuest'+guestNumber+'" type="button"><i class="fa fa-minus"></i></button></span></div><div class="input-group"><span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span><input name="guestEmails['+guestNumber+']" type="email" placeholder="Email address" class="form-control"></div></div>'))
       $('#removeGuest'+guestNumber).click(function(){
         $(this).parent().parent().parent().remove()
         guestNumber--
