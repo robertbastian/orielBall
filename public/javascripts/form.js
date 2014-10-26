@@ -70,7 +70,6 @@ $(document).ready(function(){
 
   $('#email input').change(function(){
     var test = /^.+@(.+)\.ox\.ac\.uk$/.exec($(this).val())
-    $('#nonDiningToggle small').html('&pound;'+PRICES['Non-dining'])
     if(test) {
       // Sets college
       if (COLLEGES[test[1]])

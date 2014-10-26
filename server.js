@@ -103,7 +103,7 @@ server.post('/tickets',function(req,res){
   var orielOnly = (Date.now() < c.tickets.date && Date.now() > c.tickets.orielDate)
 
   // Checking: correct name, .ox.ac.uk email, tickets are open to customer, bodcard, number of guests
-  if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && (r.guestNames.length != r.guests || r.guests > 9 || (r.guests > 2 && orielOnly)))){
+  if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && (r.guestNames.length != r.guests || r.guests > 9 || (r.guests > 1 && orielOnly)))){
     res.render('tickets/error',{type:'input'})
     return false
   }
