@@ -216,22 +216,27 @@ server.post('/tickets',function(req,res){
   )
 })
 
+server.get('/committeeTickets',require('basic-auth-connect')('user',c.committeePassword),function(req,res){
+  ticketsLeft(function(error,nonDining,dining){
+    res.render('tickets/form',{ 
+      prices: c.tickets.prices,
+      stripe: c.stripe.public,
+      orielOnly: true,
+      ticketsLeft: [nonDining,dining],
+      colleges: c.colleges
+    })
+  })
 
-server.get('/ticketStatus',require('basic-auth-connect')('user','orielball'),function(req,res){
-  res.send('hi')
 })
 
 // !Remaining tickets helper function
 server.post('/ticketsLeft',function(req,res){
-  if (!c.tickets.amountPublic)
-    res.status(403).end()
-  else
-    ticketsLeft(function(error,nonDining,dining){
-      if (error) 
-        res.status(500).end()
-      else 
-        res.json([nonDining,dining])
-    })
+  ticketsLeft(function(error,nonDining,dining){
+    if (error) 
+      res.status(500).end()
+    else 
+      res.json([nonDining,dining])
+  })
 })
 
 var ticketsLeft = function(callback){
