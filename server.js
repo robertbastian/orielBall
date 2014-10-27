@@ -382,7 +382,9 @@ server.use(function(error,req,res,next){
 })
 
 // !HTTPS server
-require('https').createServer(c.ssl,server).listen(443,function(){
+var httpsConf = c.ssl
+httpsConf.secureOptions = require('constants').SSL_OP_NO_SSLv3
+require('https').createServer(httpsConf,server).listen(443,function(){
   console.log('Listening for HTTPS requests on port 443')
 })
 
