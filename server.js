@@ -356,17 +356,6 @@ server.get('/pushNotification/:id',function(req,res){
   res.status(200).end()
 })
 
-// !success
-server.get('/ticketsuccess',function(req,res){
-  res.render('tickets/success',{
-    type:'Dining',
-    email:'test@email.com',
-    amount: 3,
-    guests:['Guest One','Guest Two']
-  })
-})
-
-
 server.get('/robots.txt',function(req,res){
   res.type('text/plain')
   if (c.host != 'orielball.uk') // Dev
