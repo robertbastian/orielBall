@@ -94,6 +94,23 @@ server.get('/tickets',function(req,res,next){
   }
 })
 
+var pwProtection = require('basic-auth-connect')(
+                    function(user,pw){
+                      return pw == c.ticketPasswords[user]
+                    })
+
+server.get('/protectedTickets',pwProtection,function(req,res){
+  ticketsLeft(function(error,nonDining,dining){
+    res.render('tickets/form',{ 
+      prices: c.tickets.prices,
+      stripe: c.stripe.public,
+      orielOnly: true,
+      ticketsLeft: [nonDining,dining],
+      colleges: c.colleges
+    })
+  })
+})
+
 // !Payment processing
 server.post('/tickets',function(req,res){
  
@@ -214,19 +231,6 @@ server.post('/tickets',function(req,res){
       }
     }
   )
-})
-
-server.get('/backdoor',require('basic-auth-connect')(function(user,pw){return pw == c.backdoorPassword}),function(req,res){
-  ticketsLeft(function(error,nonDining,dining){
-    res.render('tickets/form',{ 
-      prices: c.tickets.prices,
-      stripe: c.stripe.public,
-      orielOnly: false,
-      ticketsLeft: [nonDining,dining],
-      colleges: c.colleges
-    })
-  })
-
 })
 
 // !Remaining tickets helper function

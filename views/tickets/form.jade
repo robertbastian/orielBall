@@ -24,6 +24,9 @@ html
       html{
         min-height: 100%
       }
+    style.
+              dt { width: 60px; !important}
+              dd { margin-left: 80px; !important}
   body.gradientBackground
     //- Navbar
     nav.navbar.navbar-default.navbar-fixed-top.navbar-inverse(role="navigation")
@@ -100,13 +103,8 @@ html
                   input(type="checkbox" value="")
                   | I&nbsp;accept&nbsp;the&nbsp;<a href='#tacModal' data-toggle='modal'>Terms&nbsp;&amp;&nbsp;Conditions</a>
               button.disabled#pay.btn.btn-gold.btn-lg(style='width:100%;min-width:200px',data-loading-text='Loading...') Proceed to payment
-    .modal.fade#tacModal(tabindex="-1",role="dialog")
+    .modal.fade#tacModal(tabindex="-1",role="dialog",style="height:100%")
       .modal-dialog
-        .modal-content.text-center
-          .modal-header
-            button.close(type="button",data-dismiss="modal")
-              span(aria-hidden="true") &times;
-              span.sr-only Close
-            h3.modal-title(style='margin-left:18px;') Terms &amp; Conditions
-          .modal-body
-            include ../tac                        
+        .modal-content
+          .modal-body(style='height:800px')
+            iframe(src='/Terms%20and%20Conditions.pdf',style='width:100%;height:100%;')                      
