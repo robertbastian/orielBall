@@ -94,10 +94,18 @@ server.get('/tickets',function(req,res,next){
   }
 })
 
-var pwProtection = require('basic-auth-connect')(
-                    function(user,pw){
-                      return pw == c.ticketPasswords[user]
-                    })
+var pwProtection = require('basic-auth-connect')(function(user,pw,fn){
+  if (pw != c.ticketPasswords[user])
+    fn(false,false)
+  else{
+    db.query(
+      'SELECT COUNT(*) FROM bookings WHERE email = ?',[user+'@oriel.ox.ac.uk'],
+      function(error,rows,fields){
+        fn(false,rows[0]['COUNT(*)'] == 0)
+      }
+    )
+  }
+})
 
 server.get('/protectedTickets',pwProtection,function(req,res){
   ticketsLeft(function(error,nonDining,dining){
@@ -232,6 +240,56 @@ server.post('/tickets',function(req,res){
     }
   )
 })
+
+server.get('/addGuests',function(req,res){
+    ticketsLeft(function(error,nonDining,dining){
+      // Tickets released
+      if (Date.now() > c.tickets.dates.normal || c.ticketdebug) {
+        // Can't sell tickets because database is offline
+        if (error)
+          res.render('tickets/error',{type:'connection'})
+        // Tickets sold out
+        else if (nonDining + dining == 0)
+          res.render('tickets/soldOut')
+        // Tickets available
+        else
+          res.render('tickets/guests',{ 
+            ticketsLeft: [nonDining,dining]
+          })
+      }
+      // Tickets not yet released
+      else
+        res.render('tickets/countdown',{date:c.tickets.dates.normal,orielOnly:false})
+    })
+})
+
+
+server.post('/loadGuests',function(req,res){
+  db.query(
+    'SELECT name, email, type FROM bookings WHERE name = ? AND email = ? AND bodcard = ?',
+    [req.body.name, req.body.email, req.body.email],
+    function(error, rows, fields){
+      if (rows.length == 0)
+        res.send('No tickets')
+      else{
+        db.query(
+          'SELECT name, email FROM bookings WHERE payment = ?',['Guest of: '+req.body.email],
+          function(error2,guests,fields){
+            res.send({
+              type: rows[0]['type'],
+              guests: guests
+            })
+          }
+        )
+      }
+    }
+  )
+})
+
+server.post('/addGuests',function(req,res){
+
+})
+
 
 // !Remaining tickets helper function
 server.post('/ticketsLeft',function(req,res){
