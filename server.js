@@ -254,6 +254,9 @@ server.get('/addGuests',function(req,res){
         // Tickets available
         else
           res.render('tickets/guests',{ 
+            prices: c.tickets.prices,
+            stripe: c.stripe.public,
+            colleges: c.colleges,
             ticketsLeft: [nonDining,dining]
           })
       }
@@ -267,8 +270,9 @@ server.get('/addGuests',function(req,res){
 server.post('/loadGuests',function(req,res){
   db.query(
     'SELECT name, email, type FROM bookings WHERE name = ? AND email = ? AND bodcard = ?',
-    [req.body.name, req.body.email, req.body.email],
+    [req.body.name, req.body.email, req.body.bodcard],
     function(error, rows, fields){
+      console.log(rows)
       if (rows.length == 0)
         res.send('No tickets')
       else{
