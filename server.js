@@ -424,8 +424,13 @@ server.get('/robots.txt',function(req,res){
     res.send("User-agent: *\nDisallow: /")
   else // Production
     res.send('')
-  
 })
+
+server.get('/sitemap.txt',function(req,res){
+  res.type('text/plain')
+  res.send('https://orielball.uk\nhttps://orielball.uk/tickets')
+})
+
 // !404 errors
 server.use(function(req,res){
   res.status(404).render('error',{type:404,error:'The requested page does not exist'})

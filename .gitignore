@@ -2,3 +2,4 @@ constants.js
 assets/
 public/cache/
 node_modules/
+resendConfirmations.js
