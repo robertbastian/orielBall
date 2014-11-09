@@ -19,7 +19,7 @@ html
               .alert.alert-danger(role='alert') Our payment provider replied with a card error:<br>!{stripe.message}
               p Your card was not charged and your ticket purchase did not succeed.
             else
-              .alert.alert-danger(role='alert') An error occured communicating with our payment provider.
+              .alert.alert-danger(role='alert') An error occurred communicating with our payment provider.
               p Your card was not charged and your ticket purchase did not succeed.
           else if type == 'connection'
             span.fa-stack.fa-lg.fa-5x
@@ -44,6 +44,6 @@ html
               i.fa.fa-database.fa-stack-2x
             h1 Database Error
             .alert.alert-warning(role='alert').
-              Your ticket purchase succeded, but there was an error entering your details into our database. We are aware of this error and will be in contact with you after we have fixed this. To be safe, please keep a screenshot of this page for your record. We apologise for the inconvenience.
+              Your ticket purchase succeded, but there was an error entering your details into our database. We are aware of this error and will be in contact with you after we have fixed this. To be on the safe side, please keep a screenshot of this page for your records. We apologise for the inconvenience.
             .well=charge
             .well=error

@@ -39,7 +39,7 @@ var logError = function(type,error,action,info){
   console.error('**********')  
 }
 
-// !Redirecting everything to https://www.orielball.uk/...
+// !Redirecting everything to https://orielball.uk/...
 server.all('*',function(req,res,next){
   if (req.headers.host == c.host && req.secure) 
     next()

@@ -68,7 +68,9 @@ html
           h5.visible-xs 26 June 2015
           p.hidden-xs.
             Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which linger longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
-          #enterBtn.btn.btn-gold.btn-lg(style='width:150px; margin:20px;') Enter
+          #enterBtn.btn.btn-gold.btn-lg(style='width:150px; margin:20px;') Enter page
+          if (bookingDates && !bookingDates.oriel && !bookingDates.normal)
+            a.btn.btn-gold.btn-lg(href='/tickets',style='width:150px; margin: 20px;') Buy tickets
       if trailer
         #trailer.row(style='background:black; padding:0px; height:600px;')
           .col-xs-12.text-center(style='width:100%; height:100%; padding:0px')
