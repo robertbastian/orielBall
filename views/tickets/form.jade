@@ -10,8 +10,8 @@ html
 
     script(type='text/javascript').
       var remaining = {
-        'Dining': !{ticketsLeft[0]},
-        'Non-dining': !{ticketsLeft[1]}
+        'Dining': !{ticketsLeft[1]},
+        'Non-dining': !{ticketsLeft[0]}
       }
       var PRICES = !{JSON.stringify(prices)}
       var STRIPE = !{JSON.stringify(stripe)}
