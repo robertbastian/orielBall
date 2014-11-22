@@ -68,9 +68,9 @@ html
           h5.visible-xs 26 June 2015
           p.hidden-xs.
             Of all the Seven Wonders of the Ancient World, it is the Hanging Gardens of Babylon which linger longest in the imagination - the only Wonder whose location remains, to this day, unknown. Some speculate that it existed only in myth; a fantastic creation of the poet or fabulist. On the 26th June, however, we offer it as yours to explore...
-          #enterBtn.btn.btn-gold.btn-lg(style='width:150px; margin:20px;') Enter page
+          #enterBtn.btn.btn-gold.btn-lg(style='width:150px; margin:10px 20px;') Enter page
           if (bookingDates && !bookingDates.oriel && !bookingDates.normal)
-            a.btn.btn-gold.btn-lg(href='/tickets',style='width:150px; margin: 20px;') Buy tickets
+            a.btn.btn-gold.btn-lg(href='/tickets',style='width:150px; margin:0px 20px;') Buy tickets
       if trailer
         #trailer.row(style='background:black; padding:0px; height:600px;')
           .col-xs-12.text-center(style='width:100%; height:100%; padding:0px')
@@ -198,25 +198,25 @@ html
                         h4.panel-title
                           a(data-toggle="collapse", data-parent=".panel-group", href="#collapse"+i) !{faqs[i][0]}
                       .panel-collapse.collapse(id="collapse"+i)
-                        .panel-body.text-left !{faqs[i][1]}        
-            br
-            if bookingDates
-              .row
-                .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3
-                  a#ticketBtn.btn.btn-lg.btn-gold.btn-block(href='/tickets',style='margin-bottom:-20px') Booking system
-              h3 
-                if bookingDates.oriel
-                  small Oriel tickets go on sale on !{bookingDates.oriel} <br>
-                else if bookingDates.normal
-                  small Tickets for Oriel members are now available <br>
-                if bookingDates.normal 
-                  small Public tickets go on sale on !{bookingDates.normal}
-                else
-                  small Tickets are now on sale!
-            else
-              a#ticketBtn.btn.btn-lg.btn-gold.disabled(href='#') Booking system
-              h5: small Dates will be published shortly
-            br
+                        .panel-body.text-left !{faqs[i][1]}               
+              br
+              if bookingDates
+                .row
+                  .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3
+                    a#ticketBtn.btn.btn-lg.btn-gold.btn-block(href='/tickets',style='margin-bottom:-20px') Booking system
+                h3 
+                  if bookingDates.oriel
+                    small Oriel tickets go on sale on !{bookingDates.oriel} <br>
+                  else if bookingDates.normal
+                    small Tickets for Oriel members are now available <br>
+                  if bookingDates.normal 
+                    small Public tickets go on sale on !{bookingDates.normal}
+                  else
+                    small Tickets are now on sale!
+              else
+                a#ticketBtn.btn.btn-lg.btn-gold.disabled(href='#') Booking system
+                h5: small Dates will be published shortly
+              br
       #news.row.gradientBackground
         .col-xs-10.col-xs-offset-1
           .row

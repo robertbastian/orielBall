@@ -14,7 +14,7 @@ html
           h1 Congratulations
           .alert.alert-success
             if amount > 1
-              p You successfully purchased <b>!{['two','three','four','five','six','seven','eight','nine'][amount-2]} !{type.toLowerCase()} tickets</b> for !{guests.join(', ')} and yourself.
+              p You successfully purchased <b>!{['two','three','four','five','six','seven','eight','nine'][amount-2]} !{type.toLowerCase()} tickets</b> for !{guests.join(', ')}!{(!additional)?' and yourself':''}.
             else
               p You successfully purchased a  <b>!{type.toLowerCase()} ticket</b>.
             p A confirmation email was sent to !{email}.
@@ -22,10 +22,3 @@ html
           .row
             .col-xs-8.col-xs-offset-2
               a(href='http://ate.so/?0ScenBG+ical').btn.btn-lg.btn-default.btn-block Add to calendar
-            //-.col-xs-6
-            //- a(href='#').btn.btn-lg.btn-default.btn-block Hire a suit
-          //- .row.text-center
-          //-   .col-xs-12
-          //-     <a href="https://twitter.com/orielball" class="twitter-follow-button" data-show-count="true" data-show-screen-name="false">Follow @orielball</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-          //-   .col-xs-12
-          //-     <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Ffacebook.com%2Forielball&amp;width=100&amp;layout=button_count&amp;action=like&amp;show_faces=true&amp;share=false&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:21px;" allowTransparency="true"></iframe>
