@@ -23,8 +23,10 @@ server.use(bodyParser.urlencoded({extended:true}))
 // !Minifying, compressing and serving static files
 var compression = require('compression')
 server.use(compression())
-var minify = require('express-minify')
-server.use(minify({cache: __dirname + '/public/cache'}))
+if (c.host == 'orielball.uk'){
+  var minify = require('express-minify')
+  server.use(minify({cache: __dirname + '/public/cache'}))  
+}
 server.use(express.static(__dirname + '/public'))
 
 var inOriel = function(req){
@@ -70,7 +72,7 @@ server.get('/tickets',function(req,res,next){
     var orielOnly = Date.now() < c.tickets.dates.normal && Date.now() > c.tickets.dates.oriel
     ticketsLeft(function(error,nonDining,dining){
       // Tickets released
-      if (Date.now() > date || c.ticketdebug) {
+      if (Date.now() > date) {
         // Can't sell tickets because database is offline
         if (error)
           res.render('tickets/error',{type:'connection'})
@@ -242,28 +244,28 @@ server.post('/tickets',function(req,res){
 })
 
 server.get('/addGuests',function(req,res){
-    ticketsLeft(function(error,nonDining,dining){
-      // Tickets released
-      if (Date.now() > c.tickets.dates.normal || c.ticketdebug) {
-        // Can't sell tickets because database is offline
-        if (error)
-          res.render('tickets/error',{type:'connection'})
-        // Tickets sold out
-        else if (nonDining + dining == 0)
-          res.render('tickets/soldOut')
-        // Tickets available
-        else
-          res.render('tickets/guests',{ 
-            prices: c.tickets.prices,
-            stripe: c.stripe.public,
-            colleges: c.colleges,
-            ticketsLeft: [nonDining,dining]
-          })
-      }
-      // Tickets not yet released
+  ticketsLeft(function(error,nonDining,dining){
+    // Tickets released
+    if (Date.now() > c.tickets.dates.normal) {
+      // Can't sell tickets because database is offline
+      if (error)
+        res.render('tickets/error',{type:'connection'})
+      // Tickets sold out
+      else if (nonDining + dining == 0)
+        res.render('tickets/soldOut')
+      // Tickets available
       else
-        res.render('tickets/countdown',{date:c.tickets.dates.normal,orielOnly:false})
-    })
+        res.render('tickets/guests',{ 
+          prices: c.tickets.prices,
+          stripe: c.stripe.public,
+          colleges: c.colleges,
+          ticketsLeft: [dining,nonDining]
+        })
+    }
+    // Tickets not yet released
+    else
+      res.render('tickets/countdown',{date:c.tickets.dates.normal,orielOnly:false})
+  })
 })
 
 
@@ -272,9 +274,8 @@ server.post('/loadGuests',function(req,res){
     'SELECT name, email, type FROM bookings WHERE name = ? AND email = ? AND bodcard = ?',
     [req.body.name, req.body.email, req.body.bodcard],
     function(error, rows, fields){
-      console.log(rows)
       if (rows.length == 0)
-        res.send('No tickets')
+        res.json({ guests: false })
       else{
         db.query(
           'SELECT name, email FROM bookings WHERE payment = ?',['Guest of: '+req.body.email],
@@ -290,10 +291,124 @@ server.post('/loadGuests',function(req,res){
   )
 })
 
+// !Payment processing for additional guests
 server.post('/addGuests',function(req,res){
+ 
+  // req.body is going to be used a lot
+  var r = req.body
+  console.log(r)
+  r.guests = parseInt(r.guests)
+  
+  db.query('SELECT COUNT(*) AS count FROM bookings WHERE email = ? OR payment = ?',
+    [r.email,'Guest of: '+r.email],
+    function(error,rows,fields){
+      if (error){
+        logError('Database',error,'Trying to get ticket count for',r.email)
+        res.render('tickets/error',{type:'databaseCount'})
+      }
+      if (rows[0]['count'] > 0){
+        // Checking: correct name, .ox.ac.uk email, tickets are open to customer, bodcard, number of guests
+        if (r.guests == 0 || r.guestNames.length != r.guests || r.guests + rows[0]['count'] > 10){
+          res.render('tickets/error',{type:'input'})
+        }
+        else {
+          var amount = c.tickets.prices[r.type][false] * r.guests
+          stripe.charges.create({
+          amount: amount*100,
+          currency: 'gbp',
+          card: r.stripeToken,
+          description: r.email,
+          statement_description: (r.guests)+'x ' + r.type.toLowerCase()
+        },
+          function(error, charge){
+          // Stripe/card error. Nothing charged, no ticket bought
+          if (error || !charge.paid) {
+            logError('Payment',error,'Processing purchase request',r)
+            res.render('tickets/error',{type:'payment', stripe: error})
+          }
+          else {
+            // Inserting customer + guests into DB
+            var data = []
+            for (var i = 0; i < r.guests; i++)
+              data.push([r.guestNames[i],r.guestEmails[i],'Guest of: '+r.email,r.type])
+            db.query(
+              'INSERT INTO bookings (name,email,payment,type) VALUES ?; INSERT INTO Paid (email, charge_id) VALUES (?,?)',
+              [data,r.email,charge.id],
+              function(error,rows,fields){
+                // Big error: customer was charged but not entered into DB
+                if (error) {
+                  logError('Database',error,'Trying to insert',data)
+                  mandrill.messages.send(
+                    {'message': 
+                      {
+                        'text': 'Error:\n' + error + '\n\n' + 'Data:\n' + data,
+                        'subject': 'Database error',
+                        'from_email': 'server@orielball.uk',
+                        'to': [{'email': 'it@orielball.uk'}],
+                      }
+                    }, function(result){}, 
+                    function(error) {
+                      logError('Mandrill',error,'Trying to email','about db error')
+                    }
+                  )
+                  res.render('tickets/error',{type: 'database', charge: charge.id, error: error})
+                }
+                // All good, send confirmation mail
+                else {
+                  mandrill.messages.sendTemplate({
+                    'template_name':'confirmation',
+                    'template_content':[],
+                    'message': 
+                    {
+                      'to': [{'email': r.email,'name': r.name}],
+                      'subject': 'Ticket confirmation',
+                      'from_name': 'Oriel College Ball',
+                      'from_email': 'tickets@orielball.uk',
+                      'global_merge_vars': [
+                        {"name": 'TICKET_STRING', 'content': r.guests+' '+r.type+' Ticket'+((r.guests>1)?'s':'')}
+                      ]
+                    }
+                    },
+                    function(result){
+                      if (result[0].status == 'sent')
+                        console.log('Sent confirmation of additional guest tickets to %s',r.email)
+                      else
+                        logError('Mandrill',result,'Trying to send confirmation to',r.name)
+                    }, 
+                    function(error) {
+                      logError('Mandrill',error,'Trying to send confirmation to',r.name)
+                    }
+                  )
 
+                  res.render('tickets/success',{
+                    type:r.type,
+                    email:r.email,
+                    amount: r.guests,
+                    guests:r.guestNames,
+                    additional: true
+                  })
+                  
+                  // Adding to ticket holder mailing list
+                  var users = []
+                  for (var i = 0; i < r.guests; i++)
+                    users.push({email:{email:r.guestEmails[i]},merge_vars:{NAME: r.guestNames[i],TYPE: r.type,GUEST:'Yes'}})
+
+                  mailchimp(users,'a52cfddcf4',function(error,response,body){
+                    if (!error && response.statusCode == 200)
+                      console.log('Added %s and guests to ticket holder email list',r.email)
+                    else 
+                      logError('Mailchimp',error || body.error,'Trying to add to ticket holder list',r.email)
+                  })
+                }
+              }
+            )
+          }
+        })
+        }
+      }
+    }
+  )
 })
-
 
 // !Remaining tickets helper function
 server.post('/ticketsLeft',function(req,res){

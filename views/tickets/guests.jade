@@ -15,31 +15,11 @@ html
       }
       var PRICES = !{JSON.stringify(prices)}
       var STRIPE = !{JSON.stringify(stripe)}
-      var MAX_TICKET_NUMBER = 0
+      var MAX_TICKET_NUMBER = 10
       var ORIEL_ONLY = false
       var COLLEGES = !{JSON.stringify(colleges)}
     
-    script(type='text/javascript', src='/javascripts/form.js')
-    script(type='text/javascript').
-      $('#loadGuests').click(function(){
-        $.post('/loadGuests',{
-          name: $('#name input').val(),
-          email: $('#email input').val(),
-          bodcard: $('#bodcard input').val()
-        },function(data){
-          if (data == 'No tickets')
-            window.location = '/tickets'
-          else {
-            type = data.type
-            for (var i = 0; i < data.guests.length; i++)
-              $('#guestList').append($('<div class="form-group"><div class="input-group"><span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input type="text" placeholder="'+data.guests[i]['name']+'" class="form-control" disabled><span class="input-group-btn"><button class="btn btn-default disabled" type="button" disabled><i class="fa fa-minus"></i></button></span></div><div class="input-group"><span class="input-group-addon"><i class="fa fa-at fa-fw"></i></span><input type="email" placeholder="'+data.guests[i]['email']+'" class="form-control" disabled></div></div>'))
-            $('#guests').removeClass('hidden')
-            $('#payment').removeClass('hidden')
-            MAX_TICKET_NUMBER = 10 - 1 - data.guests.length
-          }
-        })
-        return false
-      })
+    script(type='text/javascript', src='/javascripts/guests.js')      
     style.
       html{
         min-height: 100%
@@ -69,7 +49,7 @@ html
         .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
           form.form#payment-form(role='form',method='POST',autocomplete='on',action='/addGuests')
             #name.form-group
-              h5 Enter your info EXACTLY as during booking
+              h5 Enter your info exactly as during booking
               .input-group
                 span.input-group-addon
                   i.fa.fa-user.fa-fw
@@ -92,9 +72,11 @@ html
                 span.input-group-btn
                   a.btn.btn-default#bodcardHelp
                     i.fa.fa-question 
-            button#loadGuests.btn.btn-gold(type='button') Load guests
+            h5 Your guests
+            .text-center
+              button#loadGuests.btn.btn-gold(type='button') Load
             #guests.hidden
-              h5 Your guests
+              #oldGuestList
               #guestList
               .text-center
                 button.btn.btn-default#addGuest
