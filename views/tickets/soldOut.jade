@@ -25,8 +25,7 @@ html
             }).done(function(){
               btn.html('Success!')
               setTimeout(function(){
-                $('#emailModal').modal('hide')
-                $('#emailInput').val('')
+                $('input').val('')
                 btn.button('reset')
               },1000)
             }).fail(function(){

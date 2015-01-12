@@ -470,7 +470,7 @@ server.post('/subscribeEmail', function(req,res){
 // !Waiting list processing
 server.post('/subscribeWaitingList',function(req,res){
   db.query(
-    'INSERT INTO waitingList (email,name) VALUES (?,?)',
+    'INSERT IGNORE INTO waitingList (email,name) VALUES (?,?)',
     [req.body.email,req.body.name],
     function(error,rows,fields){ 
       if (error) {
