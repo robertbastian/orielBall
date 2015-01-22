@@ -90,3 +90,27 @@ fieldset[disabled] .btn-gold.active {
   color: #F3D883; 
   background-color: #FFFFFF; 
 }
+
+
+.label-platinum {
+  background-color: #b7b7b7;
+}
+.label-platinum[href]:hover,
+.label-platinum[href]:focus {
+  background-color: #b7b7b7;
+}
+.label-gold {
+  background-color: #D4AF37;
+}
+.label-gold[href]:hover,
+.label-gold[href]:focus {
+  background-color: #D4AF37;
+}
+.label-bronze {
+  background-color: #CD7F32;
+}
+.label-bronze[href]:hover,
+.label-bronze[href]:focus {
+  background-color: #CD7F32;
+}
+
