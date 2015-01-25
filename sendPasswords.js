@@ -1,4 +1,5 @@
 var c = require('./constants')
+var db = require('mysql').createConnection(c.mysql)
 var m = require('mandrill-api/mandrill')
 var mandrill = new m.Mandrill(c.mandrill)
 var sendTo = function(name){

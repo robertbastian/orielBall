@@ -44,20 +44,22 @@ html
               i.fa.fa-frown-o.fa-stack-2x
           br
           h1 Sold out
-          .alert.alert-info.
-            If you want to join the waiting list, use the form below.
-      .row
-        .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
-          form.form(role='form')
-            #name.form-group
-              .input-group
-                span.input-group-addon
-                  i.fa.fa-user.fa-fw
-                input.form-control(name='name',type='text',placeholder='Name')
-            #email.form-group
-              .input-group
-                span.input-group-addon
-                  i.fa.fa-at.fa-fw
-                input.form-control(name='email',type='email',placeholder='University email address')
-          .text-center
-            button#join.btn.btn-gold.btn-lg(data-loading-text="Loading...",style='margin-top:10px;width=200px') Join waiting list
+      if waitingList
+        .row
+            .alert.alert-info.
+              If you want to join the waiting list, use the form below.
+        .row
+          .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
+            form.form(role='form')
+              #name.form-group
+                .input-group
+                  span.input-group-addon
+                    i.fa.fa-user.fa-fw
+                  input.form-control(name='name',type='text',placeholder='Name')
+              #email.form-group
+                .input-group
+                  span.input-group-addon
+                    i.fa.fa-at.fa-fw
+                  input.form-control(name='email',type='email',placeholder='University email address')
+            .text-center
+              button#join.btn.btn-gold.btn-lg(data-loading-text="Loading...",style='margin-top:10px;width=200px') Join waiting list

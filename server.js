@@ -59,6 +59,7 @@ server.get('/', function(req, res){
       normal: (Date.now() < c.tickets.dates.normal) ? moment(c.tickets.dates.normal).format('dddd, DD MMMM [at] h:mm a') : false,
       oriel: (Date.now() < c.tickets.dates.oriel) ? moment(c.tickets.dates.oriel).format('dddd, DD MMMM [at] h:mm a') : false
     } : false,
+    waitingList: c.tickets.waitingList,
     committee: c.committee
   })
 })
@@ -77,8 +78,8 @@ server.get('/tickets',function(req,res,next){
         if (error)
           res.render('tickets/error',{type:'connection'})
         // Tickets sold out
-        else if (nonDining + dining == 0)
-          res.render('tickets/soldOut')
+        else if (nonDining + dining == 0 || !c.tickets.waitingList)
+          res.render('tickets/soldOut',{waitingList: c.tickets.waitingList})
         // Tickets available
         else
           res.render('tickets/form',{ 
@@ -97,27 +98,28 @@ server.get('/tickets',function(req,res,next){
 })
 
 var pwProtection = require('basic-auth-connect')(function(user,pw,fn){
-  if (pw != c.ticketPasswords[user])
-    fn(false,false)
-  else{
-    db.query(
-      'SELECT COUNT(*) FROM bookings WHERE email = ?',[user+'@oriel.ox.ac.uk'],
-      function(error,rows,fields){
-        fn(false,rows[0]['COUNT(*)'] == 0)
-      }
-    )
-  }
+  db.query(
+    'SELECT password FROM waitingList WHERE email = ?',
+    [user],
+    function(error,rows,fields){
+      if (error)
+        fn(error,false)
+      else if (rows.length == 0)
+        fn(false,false)
+      else
+        fn(false, pw == rows[0]['password'])
+    }
+  )
 })
 
-server.get('/protectedTickets',pwProtection,function(req,res){
-  ticketsLeft(function(error,nonDining,dining){
-    res.render('tickets/form',{ 
-      prices: c.tickets.prices,
-      stripe: c.stripe.public,
-      orielOnly: true,
-      ticketsLeft: [nonDining,dining],
-      colleges: c.colleges
-    })
+server.get('/waitingListTickets',pwProtection,function(req,res){
+  res.render('tickets/form',{ 
+    prices: c.tickets.prices,
+    stripe: c.stripe.public,
+    orielOnly: false,
+    ticketsLeft: [1,0],
+    colleges: c.colleges,
+    singleTickets: true
   })
 })
 
@@ -136,15 +138,17 @@ server.post('/tickets',function(req,res){
   }
   
   // Checking if tickets were previously bought
-  db.query('SELECT COUNT(*) AS count FROM bookings WHERE email = ? OR payment = ?',
-    [r.email,'Guest of: '+r.email],
+  db.query(
+    'SELECT ((SELECT COUNT(*) > 0 FROM waitingList WHERE email = ? AND password IS NOT NULL) && (SELECT COUNT(*) = 0 FROM bookings WHERE email = ? OR payment = ?)) AS allowed',
+    [r.email,r.email,'Guest of: '+r.email,r.email],
     function(error,rows,fields){
       if (error){
         logError('Database',error,'Trying to get ticket count for',r.email)
         res.render('tickets/error',{type:'databaseCount'})
       }
-      if (rows[0]['count'] > 0)
-        res.render('tickets/error',{type:'duplicate',number:rows[0]['count']})
+      if (rows[0]['allowed'] == 0)
+        res.render('tickets/error',{type:'disallowed'})
+        //res.render('tickets/error',{type:'duplicate',number:rows[0]['count']})
       else {
         // Charging the customer
         var amount = c.tickets.prices[r.type][r.college == 'Oriel'] + c.tickets.prices[r.type][false] * r.guests
@@ -167,8 +171,8 @@ server.post('/tickets',function(req,res){
             for (var i = 0; i < r.guests; i++)
               data.push([r.guestNames[i],r.guestEmails[i],'N/A','N/A','Guest of: '+r.email,r.type])
             db.query(
-              'INSERT INTO bookings (name,email,college,bodcard,payment,type) VALUES ?',
-              [data],
+              'INSERT INTO bookings (name,email,college,bodcard,payment,type) VALUES ?; DELETE FROM waitingList WHERE email = ?',
+              [data,r.email],
               function(error,rows,fields){
                 // Big error: customer was charged but not entered into DB
                 if (error) {
@@ -421,7 +425,9 @@ server.post('/ticketsLeft',function(req,res){
 })
 
 var ticketsLeft = function(callback){
-  db.query(
+  callback(false,1,0)
+  /*
+db.query(
     'SELECT (SELECT COUNT(*) FROM bookings) AS total, (SELECT COUNT(*) FROM bookings WHERE type = "Dining") AS dining',
     function(error,rows,fields){
       if (error) {
@@ -435,6 +441,7 @@ var ticketsLeft = function(callback){
       }
     }
   )
+*/
 }
 
 var mailchimp = function(batch,id,callback){
@@ -469,6 +476,8 @@ server.post('/subscribeEmail', function(req,res){
 
 // !Waiting list processing
 server.post('/subscribeWaitingList',function(req,res){
+  if (!c.tickets.waitingList)
+    res.send(500)
   db.query(
     'INSERT IGNORE INTO waitingList (email,name) VALUES (?,?)',
     [req.body.email,req.body.name],

@@ -16,7 +16,7 @@ html
       var PRICES = !{JSON.stringify(prices)}
       var STRIPE = !{JSON.stringify(stripe)}
       var ORIEL_ONLY = !{JSON.stringify(orielOnly)}
-      var MAX_TICKET_NUMBER = ORIEL_ONLY ? 2 : 10
+      var MAX_TICKET_NUMBER = ORIEL_ONLY ? 2 : !{singleTickets?1:10}
       var COLLEGES = !{JSON.stringify(colleges)}
       
     script(type='text/javascript', src='/javascripts/form.js')
@@ -34,12 +34,12 @@ html
                 i.fa.fa-angle-left &nbsp; 
                 | Back
           ul.nav.navbar-nav.navbar-right.hidden-xs 
-            li
-              a Tickets left:
-                i.fa.fa-glass(style='margin-left:10px') &nbsp;
-                span#nonDiningLeft ?
-                i.fa.fa-cutlery(style='margin-left:10px') &nbsp;
-                span#diningLeft ?
+            //li
+              //a Tickets left:
+              //  i.fa.fa-glass(style='margin-left:10px') &nbsp;
+              //  span#nonDiningLeft ?
+              //  i.fa.fa-cutlery(style='margin-left:10px') &nbsp;
+              //  span#diningLeft ?
     a(href='/')
       img#logo(src='/icons/logoSmall.png',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
     
@@ -72,14 +72,15 @@ html
                 span.input-group-btn
                   a.btn.btn-default#bodcardHelp
                     i.fa.fa-question 
-            #guests
-              h5 Your guests
-              #guestList
-              .text-center
-                button.btn.btn-default#addGuest
-                  i.fa.fa-plus
-                  | &nbsp;
-                  i.fa.fa-user
+            if !singleTickets
+              #guests
+                h5 Your guests
+                #guestList
+                .text-center
+                  button.btn.btn-default#addGuest
+                    i.fa.fa-plus
+                    | &nbsp;
+                    i.fa.fa-user
             #type.form-group
               h5 Your tickets
               .btn-group.btn-block.text-center(data-toggle="buttons")

@@ -210,7 +210,10 @@ html
               if bookingDates
                 .row
                   .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3
-                    a#ticketBtn.btn.btn-lg.btn-gold.btn-block.disabled(href='/tickets',style='margin-bottom:-20px' disabled) Waiting list closed
+                    if waitingList 
+                      a#ticketBtn.btn.btn-lg.btn-gold.btn-block(href='/tickets',style='margin-bottom:-20px') Ticket system
+                    else
+                      a#ticketBtn.btn.btn-lg.btn-gold.btn-block.disabled(href='/tickets',style='margin-bottom:-20px' disabled) Waiting list closed
                 h3 
                   if bookingDates.oriel
                     small Oriel tickets go on sale on !{bookingDates.oriel} <br>
@@ -218,8 +221,8 @@ html
                     small Tickets for Oriel members are now available <br>
                   if bookingDates.normal 
                     small Public tickets go on sale on !{bookingDates.normal}
-                  //- else
-                  //-  small Tickets are now on sale!
+                  else if waitingList
+                    small Tickets are now on sale!
               else
                 a#ticketBtn.btn.btn-lg.btn-gold.disabled(href='#') Booking system
                 h5: small Dates will be published shortly

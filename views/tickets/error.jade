@@ -39,6 +39,12 @@ html
             h1 Repeated purchase
             .alert.alert-danger(role='alert').
               You already bought !{number} ticket!{(number>1)?'s':''} using this email address. If you'd like to add more guest tickets, go <a class='alert-link' href='/addGuests'>here</a>.<br>Your card was not charged.   
+          else if type == 'disallowed'
+            span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-error.fa-stack-2x
+            h1 Not allowed
+            .alert.alert-danger(role='alert')
+              You are not allowed to buy any tickets
           else
             span.fa-stack.fa-5x.fa-lg
               i.fa.fa-database.fa-stack-2x
