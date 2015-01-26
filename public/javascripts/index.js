@@ -83,31 +83,12 @@ $(document).ready(function(){
       setTimeout(function(){btn.button('reset')},2000)
     })
   }) 
-
-  // !Push notifications
-  var adjustPushBtn = function(){
-    if ('safari' in window && 'pushNotification' in window.safari) {
-      if(window.safari.pushNotification.permission('web.uk.orielball').permission === 'default') {
-        $('#pushBtn').removeClass('disabled')
-        $('#pushBtn').parent().tooltip({title:'Push notifications',placement:'bottom',container:'body'})
-      }
-      else
-        $('#pushBtn').parent().tooltip({title:"Adjust in Safari settings",placement:'bottom',container:'body'}) 
-    }
-    else 
-      $('#pushBtn').parent().tooltip({title:"Push notifications require Safari",placement:'bottom',container:'body'}) 
-  }
-  adjustPushBtn()
-  $('#pushBtn').click(function(){
-    if ('safari' in window && 'pushNotification' in window.safari)
-      window.safari.pushNotification.requestPermission('https://orielball.uk','web.uk.orielball',{},adjustPushBtn)
-    return false
-  }) 
    
   // !News button tooltips
   $('#facebookBtn').parent().tooltip({title:'Facebook',placement:'top',container:'body'})
   $('#twitterBtn').parent().tooltip({title:'Twitter',placement:'top',container:'body'})
   $('#newsletterBtn').parent().tooltip({title:'Newsletter',placement:'bottom',container:'body'})
+  $('#committeeBtn').parent().tooltip({title:'Email the commitee',placement:'bottom',container:'body'})
   
   // !Animates logo on non-touchscreens
   if(!('ontouchstart' in window)){

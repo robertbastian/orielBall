@@ -12,7 +12,7 @@ var moment = require('moment')
 
 // !Passwords and access protection
 var crypto = require('crypto')
-var pwprotect = require('basic-auth-connect')
+var pwProtect = require('basic-auth-connect')
 
 // !Creating server
 var express = require('express')
@@ -28,6 +28,7 @@ server.use(bodyParser.urlencoded({extended:true}))
 var compression = require('compression')
 server.use(compression())
 if (c.host == 'orielball.uk'){
+  // Production
   var minify = require('express-minify')
   server.use(minify({cache: __dirname + '/public/cache'}))  
 }
@@ -46,7 +47,7 @@ var logError = function(type,error,action,info){
   console.error('**********')  
 }
 
-// !Redirecting everything to https://orielball.uk/...
+// !Redirecting everything to a secure connection using specified hostname
 server.all('*',function(req,res,next){
   if (req.headers.host == c.host && req.secure) 
     next()
@@ -56,14 +57,21 @@ server.all('*',function(req,res,next){
 
 // !Homepage
 server.get('/', function(req, res){
+  var bookingInfo
+  if (c.tickets.bookingClosed)
+    bookingInfo = 'closed'
+  else if (!c.tickets.datesPublic)
+    bookingInfo = 'notPublic'
+  else
+    bookingInfo = { 
+      normal: (Date.now() < c.tickets.dates.normal) ? moment(c.tickets.dates.normal).format('dddd, DD MMMM [at] h:mm a') : false, 
+      oriel: (Date.now() < c.tickets.dates.oriel) ? moment(c.tickets.dates.oriel).format('dddd, DD MMMM [at] h:mm a') : false
+    }
+
   res.render('index',{
     trailer: c.trailer,
     prices: c.tickets.pricesPublic ? c.tickets.prices : false,
-    // Show date when booking opens, if in the future
-    booking: c.tickets.datesPublic ? {
-      normal: (Date.now() < c.tickets.dates.normal) ? moment(c.tickets.dates.normal).format('dddd, DD MMMM [at] h:mm a') : false,
-      oriel: (Date.now() < c.tickets.dates.oriel) ? moment(c.tickets.dates.oriel).format('dddd, DD MMMM [at] h:mm a') : false
-    } : (c.tickets.bookingOver ? 'closed' : false),
+    bookingInfo: bookingInfo,
     committee: c.committee
   })
 })
@@ -84,10 +92,10 @@ server.get('/tickets',function(req,res,next){
     if (Date.now() < date)
       res.render('tickets/countdown',{date:date,orielOnly:orielOnly})
     // Booking is over
-    else if (c.tickets.bookingOver)
+    else if (c.tickets.bookingClosed)
       res.render('tickets/soldOut',{waitingList: false})
     // Booking is open
-    else
+    else {
       ticketsLeft(function(error,nonDining,dining){
         // Can't sell tickets because database is offline
         if (error)
@@ -105,6 +113,7 @@ server.get('/tickets',function(req,res,next){
             colleges: c.colleges
           })
       })
+    }
   }
 })
 
@@ -119,7 +128,7 @@ server.post('/tickets',function(req,res){
   // Checking: correct name, .ox.ac.uk email, tickets are open to customer, bodcard, number of guests
   if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || (r.college != 'Oriel' && orielOnly) || !/^[0-9]{7}$/.test(r.bodcard) || (r.guests > 0 && (r.guestNames.length != r.guests || r.guests > 9 || (r.guests > 1 && orielOnly))))
     res.render('tickets/error',{type:'input'})
-  else if {
+  else {
     db.query(
       // If user doesn't have a ticket
       "SELECT COUNT(*) as count FROM bookings WHERE email = ?",
@@ -129,7 +138,7 @@ server.post('/tickets',function(req,res){
           logError('Database',error,'Trying to validate ticket count for',r.email)
           res.render('tickets/error',{type:'databaseCount'})
         }
-        else if (rows[0].count > 0)
+        else if (parseInt(rows[0].count) > 0)
           res.render('tickets/error',{type:'duplicate',number:rows[0].count})
         else
           processPayment(res,req.body)
@@ -144,7 +153,7 @@ server.get('/waitingListTickets',
   pwProtect(function(email,password,callback){
     db.query(
       "SELECT password FROM waitingList WHERE email = ? AND state = 'Emailed'",
-      [user],
+      [email],
       function(error,rows,fields){
         if (error)
           callback(error,false)
@@ -164,29 +173,31 @@ server.get('/waitingListTickets',
       orielOnly: false,
       ticketsLeft: [1,0],
       colleges: c.colleges,
-      singleTickets: true
+      waitingList: true
     })
 })
 
 // !Waiting list ticket request
 server.post('/waitingListTickets',function(req,res){
   var r = req.body 
+  r.guests = parseInt(r.guests)
   if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || !/^[0-9]{7}$/.test(r.bodcard))
     res.render('tickets/error',{type:'input'})
-  else if {
+  else {
     db.query(
-    //        Is on the waiting list and in correct state                                  && hasn't bought tickets before
-    "SELECT ((SELECT COUNT(*) > 0 FROM waitingList WHERE email = ? AND state = 'Emailed') && (SELECT COUNT(*) = 0 FROM bookings WHERE email = ?)) AS allowed",
-    [r.email,r.email],
-    function(error,rows,fields){
-      if (error){
-        logError('Database',error,'Trying to validate waiting list ticket for',r.email)
-        res.render('tickets/error',{type:'databaseCount'})
+      //        Is on the waiting list and in correct state                                  && hasn't bought tickets before
+      "SELECT ((SELECT COUNT(*) > 0 FROM waitingList WHERE email = ? AND state = 'Emailed') && (SELECT COUNT(*) = 0 FROM bookings WHERE email = ?)) AS allowed",
+      [r.email,r.email],
+      function(error,rows,fields){
+        if (error){
+          logError('Database',error,'Trying to validate waiting list ticket for',r.email)
+          res.render('tickets/error',{type:'databaseCount'})
+        }
+        else if (parseInt(rows[0].allowed) == 0)
+          res.render('tickets/error',{type:'disallowed'})
+        else
+          processPayment(res,req.body)
       }
-      else if (rows[i].allowed = 0)
-        res.render('tickets/error',{type:'disallowed'})
-      else
-        processPayment(res,req.body)
     )
   }
 })
@@ -215,16 +226,14 @@ var processPayment = function(res, r){
           emails.push(r.guestEmails[i])
         }
         db.query(
-          "START TRANSACTION;\
-            INSERT INTO payments (payer,bodcard,type,reference,amount) VALUES (?,?,'Stripe',?,?);\
-            INSERT INTO bookings (name,email,college,type,paidBy) VALUES ?;\
-            DELETE FROM waitingList WHERE email IN ?;\
-           COMMIT TRANSACTION;",
-          [r.email,r.bodcard,charge.id,charge.amount / 100, guests, emails],
+          "INSERT INTO payments (payer,bodcard,type,reference,amount) VALUES (?,?,'Stripe',?,?);\
+           INSERT INTO bookings (name,email,college,type,payment) VALUES ?;\
+           DELETE FROM waitingList WHERE email = ?;",
+          [r.email,r.bodcard,charge.id,charge.amount / 100, guests, r.email],
           function(error,rows,fields){
             // Big error: customer was charged but not entered into DB
             if (error) {
-              logError('Database',error,'Trying to insert',data)
+              logError('Database',error,'Trying to insert',r)
               mandrill.messages.send(
                 {'message': {
                     'text': 'Error:\n' + error + '\n\n' + 'Data:\n' + r,
@@ -255,6 +264,7 @@ var processPayment = function(res, r){
                   console.log('Sent confirmation to %s',r.email)
                 }, 
                 function(error) {
+                  console.log(error)
                   logError('Mandrill',error,'Trying to send confirmation to',r.name)
                 }
               )
@@ -307,8 +317,8 @@ server.post('/subscribeEmail', function(req,res){
       uri: 'https://us9.api.mailchimp.com/2.0/lists/batch-subscribe',
       method: 'POST',
       json: {
-        apikey: c.mailchimp,
-        id: '6f63740421',
+        apikey: c.mailchimp.key,
+        id: c.mailchimp.waitingList,
         batch: [{email:{email:req.body.email},merge_vars:{}}],
         double_optin: false,
         update_existing: true
@@ -325,7 +335,7 @@ server.post('/subscribeEmail', function(req,res){
       }  
     }
   )
-}
+})
   
   
 // !Waiting list processing

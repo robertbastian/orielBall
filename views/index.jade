@@ -207,25 +207,26 @@ html
                       .panel-collapse.collapse(id="collapse"+i)
                         .panel-body.text-left !{faqs[i][1]}               
               br
-              if bookingDates
-                .row
-                  .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3
-                    if waitingList 
-                      a#ticketBtn.btn.btn-lg.btn-gold.btn-block(href='/tickets',style='margin-bottom:-20px') Ticket system
-                    else
-                      a#ticketBtn.btn.btn-lg.btn-gold.btn-block.disabled(href='/tickets',style='margin-bottom:-20px' disabled) Waiting list closed
-                h3 
-                  if bookingDates.oriel
+              .row
+                .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3
+                  if bookingInfo == 'closed'
+                    a#ticketBtn.btn.btn-lg.btn-gold.btn-block.disabled(href='/tickets',style='margin-bottom:-20px' disabled) Waiting list closed
+                  else if bookingInfo == 'notPublic'
+                    a#ticketBtn.btn.btn-lg.btn-gold.btn-block.disabled(href='/tickets',style='margin-bottom:-20px' disabled) Ticket system
+                  else
+                    a#ticketBtn.btn.btn-lg.btn-gold.btn-block(href='/tickets',style='margin-bottom:-20px') Ticket system
+              h3 
+                if bookingInfo == 'notPublic'
+                  h5: small Dates will be published shortly
+                else if bookingInfo != 'closed'
+                  if bookingInfo.oriel
                     small Oriel tickets go on sale on !{bookingDates.oriel} <br>
-                  else if bookingDates.normal
+                  else if bookingInfo.normal
                     small Tickets for Oriel members are now available <br>
-                  if bookingDates.normal 
+                  if bookingInfo.normal 
                     small Public tickets go on sale on !{bookingDates.normal}
-                  else if waitingList
+                  else
                     small Tickets are now on sale!
-              else
-                a#ticketBtn.btn.btn-lg.btn-gold.disabled(href='#') Booking system
-                h5: small Dates will be published shortly
 
       #news.row.gradientBackground
         .col-xs-10.col-xs-offset-1
@@ -253,14 +254,10 @@ html
                         i.fa.fa-square.fa-stack-2x
                         i.fa.fa-envelope.fa-stack-1x.fa-inverse
                   td
-                    a#pushBtn.disabled(href="#")
+                    a#committeeBtn(href='#committeeModal',data-toggle="modal")
                       span.fa-stack.fa-4x
                         i.fa.fa-square.fa-stack-2x
-                        i.fa.fa-certificate.fa-stack-1x.fa-inverse
-                tr
-                  td(colspan='2')
-                    br
-                    a#committeLink(href='#committeeModal',data-toggle="modal") Email the committee
+                        i.fa.fa-info.fa-stack-1x.fa-inverse
 
             .col-md-4.col-sm-6.hidden-xs.
               <a class="twitter-timeline" href="https://twitter.com/orielball" data-widget-id="505300711664394240">Tweets by @orielball</a>

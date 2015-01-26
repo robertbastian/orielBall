@@ -16,7 +16,8 @@ html
       var PRICES = !{JSON.stringify(prices)}
       var STRIPE = !{JSON.stringify(stripe)}
       var ORIEL_ONLY = !{JSON.stringify(orielOnly)}
-      var MAX_TICKET_NUMBER = ORIEL_ONLY ? 2 : !{singleTickets?1:10}
+      var WAITINGLIST = !{JSON.stringify(waitingList)}
+      var MAX_TICKET_NUMBER = !{orielOnly ? 2 : (waitingList ? 1 : 10)}
       var COLLEGES = !{JSON.stringify(colleges)}
       
     script(type='text/javascript', src='/javascripts/form.js')
@@ -34,12 +35,13 @@ html
                 i.fa.fa-angle-left &nbsp; 
                 | Back
           ul.nav.navbar-nav.navbar-right.hidden-xs 
-            //li
-              //a Tickets left:
-              //  i.fa.fa-glass(style='margin-left:10px') &nbsp;
-              //  span#nonDiningLeft ?
-              //  i.fa.fa-cutlery(style='margin-left:10px') &nbsp;
-              //  span#diningLeft ?
+            if !waitingList
+              li
+                a Tickets left:
+                  i.fa.fa-glass(style='margin-left:10px') &nbsp;
+                  span#nonDiningLeft ?
+                  i.fa.fa-cutlery(style='margin-left:10px') &nbsp;
+                  span#diningLeft ?
     a(href='/')
       img#logo(src='/icons/logoSmall.png',alt='Logo',style="position:fixed;top:0px;left:50%;margin-left:-40px;width:80px;height:80px;z-index:1031")
     
@@ -47,7 +49,7 @@ html
     .container-fluid
       .row(style='padding-top:7%;padding-bottom:30px')
         .col-xs-12.col-sm-6.col-sm-offset-3.col-lg-4.col-lg-offset-4
-          form.form#payment-form(role='form',method='POST',autocomplete='on',action='/tickets')
+          form.form#payment-form(role='form',method='POST',autocomplete='on',action=waitingList ? '/waitingListTickets' : '/tickets')
             #name.form-group
               h5 Your info
               .input-group
@@ -72,7 +74,7 @@ html
                 span.input-group-btn
                   a.btn.btn-default#bodcardHelp
                     i.fa.fa-question 
-            if !singleTickets
+            if !waitingList
               #guests
                 h5 Your guests
                 #guestList

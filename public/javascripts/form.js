@@ -122,7 +122,10 @@ $(document).ready(function(){
   })
   
   $('#nonDiningToggle').click()
-  updateTickets()
+  if (!WAITINGLIST)
+    updateTickets()
+  else
+    adjustButtons()
 })
 
 // Checks whether a guest can be added
@@ -199,7 +202,7 @@ var updateTickets = function(){
     $('#diningLeft').html(remaining['Dining'])
 
     // And load again in 10s
-    //setTimeout(updateTickets,10000)
+    setTimeout(updateTickets,10000)
   })
   .fail(function(err){
     // On fail, retry in 30s
