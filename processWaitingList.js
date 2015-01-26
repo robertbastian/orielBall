@@ -78,31 +78,10 @@ if (process.argv[2] == 'emailEligible'){
   }
 }
 
-// create passwords
-else if (process.argv[2] == 'createPasswords'){
-  db.query("SELECT email FROM waitingList WHERE password IS NULL",[],
-  function(error,rows,fields){
-    if (error)
-      console.log(error)
-    else {
-      console.log(rows)
-      for (var i = 0; i < rows.length; i++){
-        db.query('UPDATE waitingList SET password = ? WHERE email = ?',
-        [crypto.randomBytes(5).toString('hex'), rows[i].email],
-        function(error2,rows2,fields2){
-          if (!error2){
-            console.log("Created password")
-          }
-        })
-      }
-    }
-  })
-}
-
-// send passwords
-else if (process.argv[2] == 'emailInterested'){
+// send passwords to 'Interested' people
+else if (process.argv[2] == 'sendPasswords'){
   db.query(
-    "SELECT name,email,password FROM waitingList WHERE state = 'Interested' ",
+    "SELECT name,email,password FROM waitingList WHERE state = 'Interested'",
     [],
     function(error,rows,fields){
       if (error)
@@ -129,7 +108,7 @@ else if (process.argv[2] == 'emailInterested'){
             var emails = []
             for (var i = 0; i < result.length; i++)
               emails.push(result[i].email)
-            db.query("UPDATE waitingList SET state = 'Emailed' WHERE email IN ?",
+            db.query("UPDATE waitingList SET state = 'Emailed' WHERE email IN (?)",
             [emails],
             function(error,rows,fields){
               if (error)
