@@ -114,7 +114,7 @@ else if (process.argv[2] == 'sendPasswords'){
               if (error)
                 console.log(error)
               else
-                console.log("Noted deliveries in database")
+                console.log("Noted deliveries to %s in database",emails)
             })
           }, 
           function(error){
