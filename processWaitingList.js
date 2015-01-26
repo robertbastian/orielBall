@@ -62,7 +62,7 @@ if (process.argv[2] == 'emailEligible'){
         var emails = []
         for (var i = 0; i < result.length; i++)
           emails.push(result[i].email)
-        db.query("UPDATE waitingList SET state = 'Eligible' WHERE email IN ?",
+        db.query("UPDATE waitingList SET state = 'Eligible' WHERE email IN (?)",
         [emails],
         function(error,rows,fields){
           if (error)
