@@ -130,8 +130,8 @@ server.post('/tickets',function(req,res){
     res.render('tickets/error',{type:'input'})
   else {
     db.query(
-      // If user doesn't have a ticket
-      "SELECT COUNT(*) as count FROM bookings WHERE email = ?",
+      // If user hasn't bought a ticket before
+      "SELECT COUNT(*) as count FROM payment WHERE email = ?",
       [r.email],
       function(error,rows,fields){
         if (error){
@@ -186,7 +186,7 @@ server.post('/waitingListTickets',function(req,res){
   else {
     db.query(
       //        Is on the waiting list and in correct state                                  && hasn't bought tickets before
-      "SELECT ((SELECT COUNT(*) > 0 FROM waitingList WHERE email = ? AND state = 'Emailed') && (SELECT COUNT(*) = 0 FROM bookings WHERE email = ?)) AS allowed",
+      "SELECT ((SELECT COUNT(*) > 0 FROM waitingList WHERE email = ? AND state = 'Emailed') && (SELECT COUNT(*) = 0 FROM payments WHERE email = ?)) AS allowed",
       [r.email,r.email],
       function(error,rows,fields){
         if (error){
@@ -226,10 +226,11 @@ var processPayment = function(res, r){
           emails.push(r.guestEmails[i])
         }
         db.query(
-          "INSERT INTO payments (payer,bodcard,type,reference,amount) VALUES (?,?,'Stripe',?,?);\
-           INSERT INTO bookings (name,email,college,type,payment) VALUES ?;\
+          "INSERT INTO payments (email,barcode,type,reference,amount,nonDining,dining,orielDiscount) VALUES (?,?,'Stripe',?,?,?,?,?);\
+           INSERT INTO guestList (name,email,college,type,payment) VALUES ?;\
            DELETE FROM waitingList WHERE email = ?;",
-          [r.email,r.bodcard,charge.id,charge.amount / 100, guests, r.email],
+          [r.email,r.bodcard,charge.id,charge.amount / 100, (r.type == 'Non-dining') ? (1+r.guests) : 0,
+           (r.type == 'Dining') ? (1+r.guests) : 0, (r.college == 'Oriel') ? 1 : 0, guests, r.email],
           function(error,rows,fields){
             // Big error: customer was charged but not entered into DB
             if (error) {
@@ -296,7 +297,7 @@ server.post('/ticketsLeft',function(req,res){
 
 var ticketsLeft = function(callback){
   db.query(
-    'SELECT (SELECT COUNT(*) FROM bookings) AS total, (SELECT COUNT(*) FROM bookings WHERE type = "Dining") AS dining',
+    "SELECT (SELECT COUNT(*) FROM guestList) + (SELECT SUM(amount) FROM blocks) as total, (SELECT COUNT(*) FROM guestList WHERE type = 'Dining') + (SELECT SUM(amount) FROM blocks WHERE type = 'Dining') as dining",
     function(error,rows,fields){
       if (error) {
         logError('Database',error,'Trying to count','tickets')
@@ -371,6 +372,75 @@ server.get('/robots.txt',function(req,res){
 server.get('/sitemap.txt',function(req,res){
   res.type('text/plain')
   res.send('https://orielball.uk\nhttps://orielball.uk/tickets')
+})
+
+server.get('/ticketCollection',pwProtect('committee',c.collectionPassword),function(req,res){
+  res.render('ticketCollection')
+})
+
+server.post('/barcodeForEmail',pwProtect('committee',c.collectionPassword),function(req,res){
+  if (req.body.email == null){
+    res.sendStatus(400).end()
+  }
+  else {
+    db.query(
+      "SELECT barcode FROM payments WHERE email LIKE ?",
+      [req.body.email+'%'],
+      function(error,rows,fields){
+        if (error)
+          res.sendStatus(500).end()
+        else if (rows.length == 0)
+          res.sendStatus(404).end()
+        else
+          res.send(rows[0].barcode)
+      })
+  }
+})
+
+server.post('/checkOutTickets',function(req,res){
+  db.query(
+    "UPDATE guestList SET collected = CURRENT_TIMESTAMP WHERE id IN (?)",
+    [req.body.ids],
+    function(error,rows,fields){
+      res.sendStatus(error ? 500 : 200).end()
+    })
+})
+
+server.post('/ticketsForBarcode',pwProtect('committee',c.collectionPassword),function(req,res){
+  db.query(
+    'SELECT * FROM payments WHERE barcode = ?',
+    [req.body.barcode],
+    function(error,rows,fields){
+      if (error)
+        res.status(500).end()
+      else if (rows.length == 0)
+        res.status(404).end()
+      else {
+        var payment = rows[0]
+        db.query(
+          'SELECT * FROM guestList WHERE payment = ?',
+          [payment.email],
+          function(error,rows,fields){
+            if (error)
+              res.sendStatus(500).end()
+            else {
+              for (var i = 0; i < rows.length; i++)
+                if (rows[i].collected != null)
+                  rows[i].collected = moment(rows[i].collected).calendar()
+              res.send({
+                payment: {
+                  amount: payment.amount,
+                  type: payment.type,
+                  time: moment(payment.time).format('DD.MM.YYYY, HH:mm')
+                },
+                guests: rows
+              })
+            }
+          }
+        )
+      }
+    }
+  )
 })
 
 // !404 errors

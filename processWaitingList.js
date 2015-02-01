@@ -9,13 +9,13 @@ var crypto = require('crypto')
 if (process.argv[2] == 'emailEligible'){
   
   db.query(
-    "SELECT (SELECT COUNT(*) FROM bookings) + (SELECT COUNT(*) FROM waitingList WHERE state = 'Eligible') as possiblySold",
+    "SELECT (SELECT COUNT(*) FROM guestList) + (SELECT SUM(amount) FROM blocks) + (SELECT COUNT(*) FROM waitingList WHERE NOT state = 'Waiting') as possiblySold",
     [],
     function(error,rows,fields){
       if (error)
         console.log(error)
       else {
-        var ticketsLeft = c.tickets.amount.total - rows[0]['possiblySold']
+        var ticketsLeft = c.tickets.amount.total - rows[0].possiblySold
         var limit = (process.argv.length < 4) ? ticketsLeft : Math.min(ticketsLeft,process.argv[3])
         findEligible(limit, emailRows)
       }

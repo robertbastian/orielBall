@@ -1,0 +1,150 @@
+doctype html
+html
+  head
+    title Oriel College Commemoration Ball 2015 - Ticket collection system
+    include imports
+    script.
+      var symbols = {
+        'Non-dining': "<i class='fa fa-glass'></i>",
+        Dining: "<i class='fa fa-cutlery'></i>"
+      }
+      var barcode = null
+
+      $(function(){
+        // Controlling input field
+        $('#barcode').keyup(function() {
+          // Remove non-numeric
+          this.value = this.value.replace(/[^0-9]/g, '')
+          // If size is seven, store and query
+          if (this.value.length == 7 && barcode == null){
+            barcode = this.value
+            query()
+          }
+        })
+        $('#barcode').focus()
+
+        $('#lookupEmail').click(function(){
+          $.post('barcodeForEmail',{email: $('#email').val()})
+          .done(function(data){
+            barcode = data
+            query()
+          })
+        })
+
+        // Form shouldn't submit
+        $('form').submit(function(e){
+          e.preventDefault()
+        })
+
+        // Checking out tickets
+        $('#checkout').click(function(){
+          var checkoutIds = []
+          var checkboxes = $('input[type="checkbox"]:checked')
+          for (var i = 0; i < checkboxes.length; i++)
+            checkoutIds.push(checkboxes[i].value)
+          $.post('/checkOutTickets',{ids:checkoutIds})
+          .done(function(data){
+            query()
+            $('#cancel').html('Finish')
+            this.remove()
+          })
+          .fail(function(error){
+            query()
+          })
+        })
+      })
+
+      var query = function(){
+        $.post('/ticketsForBarcode',{barcode:barcode})
+        .done(function(data){
+
+          $('#query').remove()
+
+          $('#response').removeClass('hidden')
+          $('#date').html(data.payment.time)
+          $('#amount').html("£"+data.payment.amount)
+          $('#type').html(data.payment.type)
+
+          $('table tr').slice(1).remove()
+          for (var i = 0; i < data.guests.length; i++){
+            var line = $('<tr></tr>').append(
+              '<td>'+(i+1)+'</td>',
+              '<td>'+data.guests[i].name+'<br><small>'+data.guests[i].email+'</small></td>',
+              '<td class="text-center">'+symbols[data.guests[i].type]+'</td>',
+              '<td class="text-center"></td>'
+            )
+            if (data.guests[i].collected == null)
+              $(line.children()[3]).html('Available: <input type="checkbox" checked="checked" value="'+data.guests[i].id+'">')
+            else
+              $(line.children()[3]).html('Collected<br><small>'+data.guests[i].collected+'</small>')
+            $('table').append(line)
+          }
+
+          // Everything collected
+          if ($('input[type="checkbox"]').length == 0){
+            $('#checkout').addClass('hidden')
+            $('#cancel').html('Finish')
+          }
+          else {
+            $('input[type="checkbox"]').change(function(){
+              $('#checkout').removeClass('disabled')
+              var sel = $('input[type="checkbox"]:checked').length
+              if (sel == 0)
+                $('#checkout').addClass('disabled')
+              $('#checkout').html("Check out "+sel+" wristband" + (sel != 1 ? "s" : ""))
+            })
+            $('input[type="checkbox"]').trigger('change')
+          }
+        })
+        .fail(function(error){
+          barcode = null;
+          $('#barcode').val('')
+        })
+      }
+
+
+  body
+    include header
+    .container-fluid
+      .row
+        .col-xs-12.col-sm-8.col-sm-offset-2.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4.text-center(style='margin-top:100px')
+          span.fa-stack.fa-5x.fa-lg
+              i.fa.fa-ticket.fa-stack-2x
+      .row
+        .col-xs-12.col-sm-12.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3.text-center
+          #query
+            .row
+              .col-sm-8.col-sm-offset-2
+                form.form
+                  br
+                  input.input-lg.text-center#barcode.form-control(placeholder='Scan barcode')
+                  br
+                  br
+                  .input-group
+                    input#email.text-center.form-control(placeholder='or enter full email address')
+                    span.input-group-btn
+                      a.btn.btn-default#lookupEmail Lookup
+          #response.hidden
+            .row
+              .col-sm-8.col-sm-offset-2
+                dl.dl-horizontal
+                  br
+                  dt Date of purchase
+                  dd#date
+                  dt Amount paid
+                  dd#amount
+                  dt Paid by 
+                  dd#type
+            br
+            table.table.table-striped.text-left
+              tr
+                th(width='10%') #
+                th(width='40%') Name
+                th.text-center(width='10%') Type
+                th.text-center(width='40%') Status
+            .row
+              .col-sm-8.col-sm-offset-2
+                form.form
+                  submit.btn.btn-lg.btn-primary.btn-block#checkout
+                  br
+                  a.btn.btn-default.btn-block#cancel(href='/ticketCollection') Cancel
