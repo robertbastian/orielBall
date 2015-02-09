@@ -392,8 +392,9 @@ server.post('/barcodeForEmail',pwProtect('committee',c.collectionPassword),funct
         else if (rows.length == 0)
           res.sendStatus(404).end()
         else
-          res.send(rows[0].barcode)
-      })
+          res.send(""+rows[0].barcode)
+      }
+    )
   }
 })
 
