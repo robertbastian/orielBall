@@ -30,7 +30,8 @@ if (process.argv[2] == 'emailEligible'){
         if (error)
           console.log(error)
         else {
-          console.log("Eligible:")
+          console.log("Eligible:\n"+rows)
+          
           next(rows)
         }   
       }
@@ -69,6 +70,7 @@ if (process.argv[2] == 'emailEligible'){
             console.log(error)
           else
             console.log("Noted deliveries in database")
+          process.exit()
         })
       }, 
       function(error){
@@ -77,6 +79,55 @@ if (process.argv[2] == 'emailEligible'){
     )
   }
 }
+
+
+
+// Determine eligible people and email them
+if (process.argv[2] == 'remindEligible'){
+  
+  db.query(
+    "SELECT name, email FROM waitingList WHERE state = 'Eligible'",
+    [],
+    function(error,rows,fields){
+      if (error)
+        console.log(error)
+      else {
+        console.log("Eligible:%j\n",rows)
+        
+        emailRows(rows)
+      }   
+    }
+  ) 
+
+  var emailRows = function(rows){
+    var to = []
+    var mergeVars = []
+    for (var i = 0; i < rows.length; i++){
+      to.push({"name":rows[i].name, "email": rows[i].email})
+      mergeVars.push({"rcpt":rows[i].email, "vars":[{name:"fname", content: rows[i].name.split(' ')[0]}]})
+    }
+    mandrill.messages.send(
+      {'message': 
+        {
+          'text': 'Dear *|fname|*,\n\nPlease reply to this email by 9pm tonight if you want to buy a ticket, otherwise your place on the waiting list will be forfeited.\n\nRobert',
+          'subject': 'Re: Oriel Ball: Waiting list update',
+          'from_email': 'it@orielball.uk',
+          'from_name': 'Robert Bastian',
+          'to': to,
+          'merge_vars': mergeVars
+        }
+      },
+      function(result){
+        console.log("Done")
+        process.exit()
+      }, 
+      function(error){
+        console.log(error)
+      }
+    )
+  }
+}
+
 
 // send passwords to 'Interested' people
 else if (process.argv[2] == 'sendPasswords'){
@@ -96,7 +147,7 @@ else if (process.argv[2] == 'sendPasswords'){
         mandrill.messages.send(
           {'message': 
             {
-              'text': 'Dear *|fname|*,\n\nTo buy your ticket, please go to https://orielball.uk/waitingListTickets. \n\nYou will need to log in using the following credentials:\nUsername: *|email|*\nPassword: *|password|*\n\nThe rest of the booking process is as before, you will need a credit card and your bodcard. You have until Sunday (Feb 1) to buy your ticket, after that it will be passed down the waiting list.\n\nBest wishes,\nRobert',
+              'text': 'Dear *|fname|*,\n\nTo buy your ticket, please go to https://orielball.uk/waitingListTickets. \n\nYou will need to log in using the following credentials:\nUsername: *|email|*\nPassword: *|password|*\n\nThe rest of the booking process is as before, you will need a credit card and your bodcard. You have until Saturday (Feb 7) at 5pm to buy your ticket, after that it will be passed down the waiting list.\n\nBest wishes,\nRobert',
               'subject': 'Oriel Ball: Buy your ticket',
               'from_email': 'it@orielball.uk',
               'from_name': 'Robert Bastian',
@@ -115,6 +166,7 @@ else if (process.argv[2] == 'sendPasswords'){
                 console.log(error)
               else
                 console.log("Noted deliveries to %s in database",emails)
+              process.exit()
             })
           }, 
           function(error){

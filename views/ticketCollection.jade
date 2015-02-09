@@ -62,8 +62,8 @@ html
 
           $('#response').removeClass('hidden')
           $('#date').html(data.payment.time)
-          $('#amount').html("£"+data.payment.amount)
-          $('#type').html(data.payment.type)
+          $('#amount').html("£"+data.payment.amount + " ("+data.payment.type+")")
+          $('#reference').html(data.payment.reference)
 
           $('table tr').slice(1).remove()
           for (var i = 0; i < data.guests.length; i++){
@@ -131,10 +131,10 @@ html
                   br
                   dt Date of purchase
                   dd#date
-                  dt Amount paid
+                  dt Paid
                   dd#amount
-                  dt Paid by 
-                  dd#type
+                  dt Reference 
+                  dd#reference
             br
             table.table.table-striped.text-left
               tr

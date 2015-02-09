@@ -431,7 +431,8 @@ server.post('/ticketsForBarcode',pwProtect('committee',c.collectionPassword),fun
                 payment: {
                   amount: payment.amount,
                   type: payment.type,
-                  time: moment(payment.time).format('DD.MM.YYYY, HH:mm')
+                  time: moment(payment.time).format('DD.MM.YYYY, HH:mm'),
+                  reference: payment.reference
                 },
                 guests: rows
               })
@@ -441,6 +442,19 @@ server.post('/ticketsForBarcode',pwProtect('committee',c.collectionPassword),fun
       }
     }
   )
+})
+
+server.get('/check',function(req,res){
+  require('child_process').exec('node verify.js', function(err, stdout, stderr) {
+    if (err) {
+      res.writeHead(500, {"Content-Type": "text/plain"});
+      res.end(stderr);
+    }
+    else {
+      res.writeHead(200,{"Content-Type": "text/plain"});
+      res.end(stdout);
+    }
+  })
 })
 
 // !404 errors
