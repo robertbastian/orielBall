@@ -448,11 +448,11 @@ server.post('/ticketsForBarcode',pwProtect('committee',c.collectionPassword),fun
 server.get('/check',function(req,res){
   require('child_process').exec('node verify.js', function(err, stdout, stderr) {
     if (err) {
-      res.writeHead(500, {"Content-Type": "text/plain"});
+      res.writeHead(500, {"Content-Type": "text/plain; charset=utf-8"});
       res.end(stderr);
     }
     else {
-      res.writeHead(200,{"Content-Type": "text/plain"});
+      res.writeHead(200,{"Content-Type": "text/plain; charset=utf-8"});
       res.end(stdout);
     }
   })
