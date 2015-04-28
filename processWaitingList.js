@@ -9,8 +9,12 @@ var crypto = require('crypto')
 if (process.argv[2] == 'emailEligible'){
   
   db.query(
-    "SELECT (SELECT COUNT(*) FROM guestList) + (SELECT SUM(amount) FROM blocks) + (SELECT COUNT(*) FROM waitingList WHERE NOT state = 'Waiting') as possiblySold",
-    [],
+    "SELECT \
+        (SELECT SUM(nonDining) FROM payments) + (SELECT SUM(nonDining) FROM blocks) as nonDining, \
+        (SELECT SUM(dining) FROM payments) + (SELECT SUM(dining) FROM blocks) as dining, \
+        (SELECT SUM(vip) FROM payments) + (SELECT SUM(vip) FROM blocks) as vip, \
+        (SELECT COUNT(*) FROM waitingList WHERE NOT state = 'Waiting') as eligible, \
+        (SELECT nonDining + dining + vip + eligible) as possiblySold",[],
     function(error,rows,fields){
       if (error)
         console.log(error)
@@ -25,12 +29,12 @@ if (process.argv[2] == 'emailEligible'){
   var findEligible = function(limit, next){
     db.query(
       "SELECT name, email FROM waitingList WHERE state = 'Waiting' ORDER BY time ASC LIMIT ?",
-      [x],
+      [limit],
       function(error,rows,fields){
         if (error)
           console.log(error)
         else {
-          console.log("Eligible:\n"+rows)
+          console.log("Eligible:\n"+JSON.stringify(rows))
           
           next(rows)
         }   
@@ -48,10 +52,10 @@ if (process.argv[2] == 'emailEligible'){
     mandrill.messages.send(
       {'message': 
         {
-          'text': 'Dear *|fname|*,\n\nWe\'re happy to tell you that due to your position on the waiting list we can offer you a ticket to the Oriel Ball this summer!\nIf you\'d like to purchase a ticket, please reply to this email and we will send you more details in a couple of days. \n\nBest wishes,\nCharlie',
+          'text': 'Dear *|fname|*,\n\nWe\'re happy to tell you that due to your position on the waiting list we can offer you a ticket to the Oriel Ball this summer!\nIf you\'d like to purchase a ticket, please reply to this email before Wednesday evening and we will send you details about how to buy your ticket. \n\nBest wishes,\nCharlie Cornish\nOriel Ball Tickets',
           'subject': 'Oriel Ball: Waiting list update',
           'from_email': 'tickets@orielball.uk',
-          'from_name': 'Charlie Cornish',
+          'from_name': 'Oriel College Ball',
           "headers": {
               "Reply-To": "Robert Bastian <it@orielball.uk>"
           },
