@@ -52,7 +52,7 @@ if (process.argv[2] == 'emailEligible'){
     mandrill.messages.send(
       {'message': 
         {
-          'text': 'Dear *|fname|*,\n\nWe\'re happy to tell you that due to your position on the waiting list we can offer you a ticket to the Oriel Ball this summer!\nIf you\'d like to purchase a ticket, please reply to this email before Wednesday evening and we will send you details about how to buy your ticket. \n\nBest wishes,\nCharlie Cornish\nOriel Ball Tickets',
+          'text': 'Dear *|fname|*,\n\nWe\'re happy to tell you that due to your position on the waiting list we can offer you a ticket to the Oriel Ball this summer!\nIf you\'d like to purchase a ticket, please reply to this email by Sunday evening and we will send you details about how to buy your ticket. \n\nBest wishes,\nCharlie Cornish\nOriel Ball Tickets',
           'subject': 'Oriel Ball: Waiting list update',
           'from_email': 'tickets@orielball.uk',
           'from_name': 'Oriel College Ball',
@@ -151,7 +151,7 @@ else if (process.argv[2] == 'sendPasswords'){
         mandrill.messages.send(
           {'message': 
             {
-              'text': 'Dear *|fname|*,\n\nTo buy your ticket, please go to https://orielball.uk/waitingListTickets. \n\nYou will need to log in using the following credentials:\nUsername: *|email|*\nPassword: *|password|*\n\nThe rest of the booking process is as before, you will need a credit card and your bodcard. You have until Saturday (Feb 7) at 5pm to buy your ticket, after that it will be passed down the waiting list.\n\nBest wishes,\nRobert',
+              'text': 'Dear *|fname|*,\n\nTo buy your ticket, please go to https://orielball.uk/waitingListTickets. \n\nYou will need to log in using the following credentials:\nUsername: *|email|*\nPassword: *|password|*\n\nThe rest of the booking process is as before, you will need a credit card and your bodcard. You have until Monday at 5pm to buy your ticket, after that it will be passed down the waiting list.\n\nBest wishes,\nRobert\nOriel Ball IT',
               'subject': 'Oriel Ball: Buy your ticket',
               'from_email': 'it@orielball.uk',
               'from_name': 'Robert Bastian',
