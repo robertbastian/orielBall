@@ -83,7 +83,7 @@ var outstandingTransfers = function(){
   count++
   db.query(
     "SELECT * FROM ( \
-      SELECT email, cast(155*nonDining + 185*dining + 250*vip - 10*orielDiscount AS SIGNED) - cast(amount AS signed) as outstanding \
+      SELECT email, cast(155*nonDining + 185*dining + 250*vip - discount AS SIGNED) - cast(amount AS signed) as outstanding \
       FROM payments \
       ) a \
      WHERE NOT outstanding = 0",
@@ -127,19 +127,19 @@ var incorrectAmounts = function(){
   )
 }
 
-// Verifies only Oriel students received discount 
+// Verifies only Oriel students received discount
 var discounts = function(){
   count++
   db.query(
     "SELECT * \
      FROM payments \
-     WHERE NOT email LIKE '%@oriel.ox.ac.uk' = orielDiscount",
+     WHERE NOT (email LIKE '%@oriel.ox.ac.uk') * 10 = orielDiscount",
     [],function(err,rows,fields){
       if (!err){
         if (rows.length > 0)
           for (var i in rows)
             console.log("Incorrect discount: %s",rows[i].email)
-        else 
+        else
           console.log("All discounts applied correctly")
         console.log("\n")
       }
