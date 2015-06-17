@@ -30,7 +30,7 @@ server.use(compression())
 if (c.host == 'orielball.uk'){
   // Production
   var minify = require('express-minify')
-  server.use(minify({cache: __dirname + '/public/cache'}))  
+  server.use(minify({cache: __dirname + '/public/cache'}))
 }
 server.use(express.static(__dirname + '/public'))
 
@@ -44,14 +44,14 @@ var logError = function(type,error,action,info){
   console.error('+++ '+type+' error: %s',error)
   if (action && info)
     console.error('+++ %s : %j',action,info)
-  console.error('**********')  
+  console.error('**********')
 }
 
 // !Redirecting everything to a secure connection using specified hostname
 server.all('*',function(req,res,next){
-  if (req.headers.host == c.host && req.secure) 
+  if (req.headers.host == c.host && req.secure)
     next()
-  else 
+  else
     res.redirect('https://' + c.host + req.url)
 })
 
@@ -63,8 +63,8 @@ server.get('/', function(req, res){
   else if (!c.tickets.datesPublic)
     bookingInfo = 'notPublic'
   else
-    bookingInfo = { 
-      normal: (Date.now() < c.tickets.dates.normal) ? moment(c.tickets.dates.normal).format('dddd, DD MMMM [at] h:mm a') : false, 
+    bookingInfo = {
+      normal: (Date.now() < c.tickets.dates.normal) ? moment(c.tickets.dates.normal).format('dddd, DD MMMM [at] h:mm a') : false,
       oriel: (Date.now() < c.tickets.dates.oriel) ? moment(c.tickets.dates.oriel).format('dddd, DD MMMM [at] h:mm a') : false
     }
 
@@ -78,16 +78,16 @@ server.get('/', function(req, res){
 
 // !Ticket booking form
 server.get('/tickets',function(req,res,next){
-  
+
   // 404 if no date set
   if (!c.tickets.datesPublic)
     next()
-  
+
   // We have a date
   else {
     var date = (inOriel(req)) ? c.tickets.dates.oriel : c.tickets.dates.normal
     var orielOnly = Date.now() < c.tickets.dates.normal && Date.now() > c.tickets.dates.oriel
-  
+
     // Tickets not yet released
     if (Date.now() < date)
       res.render('tickets/countdown',{date:date,orielOnly:orielOnly})
@@ -105,7 +105,7 @@ server.get('/tickets',function(req,res,next){
           res.render('tickets/soldOut',{waitingList: true})
         // Tickets available
         else
-          res.render('tickets/form',{ 
+          res.render('tickets/form',{
             prices: c.tickets.prices,
             stripe: c.stripe.public,
             orielOnly: orielOnly,
@@ -119,7 +119,7 @@ server.get('/tickets',function(req,res,next){
 
 // !Ticket request
 server.post('/tickets',function(req,res){
- 
+
   // req.body is going to be used a lot
   var r = req.body
   r.guests = parseInt(r.guests)
@@ -167,7 +167,7 @@ server.get('/waitingListTickets',
     )
   }),
   function(req,res){
-    res.render('tickets/form',{ 
+    res.render('tickets/form',{
       prices: c.tickets.prices,
       stripe: c.stripe.public,
       orielOnly: false,
@@ -179,7 +179,7 @@ server.get('/waitingListTickets',
 
 // !Waiting list ticket request
 server.post('/waitingListTickets',function(req,res){
-  var r = req.body 
+  var r = req.body
   r.guests = parseInt(r.guests)
   if (!/.+ .+/.test(r.name) || !/^.+@(.+)\.ox\.ac\.uk$/.test(r.email) || !/^[0-9]{7}$/.test(r.bodcard))
     res.render('tickets/error',{type:'input'})
@@ -263,7 +263,7 @@ var processPayment = function(res, r){
                 },
                 function(result){
                   console.log('Sent confirmation to %s',r.email)
-                }, 
+                },
                 function(error) {
                   console.log(error)
                   logError('Mandrill',error,'Trying to send confirmation to',r.name)
@@ -288,9 +288,9 @@ var processPayment = function(res, r){
 server.post('/ticketsLeft',function(req,res){
   ticketsLeft(function(error,nonDining,dining){
     // If waiting list is closed
-    if (error || c.tickets.bookingClosed) 
+    if (error || c.tickets.bookingClosed)
       res.status(500).end()
-    else 
+    else
       res.json([nonDining,dining])
   })
 })
@@ -324,7 +324,7 @@ server.post('/subscribeEmail', function(req,res){
         double_optin: false,
         update_existing: true
       }
-    }, 
+    },
     function(error,response,body){
       if (!error && response.statusCode == 200) {
         console.log('Added %s to mailing list',req.body.email)
@@ -332,13 +332,13 @@ server.post('/subscribeEmail', function(req,res){
       }
       else {
         logError('Mailchimp',error || body.error,'Trying to add to mailing list',req.body.email)
-        res.status(500).end() 
-      }  
+        res.status(500).end()
+      }
     }
   )
 })
-  
-  
+
+
 // !Waiting list processing
 server.post('/subscribeWaitingList',function(req,res){
   if (!c.tickets.waitingList)
@@ -346,7 +346,7 @@ server.post('/subscribeWaitingList',function(req,res){
   db.query(
     'INSERT IGNORE INTO waitingList (name, email, password) VALUES ?',
     [[req.body.name,req.body.email,crypto.randomBytes(5).toString('hex')]],
-    function(error,rows,fields){ 
+    function(error,rows,fields){
       if (error) {
         logError('Database',error,'Trying to add to waiting list',req.body.email)
         res.status(500).end()
@@ -361,10 +361,10 @@ server.post('/subscribeWaitingList',function(req,res){
 
 server.get('/robots.txt',function(req,res){
   res.type('text/plain')
-  if (c.host != 'orielball.uk') 
+  if (c.host != 'orielball.uk')
     // Dev
     res.send("User-agent: *\nDisallow: /")
-  else 
+  else
     // Production
     res.send('')
 })
@@ -443,6 +443,16 @@ server.post('/ticketsForBarcode',pwProtect('committee',c.collectionPassword),fun
       }
     }
   )
+})
+
+server.get('/collectionStatus',function(req,res){
+  db.query('SELECT COUNT(*) as count, UNIX_TIMESTAMP(collected)*1000 as date FROM guestList GROUP BY DATE(collected)',[],function(error,rows,fields){
+    var data = []
+    for (var i = 0; i < rows.length; i++){
+      data.push([rows[i].date ? moment(new Date(rows[i].date)).fromNow() : 'Not collected', rows[i].count])
+    }
+    res.render('collectionStatus', {data: data})
+  })
 })
 
 server.get('/check',function(req,res){
