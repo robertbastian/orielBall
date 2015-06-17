@@ -133,12 +133,12 @@ var discounts = function(){
   db.query(
     "SELECT * \
      FROM payments \
-     WHERE NOT (email LIKE '%@oriel.ox.ac.uk') * 10 = orielDiscount",
+     WHERE NOT (email LIKE '%@oriel.ox.ac.uk') * 10 = discount",
     [],function(err,rows,fields){
       if (!err){
         if (rows.length > 0)
           for (var i in rows)
-            console.log("Incorrect discount: %s",rows[i].email)
+            console.log("Incorrect discount: £%d\t%s",rows[i].discount,rows[i].email)
         else
           console.log("All discounts applied correctly")
         console.log("\n")

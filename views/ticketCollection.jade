@@ -62,7 +62,7 @@ html
 
           $('#response').removeClass('hidden')
           $('#date').html(data.payment.time)
-          $('#amount').html("£"+data.payment.amount + " ("+data.payment.type+")")
+          $('#amount').html(data.payment.type/*+" (£"+data.payment.amount + ")"*/)
           $('#reference').html(data.payment.reference)
 
           $('table tr').slice(1).remove()
@@ -131,7 +131,7 @@ html
                   br
                   dt Date of purchase
                   dd#date
-                  dt Paid
+                  dt Method 
                   dd#amount
                   dt Reference 
                   dd#reference
