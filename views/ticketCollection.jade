@@ -5,8 +5,9 @@ html
     include imports
     script.
       var symbols = {
-        'Non-dining': "<i class='fa fa-glass'></i>",
-        Dining: "<i class='fa fa-cutlery'></i>"
+        'Non-dining': "<i data-toggle='tooltip' title='Dining' class='fa fa-glass'></i>",
+        Dining: "<i data-toggle='tooltip' title='Non-dining' class='fa fa-cutlery'></i>",
+        VIP: "<i data-toggle='tooltip' title='VIP' class='fa fa-star'></i>"
       }
       var barcode = null
 
@@ -131,9 +132,9 @@ html
                   br
                   dt Date of purchase
                   dd#date
-                  dt Method 
+                  dt Method
                   dd#amount
-                  dt Reference 
+                  dt Reference
                   dd#reference
             br
             table.table.table-striped.text-left
