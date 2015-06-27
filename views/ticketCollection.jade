@@ -5,8 +5,9 @@ html
     include imports
     script.
       var symbols = {
-        'Non-dining': "<i class='fa fa-glass'></i>",
-        Dining: "<i class='fa fa-cutlery'></i>"
+         'Non-dining': "<i data-toggle='tooltip' title='Non-dining' class='fa fa-glass'></i>",
+         Dining: "<i data-toggle='tooltip' title='Dining' class='fa fa-cutlery'></i>",
+         VIP: "<i data-toggle='tooltip' title='VIP' class='fa fa-star'></i>"
       }
       var barcode = null
 
@@ -80,6 +81,8 @@ html
             $('table').append(line)
           }
 
+          $('[data-toggle="tooltip"]').tooltip()
+          
           // Everything collected
           if ($('input[type="checkbox"]').length == 0){
             $('#checkout').addClass('hidden')
